@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gagan | Social Links</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --bg-dark: #000000;
+            --card-bg: #0a0a0a;
+            --text-main: #ffffff;
+            --text-dim: #888888;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* DEVELOPER BUTTON */
+        .developer-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            z-index: 1000;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .developer-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+        }
+
+        .main-card {
+            width: min(350px, 90vw);
+            background: var(--card-bg);
+            border: 1px solid #1a1a1a;
+            border-radius: 40px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .profile-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            padding: 5px;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: var(--primary-color);
+            font-size: 0.85rem;
+            margin-bottom: 30px;
+        }
+
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .link-item {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 18px;
+            padding: 20px;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            transition: 0.3s;
+        }
+
+        .link-item:active { transform: scale(0.95); }
+        .insta { color: #E1306C; }
+        .fb { color: #1877F2; }
+
+    </style>
+</head>
+<body>
+
+    <a href="https://kishorbankapur2-glitch.github.io/social-id/" class="developer-btn">
+        <i class="fa-solid fa-code"></i> DEVELOPER
+    </a>
+
+    <div class="main-card">
+        <div class="profile-container">
+            <img src="gagan.png" class="avatar-img" alt="Gagan">
+        </div>
+        
+        <h2>GAGAN</h2>
+        <p class="subtitle">@gagansuresh18</p>
+
+        <div class="links-container">
+            <a href="https://www.instagram.com/gagansuresh18?igsh=em1zMzlrNm94dXZ4" class="link-item" target="_blank">
+                <i class="fa-brands fa-instagram insta"></i>
+                <span>INSTAGRAM</span>
+            </a>
+
+            <a href="https://www.facebook.com/share/14ZXf3onT8S/" class="link-item" target="_blank">
+                <i class="fa-brands fa-facebook fb"></i>
+                <span>FACEBOOK</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
 
