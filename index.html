@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://i.ytimg.com https://img.youtube.com; frame-src https://www.youtube.com;">
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
@@ -601,6 +603,17 @@
             <input type="text" class="input-field" id="nameInput" placeholder="Enter your name" maxlength="20" autocomplete="off">
             <button class="btn-primary" onclick="signIn()">Get Started</button>
             <a class="skip-link" onclick="skipSignIn()">Continue as Guest</a>
+            const adBlocker = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+            if (node.tagName === 'SCRIPT' && (node.src.includes('ads') || node.src.includes('analytics'))) {
+                node.remove();
+            }
+        });
+    });
+});
+adBlocker.observe(document.documentElement, { childList: true, subtree: true });
+
         </div>
     </div>
 
@@ -854,7 +867,10 @@
             if (show) overlay.classList.add('show');
             else overlay.classList.remove('show');
         }
-
+if (playerElement) {
+    playerElement.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+}
+        
         function initYouTubePlayer() {
             if (typeof YT !== 'undefined' && YT.Player) {
                 createPlayer();
