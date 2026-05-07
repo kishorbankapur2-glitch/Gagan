@@ -339,32 +339,58 @@
             100% { transform: scaleY(1.1); }
         }
 
-        /* Mini Player */
+        /* Mini Player Layout (PERMANENT FLEXBOX & OVERFLOW FIXES) */
         .mini-player {
             position: fixed; bottom: 84px; left: 20px; right: 20px; z-index: 40;
             background: var(--glass-bg-strong); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--glass-border-strong); border-radius: 18px; padding: 8px 14px;
-            display: flex; align-items: center; gap: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.8);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.8);
             transform: translateY(120px); opacity: 0; transition: all 0.5s var(--ease);
         }
         .mini-player.visible { transform: translateY(0); opacity: 1; }
-        .mini-player-img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+        .mini-player-img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
         
-        /* 🔥 FIXED: Min-width 0 prevents text from pushing controls outside */
-        .mini-player-info { flex: 1; min-width: 0; overflow: hidden; }
-        .mini-player-title { font-size: 0.82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-player-artist { font-size: 0.72rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player-info { 
+            flex: 1; 
+            min-width: 0; /* Required to allow inner flex content to truncate gracefully */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .mini-player-title { 
+            font-size: 0.82rem; 
+            font-weight: 700; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            width: 100%;
+        }
+        .mini-player-artist { 
+            font-size: 0.72rem; 
+            color: var(--text-subdued); 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            width: 100%;
+        }
         
-        /* 🔥 FIXED: Flex shrink 0 strictly locks controls size */
-        .mini-player-controls { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-        .mini-btn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; transition: all 0.2s; }
+        .mini-player-controls { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            flex-shrink: 0; /* Prevents controls from squeezing or wrapping */
+        }
+        .mini-btn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; transition: all 0.2s; flex-shrink: 0; }
         .mini-btn:hover { background: rgba(255,255,255,0.08); }
         
-        /* 🔥 NEW: Rounded Square Play/Pause for Mini Player */
-        .mini-btn-play { background: #fff; color: #000; border-radius: 12px !important; }
+        /* Rounded Square Play Button (Mini Player) */
+        .mini-btn-play { 
+            background: #fff; 
+            color: #000; 
+            border-radius: 10px !important; /* Premium rounded square shape */
+        }
         .mini-btn-play:hover { background: #e5e5ea; transform: scale(1.03); }
         .mini-btn svg { width: 16px; height: 16px; fill: currentColor; }
-        
         .mini-progress { position: absolute; bottom: 0; left: 14px; right: 14px; height: 2px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; }
         .mini-progress-fill { height: 100%; background: #ffffff; width: 0%; transition: width 0.15s linear; }
 
@@ -391,7 +417,7 @@
         }
 
         /* ==========================================================
-           FULLSCREEN PLAYER 
+           FULLSCREEN PLAYER — BIGGER, BORDERLESS ROUNDED-SQUARE ALBUM ART
            ========================================================== */
         .fullscreen-player {
             position: fixed; inset: 0; z-index: 1000; display: none; flex-direction: column; overflow: hidden;
@@ -430,6 +456,7 @@
             flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 20px; overflow: hidden;
         }
 
+        /* Perfect Borderless Rounded Square Album Wrap (NO SIDE BORDERS) */
         .fs-album-wrap {
             width: 82vw;
             height: 82vw;
@@ -438,23 +465,24 @@
             aspect-ratio: 1 / 1 !important;
             margin: 0 auto;
             position: relative;
-            border-radius: 28px !important;
+            border-radius: 28px !important; /* Elegant Rounded Square */
             overflow: hidden;
             background: none !important;
             border: none !important;
             outline: none !important;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); /* Subtle depth shadow */
             flex-shrink: 0;
         }
 
+        /* Full Scale Album Art with Object-Fit Cover to Prevent Side Bars */
         .fs-album-art { 
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover !important; 
+            object-fit: cover !important; /* Crops cleanly into a square, eliminating black side bars */
             display: block;
             border: none !important;
             outline: none !important;
-            transform: scale(1.04); 
+            transform: scale(1.04); /* Very minor zoom to completely hide any YT thumbnail outer artifacts */
             transition: transform 0.3s var(--ease);
         }
 
@@ -463,10 +491,12 @@
         .fs-title { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; }
         .fs-artist { font-size: 0.95rem; color: var(--text-subdued); margin-bottom: 2px; font-weight: 500; }
 
+        /* Desktop layout updates */
         @media (min-width: 769px) {
             .fs-content-wrap { max-width: 1000px !important; height: 100vh; padding: 40px 32px !important; }
             .fs-main { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 54px !important; flex: 1; }
             
+            /* Desktop specific bigger rounded square album wrap */
             .fs-album-wrap { 
                 max-width: 440px !important; 
                 width: 440px !important; 
@@ -481,10 +511,12 @@
             .fs-artist { font-size: 1.15rem; margin-bottom: 12px; }
         }
 
+        /* Mobile adjustments updates */
         @media (max-width: 768px) {
             .fs-content-wrap { padding: 16px 20px calc(12px + env(safe-area-inset-bottom)); }
             .fs-main { gap: 12px; }
             
+            /* Mobile specific rounded square size */
             .fs-album-wrap { 
                 width: 78vw !important; 
                 height: 78vw !important; 
@@ -509,15 +541,21 @@
         .fs-progress-container:hover .fs-progress-thumb { transform: translateY(-50%) scale(1.25); }
         .fs-time { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-subdued); font-weight: 500; margin-top: 6px; }
 
-        /* 🔥 FIXED: Flex-shrink 0 added so controls never compress */
-        .fs-controls { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; flex-shrink: 0; }
-        .fs-ctrl-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-subdued); transition: all 0.2s; }
+        .fs-controls { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; }
+        .fs-ctrl-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-subdued); transition: all 0.2s; flex-shrink: 0; }
         .fs-ctrl-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
         .fs-ctrl-btn.active { color: #ffffff; }
         .fs-ctrl-btn svg { width: 20px; height: 20px; fill: currentColor; }
         
-        /* 🔥 NEW: Rounded Square Play/Pause for Fullscreen */
-        .fs-play-btn { width: 68px !important; height: 68px !important; background: #ffffff !important; color: #000000 !important; border-radius: 22px !important; }
+        /* Rounded Square Play Button (Fullscreen Player) */
+        .fs-play-btn { 
+            width: 68px !important; 
+            height: 68px !important; 
+            background: #ffffff !important; 
+            color: #000000 !important; 
+            border-radius: 18px !important; /* Premium rounded square shape */
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.12);
+        }
         .fs-play-btn:hover { transform: scale(1.03); background: #f2f2f7 !important; }
         .fs-play-btn svg { width: 24px; height: 24px; fill: #000 !important; }
 
@@ -668,13 +706,14 @@
             </div>
         </div>
 
-        <!-- NON-HOME VIEW -->
+        <!-- NON-HOME VIEW (search / library / profile) -->
         <section class="section" id="otherView" style="display:none;">
             <div class="section-header"><h2 class="section-title" id="sectionTitle">recently played</h2></div>
             <div id="contentArea"></div>
         </section>
     </div>
 
+    <!-- Mini Player with perfect overflow safety rules and beautiful Rounded Square controls -->
     <div class="mini-player" id="miniPlayer" onclick="openFullscreen()">
         <img class="mini-player-img" id="miniPlayerImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="artwork">
         <div class="mini-player-info">
@@ -697,6 +736,7 @@
         <button class="nav-btn" id="nav-profile" onclick="navigateTo('profile')"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Profile</button>
     </nav>
 
+    <!-- Fullscreen Player with beautiful Rounded Square Album and Play controls -->
     <div class="fullscreen-player" id="fullscreenPlayer">
         <div class="fullscreen-bg" id="fullscreenBg"></div>
         <div class="fs-content-wrap">
@@ -717,6 +757,7 @@
                             <p class="fs-artist" id="fsArtist" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</p>
                         </div>
                         <div style="display:flex; align-items:center; gap:8px;">
+                            <!-- Compact Sleep Timer Trigger -->
                             <button class="fs-ctrl-btn" id="sleepTimerBtn" onclick="toggleSleepDropdown(event)" style="position:relative;" aria-label="Sleep Timer">
                                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                                 <span id="sleepBadge" style="position:absolute; top:-3px; right:-3px; background:#ffffff; color:#000000; font-size:0.58rem; font-weight:800; border-radius:50%; width:15px; height:15px; display:none; align-items:center; justify-content:center; border:1px solid #000;"></span>
@@ -728,6 +769,7 @@
                                     <div class="sleep-dropdown-item" onclick="selectSleepTime(0)">Off</div>
                                 </div>
                             </button>
+                            <!-- Like Button -->
                             <button class="fs-ctrl-btn" id="likeBtn" onclick="toggleLike()"><svg id="likeIcon" viewBox="0 0 24 24" width="22" height="22"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
                         </div>
                     </div>
@@ -754,6 +796,7 @@
                         <button class="fs-opt-btn" onclick="shareTrack()"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>Share Link</button>
                     </div>
 
+                    <!-- Fullscreen Queue Sheet overlay -->
                     <div class="queue-panel" id="queuePanel">
                         <div class="queue-header">
                             <span>UP NEXT</span>
@@ -959,6 +1002,7 @@
             }
         }
 
+        /* Navigations & Utilities */
         function nextTrack() {
             if (tracks.length === 0) return;
             if (isShuffleOn && tracks.length > 1) {
