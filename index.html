@@ -493,7 +493,6 @@
             }
             .fs-title { font-size: 1.3rem; }
             .fs-artist { font-size: 0.88rem; }
-            .fs-controls { margin: 4px 0 10px; }
             .fs-options-panel { margin-bottom: 6px; }
             .swipe-down-hint { margin-top: 2px; }
         }
@@ -508,14 +507,285 @@
         .fs-progress-container:hover .fs-progress-thumb { transform: translateY(-50%) scale(1.25); }
         .fs-time { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-subdued); font-weight: 500; margin-top: 6px; }
 
-        .fs-controls { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; }
-        .fs-ctrl-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-subdued); transition: all 0.2s; }
-        .fs-ctrl-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
-        .fs-ctrl-btn.active { color: #ffffff; }
-        .fs-ctrl-btn svg { width: 20px; height: 20px; fill: currentColor; }
-        .fs-play-btn { width: 68px !important; height: 68px !important; background: #ffffff !important; color: #000000 !important; }
-        .fs-play-btn:hover { transform: scale(1.03); background: #f2f2f7 !important; }
-        .fs-play-btn svg { width: 24px; height: 24px; fill: #000 !important; }
+        /* ==========================================================
+           NEW: SKEUOMORPHIC PLAYBACK CONTROLS
+           ========================================================== */
+        .fs-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 18px 0 22px;
+            padding: 10px 0;
+        }
+
+        /* Dark charcoal side buttons */
+        .fs-controls .fs-ctrl-btn {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            flex: 0 0 auto;
+
+            border-radius: 16px;
+            overflow: hidden;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: rgba(255, 255, 255, 0.42);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.08) 0%,
+                    rgba(255, 255, 255, 0.015) 42%,
+                    rgba(0, 0, 0, 0.2) 100%
+                ),
+                linear-gradient(145deg, #1c1c20 0%, #101012 52%, #070708 100%);
+
+            border: 1px solid rgba(255, 255, 255, 0.075);
+
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 0.13),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.8),
+                0 16px 30px rgba(0, 0, 0, 0.65),
+                0 2px 4px rgba(255, 255, 255, 0.035);
+
+            transition:
+                transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.18s ease,
+                background 0.18s ease,
+                box-shadow 0.18s ease;
+        }
+
+        /* Subtle top-left studio highlight */
+        .fs-controls .fs-ctrl-btn::before {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            pointer-events: none;
+
+            background:
+                radial-gradient(
+                    circle at 28% 18%,
+                    rgba(255, 255, 255, 0.15),
+                    rgba(255, 255, 255, 0.04) 34%,
+                    transparent 62%
+                );
+
+            opacity: 0.7;
+        }
+
+        /* Icons on dark buttons */
+        .fs-controls .fs-ctrl-btn svg {
+            position: relative;
+            z-index: 2;
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            opacity: 0.72;
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+        }
+
+        /* Hover/press feel */
+        .fs-controls .fs-ctrl-btn:hover {
+            color: rgba(255, 255, 255, 0.72);
+            transform: translateY(-1px);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.11) 0%,
+                    rgba(255, 255, 255, 0.025) 42%,
+                    rgba(0, 0, 0, 0.16) 100%
+                ),
+                linear-gradient(145deg, #242428 0%, #131316 52%, #080809 100%);
+
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 0.17),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.85),
+                0 20px 34px rgba(0, 0, 0, 0.72),
+                0 3px 8px rgba(255, 255, 255, 0.045);
+        }
+
+        .fs-controls .fs-ctrl-btn:active {
+            transform: translateY(2px) scale(0.965);
+
+            box-shadow:
+                inset 0 3px 8px rgba(0, 0, 0, 0.85),
+                inset 0 1px 1px rgba(255, 255, 255, 0.08),
+                0 8px 16px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Active shuffle / repeat state */
+        .fs-controls .fs-ctrl-btn.active:not(.fs-play-btn) {
+            color: rgba(255, 255, 255, 0.95);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.14) 0%,
+                    rgba(255, 255, 255, 0.035) 44%,
+                    rgba(0, 0, 0, 0.18) 100%
+                ),
+                linear-gradient(145deg, #2a2a2e 0%, #151518 55%, #09090a 100%);
+
+            border-color: rgba(255, 255, 255, 0.16);
+        }
+
+        /* Tiny active indicator dot */
+        .fs-controls .fs-ctrl-btn.active:not(.fs-play-btn)::after {
+            content: "";
+            position: absolute;
+            z-index: 3;
+            bottom: 6px;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            border-radius: 999px;
+            transform: translateX(-50%);
+            background: #ffffff;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+        }
+
+        /* Large raised off-white central play/pause button */
+        .fs-controls .fs-play-btn {
+            width: 68px !important;
+            height: 68px !important;
+            border-radius: 22px !important;
+
+            color: #000000 !important;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff 0%,
+                    #f2f2ee 36%,
+                    #d7d7cf 100%
+                ) !important;
+
+            border: 1px solid rgba(255, 255, 255, 0.95);
+
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 0.95),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.16),
+                0 26px 48px rgba(0, 0, 0, 0.78),
+                0 10px 22px rgba(255, 255, 255, 0.08),
+                0 0 0 8px rgba(255, 255, 255, 0.025);
+        }
+
+        /* Light button glossy/chamfer highlight */
+        .fs-controls .fs-play-btn::before {
+            background:
+                radial-gradient(
+                    circle at 28% 18%,
+                    rgba(255, 255, 255, 0.95),
+                    rgba(255, 255, 255, 0.36) 34%,
+                    transparent 66%
+                );
+            opacity: 0.75;
+        }
+
+        /* Solid black play/pause icon */
+        .fs-controls .fs-play-btn svg {
+            width: 27px !important;
+            height: 27px !important;
+            fill: #000000 !important;
+            color: #000000 !important;
+            opacity: 1;
+            filter: none;
+        }
+
+        .fs-controls .fs-play-btn:hover {
+            transform: translateY(-2px) scale(1.025);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff 0%,
+                    #f7f7f2 36%,
+                    #dfdfd8 100%
+                ) !important;
+
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 1),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.14),
+                0 30px 56px rgba(0, 0, 0, 0.82),
+                0 12px 26px rgba(255, 255, 255, 0.1),
+                0 0 0 9px rgba(255, 255, 255, 0.03);
+        }
+
+        .fs-controls .fs-play-btn:active {
+            transform: translateY(2px) scale(0.965);
+
+            box-shadow:
+                inset 0 4px 10px rgba(0, 0, 0, 0.22),
+                inset 0 1px 1px rgba(255, 255, 255, 0.7),
+                0 12px 24px rgba(0, 0, 0, 0.75);
+        }
+
+        /* Keyboard accessibility */
+        .fs-controls .fs-ctrl-btn:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.65);
+            outline-offset: 4px;
+        }
+
+        /* Slightly larger controls on wider screens */
+        @media (min-width: 430px) {
+            .fs-controls {
+                gap: 12px;
+            }
+
+            .fs-controls .fs-ctrl-btn {
+                width: 54px;
+                height: 54px;
+                border-radius: 18px;
+            }
+
+            .fs-controls .fs-play-btn {
+                width: 76px !important;
+                height: 76px !important;
+                border-radius: 24px !important;
+            }
+
+            .fs-controls .fs-play-btn svg {
+                width: 30px !important;
+                height: 30px !important;
+            }
+        }
+
+        /* Premium desktop scale */
+        @media (min-width: 769px) {
+            .fs-controls {
+                gap: 14px;
+                margin: 24px 0 28px;
+            }
+
+            .fs-controls .fs-ctrl-btn {
+                width: 58px;
+                height: 58px;
+                border-radius: 20px;
+            }
+
+            .fs-controls .fs-ctrl-btn svg {
+                width: 22px;
+                height: 22px;
+            }
+
+            .fs-controls .fs-play-btn {
+                width: 84px !important;
+                height: 84px !important;
+                border-radius: 27px !important;
+            }
+
+            .fs-controls .fs-play-btn svg {
+                width: 32px !important;
+                height: 32px !important;
+            }
+        }
+        /* END NEW SKEUOMORPHIC CONTROLS */
 
         .fs-options-panel {
             display: flex; justify-content: space-around; background: rgba(255,255,255,0.04);
@@ -740,13 +1010,27 @@
                             <span id="fsDuration">0:00</span>
                         </div>
                     </div>
+                    
+                    <!-- UPDATED CONTROLS STRUCTURE -->
                     <div class="fs-controls">
-                        <button class="fs-ctrl-btn" id="shuffleBtn" onclick="toggleShuffle()"><svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5z"/></svg></button>
-                        <button class="fs-ctrl-btn" onclick="prevTrack()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-                        <button class="fs-ctrl-btn fs-play-btn" onclick="togglePlay()"><svg id="fsPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-                        <button class="fs-ctrl-btn" onclick="nextTrack()"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
-                        <button class="fs-ctrl-btn" id="repeatBtn" onclick="toggleRepeat()"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg></button>
+                        <button class="fs-ctrl-btn" id="shuffleBtn" onclick="toggleShuffle()" aria-label="Shuffle">
+                            <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5z"/></svg>
+                        </button>
+                        <button class="fs-ctrl-btn" onclick="prevTrack()" aria-label="Previous track">
+                            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                        </button>
+                        <button class="fs-ctrl-btn fs-play-btn" onclick="togglePlay()" aria-label="Play or pause">
+                            <svg id="fsPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <button class="fs-ctrl-btn" onclick="nextTrack()" aria-label="Next track">
+                            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                        </button>
+                        <button class="fs-ctrl-btn" id="repeatBtn" onclick="toggleRepeat()" aria-label="Repeat">
+                            <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+                        </button>
                     </div>
+                    <!-- END UPDATED CONTROLS -->
+
                     <div class="fs-options-panel">
                         <button class="fs-opt-btn" id="fsQueueBtn" onclick="toggleQueue()"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>Up Next</button>
                         <button class="fs-opt-btn" onclick="shareTrack()"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>Share Link</button>
