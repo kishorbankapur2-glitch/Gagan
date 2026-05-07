@@ -693,7 +693,7 @@
             pointer-events: none;
         }
 
-        /* Fullscreen Player — Lock Viewport Height */
+        /* Fullscreen Player — Strict No Scroll Viewport */
         .fullscreen-player {
             position: fixed;
             inset: 0;
@@ -724,68 +724,86 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
+            padding: 24px 24px calc(20px + env(safe-area-inset-bottom));
             max-width: 520px;
             margin: 0 auto;
             width: 100%;
             position: relative;
             z-index: 10;
             justify-content: space-between;
-            overflow: hidden; /* Prevent vertical scrolling */
+            overflow: hidden;
         }
-        .fs-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
-        .fs-top-info { display: flex; flex-direction: column; gap: 2px; }
-        .fs-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-subdued); font-weight: 700; }
-        .fs-playlist-name { font-size: 0.85rem; font-weight: 500; color: #ffffff; }
+
+        /* Premium Top Header Optimization */
+        .fs-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 14px;
+        }
+        .fs-top-info { display: flex; flex-direction: column; gap: 3px; }
+        .fs-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--text-subdued); font-weight: 800; }
+        .fs-playlist-name { font-size: 0.9rem; font-weight: 600; color: #ffffff; }
         .fs-icon-btn {
             background: rgba(255,255,255,0.06);
             border: 1px solid var(--glass-border);
             color: #fff;
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s var(--ease);
         }
-        .fs-icon-btn:hover { background: rgba(255,255,255,0.12); }
+        .fs-icon-btn:hover { background: rgba(255,255,255,0.12); transform: scale(1.05); }
         
-        /* Flex distribution inside mobile player sheet */
         .fs-main { 
             flex: 1; 
             display: flex; 
             flex-direction: column; 
             justify-content: space-around; 
-            gap: 24px; 
+            gap: 20px; 
             overflow: hidden;
         }
+
+        /* Perfect Borderless Large Album Art without Side Bars */
         .fs-album-wrap {
             width: 100%;
             aspect-ratio: 1;
-            max-width: 300px;
+            max-width: 330px;
             margin: 0 auto;
             position: relative;
-            border-radius: 20px;
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(255,255,255,0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: transform 0.3s var(--ease);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
+            background: transparent;
             flex-shrink: 0;
         }
-        .fs-album-art { width: 100%; height: 100%; object-fit: cover; }
-        .fs-info-section { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-        .fs-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; gap: 16px; }
-        .fs-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; }
-        .fs-artist { font-size: 0.95rem; color: var(--text-subdued); margin-bottom: 4px; font-weight: 500; }
+        .fs-album-art { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            /* Subtle zoom crops default YouTube sidebars completely */
+            transform: scale(1.06); 
+            transition: transform 0.3s var(--ease);
+        }
+
+        .fs-info-section { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+        .fs-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; gap: 16px; }
+        .fs-title { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; }
+        .fs-artist { font-size: 0.95rem; color: var(--text-subdued); margin-bottom: 2px; font-weight: 500; }
 
         @media (min-width: 769px) {
             .fs-content-wrap { max-width: 1000px !important; height: 100vh; padding: 40px 32px !important; }
             .fs-main { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 54px !important; flex: 1; }
-            .fs-album-wrap { max-width: 440px !important; width: 440px !important; height: 440px !important; margin: 0 !important; flex-shrink: 0; border-radius: 24px; }
+            .fs-album-wrap { max-width: 440px !important; width: 440px !important; height: 440px !important; margin: 0 !important; flex-shrink: 0; border-radius: 28px; }
             .fs-info-section { flex: 1; justify-content: center; gap: 24px; }
-            .fs-title { font-size: 1.8rem; }
-            .fs-artist { font-size: 1.1rem; margin-bottom: 12px; }
+            .fs-title { font-size: 1.9rem; }
+            .fs-artist { font-size: 1.15rem; margin-bottom: 12px; }
         }
 
         /* Strict responsive adjustments for smaller mobile screens */
@@ -797,23 +815,23 @@
                 gap: 12px;
             }
             .fs-album-wrap {
-                max-width: 250px;
-                max-height: 28vh;
+                max-width: 280px;
+                max-height: 31vh;
             }
             .fs-title {
-                font-size: 1.25rem;
+                font-size: 1.3rem;
             }
             .fs-artist {
-                font-size: 0.85rem;
+                font-size: 0.88rem;
             }
             .fs-controls {
-                margin: 6px 0 12px;
+                margin: 4px 0 10px;
             }
             .fs-options-panel {
-                margin-bottom: 8px;
+                margin-bottom: 6px;
             }
             .swipe-down-hint {
-                margin-top: 4px;
+                margin-top: 2px;
             }
         }
 
@@ -858,7 +876,7 @@
         .fs-opt-btn.active { color: #ffffff; }
         .fs-opt-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
-        /* Fullscreen Queue Overlay Transformation */
+        /* Fullscreen Queue Overlay Inside Player wrap */
         .queue-panel {
             position: absolute;
             inset: 0;
@@ -1085,7 +1103,7 @@
                             <p class="fs-artist" id="fsArtist" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</p>
                         </div>
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <!-- Compact Sleep Timer Trigger next to Like -->
+                            <!-- Compact Sleep Timer Trigger -->
                             <button class="fs-ctrl-btn" id="sleepTimerBtn" onclick="toggleSleepDropdown(event)" style="position:relative;" aria-label="Sleep Timer">
                                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                                 <span id="sleepBadge" style="position:absolute; top:-3px; right:-3px; background:#ffffff; color:#000000; font-size:0.58rem; font-weight:800; border-radius:50%; width:15px; height:15px; display:none; align-items:center; justify-content:center; border:1px solid #000;"></span>
@@ -1124,7 +1142,7 @@
                         <button class="fs-opt-btn" onclick="shareTrack()"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>Share Link</button>
                     </div>
 
-                    <!-- Fullscreen Queue Sheet overlay inside Player wrap -->
+                    <!-- Fullscreen Queue Sheet overlay -->
                     <div class="queue-panel" id="queuePanel">
                         <div class="queue-header">
                             <span>UP NEXT</span>
@@ -1772,7 +1790,7 @@
             delete $('picUploader').dataset.img;
         }
 
-        /* Upgraded Modular Sleep Timer system */
+        /* Sleep Timer system */
         function toggleSleepDropdown(event) {
             event.stopPropagation();
             $('sleepDropdown').classList.toggle('active');
