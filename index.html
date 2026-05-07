@@ -34,6 +34,10 @@
             --danger: #ff453a;
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
             --ease-spring: cubic-bezier(0.25, 1, 0.5, 1.15);
+
+            /* Marquee */
+            --marquee-fade: 18px;
+            --marquee-gap: 34px;
         }
         html, body {
             background: var(--bg-base);
@@ -349,9 +353,12 @@
         }
         .mini-player.visible { transform: translateY(0); opacity: 1; }
         .mini-player-img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
-        .mini-player-info { flex: 1; overflow: hidden; }
-        .mini-player-title { font-size: 0.82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-player-artist { font-size: 0.72rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-player-info { flex: 1; overflow: hidden; min-width: 0; }
+
+        /* Keep existing typography, but overflow is handled by marquee wrapper */
+        .mini-player-title { font-size: 0.82rem; font-weight: 700; }
+        .mini-player-artist { font-size: 0.72rem; color: var(--text-subdued); }
+
         .mini-player-controls { display: flex; align-items: center; gap: 4px; }
         .mini-btn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; transition: all 0.2s; }
         .mini-btn:hover { background: rgba(255,255,255,0.08); }
@@ -384,7 +391,7 @@
         }
 
         /* ==========================================================
-           FULLSCREEN PLAYER — BIGGER, BORDERLESS ROUNDED-SQUARE ALBUM ART
+           FULLSCREEN PLAYER
            ========================================================== */
         .fullscreen-player {
             position: fixed; inset: 0; z-index: 1000; display: none; flex-direction: column; overflow: hidden;
@@ -423,7 +430,6 @@
             flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 20px; overflow: hidden;
         }
 
-        /* 🔥 UPDATED: Perfect Borderless Rounded Square Album Wrap (NO SIDE BORDERS) */
         .fs-album-wrap {
             width: 82vw;
             height: 82vw;
@@ -432,29 +438,27 @@
             aspect-ratio: 1 / 1 !important;
             margin: 0 auto;
             position: relative;
-            border-radius: 28px !important; /* Elegant Rounded Square */
+            border-radius: 28px !important;
             overflow: hidden;
             background: none !important;
             border: none !important;
             outline: none !important;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); /* Subtle depth shadow */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             flex-shrink: 0;
         }
-
-        /* 🔥 UPDATED: Full Scale Album Art with Object-Fit Cover to Prevent Side Bars */
         .fs-album-art { 
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover !important; /* Crops cleanly into a square, eliminating black side bars */
+            object-fit: cover !important;
             display: block;
             border: none !important;
             outline: none !important;
-            transform: scale(1.04); /* Very minor zoom to completely hide any YT thumbnail outer artifacts */
+            transform: scale(1.04);
             transition: transform 0.3s var(--ease);
         }
 
-        .fs-info-section { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-        .fs-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; gap: 16px; }
+        .fs-info-section { width: 100%; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+        .fs-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; gap: 16px; min-width: 0; }
         .fs-title { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; }
         .fs-artist { font-size: 0.95rem; color: var(--text-subdued); margin-bottom: 2px; font-weight: 500; }
 
@@ -462,8 +466,6 @@
         @media (min-width: 769px) {
             .fs-content-wrap { max-width: 1000px !important; height: 100vh; padding: 40px 32px !important; }
             .fs-main { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 54px !important; flex: 1; }
-            
-            /* 🔥 Desktop specific bigger rounded square album wrap */
             .fs-album-wrap { 
                 max-width: 440px !important; 
                 width: 440px !important; 
@@ -482,8 +484,6 @@
         @media (max-width: 768px) {
             .fs-content-wrap { padding: 16px 20px calc(12px + env(safe-area-inset-bottom)); }
             .fs-main { gap: 12px; }
-            
-            /* 🔥 Mobile specific rounded square size */
             .fs-album-wrap { 
                 width: 78vw !important; 
                 height: 78vw !important; 
@@ -518,23 +518,17 @@
             margin: 18px 0 22px;
             padding: 10px 0;
         }
-
-        /* Dark charcoal side buttons */
         .fs-controls .fs-ctrl-btn {
             position: relative;
             width: 48px;
             height: 48px;
             flex: 0 0 auto;
-
             border-radius: 16px;
             overflow: hidden;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             color: rgba(255, 255, 255, 0.42);
-
             background:
                 linear-gradient(
                     180deg,
@@ -543,30 +537,24 @@
                     rgba(0, 0, 0, 0.2) 100%
                 ),
                 linear-gradient(145deg, #1c1c20 0%, #101012 52%, #070708 100%);
-
             border: 1px solid rgba(255, 255, 255, 0.075);
-
             box-shadow:
                 inset 0 1px 1px rgba(255, 255, 255, 0.13),
                 inset 0 -1px 2px rgba(0, 0, 0, 0.8),
                 0 16px 30px rgba(0, 0, 0, 0.65),
                 0 2px 4px rgba(255, 255, 255, 0.035);
-
             transition:
                 transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
                 color 0.18s ease,
                 background 0.18s ease,
                 box-shadow 0.18s ease;
         }
-
-        /* Subtle top-left studio highlight */
         .fs-controls .fs-ctrl-btn::before {
             content: "";
             position: absolute;
             inset: 1px;
             border-radius: inherit;
             pointer-events: none;
-
             background:
                 radial-gradient(
                     circle at 28% 18%,
@@ -574,11 +562,8 @@
                     rgba(255, 255, 255, 0.04) 34%,
                     transparent 62%
                 );
-
             opacity: 0.7;
         }
-
-        /* Icons on dark buttons */
         .fs-controls .fs-ctrl-btn svg {
             position: relative;
             z-index: 2;
@@ -588,12 +573,9 @@
             opacity: 0.72;
             filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
         }
-
-        /* Hover/press feel */
         .fs-controls .fs-ctrl-btn:hover {
             color: rgba(255, 255, 255, 0.72);
             transform: translateY(-1px);
-
             background:
                 linear-gradient(
                     180deg,
@@ -602,27 +584,21 @@
                     rgba(0, 0, 0, 0.16) 100%
                 ),
                 linear-gradient(145deg, #242428 0%, #131316 52%, #080809 100%);
-
             box-shadow:
                 inset 0 1px 1px rgba(255, 255, 255, 0.17),
                 inset 0 -1px 2px rgba(0, 0, 0, 0.85),
                 0 20px 34px rgba(0, 0, 0, 0.72),
                 0 3px 8px rgba(255, 255, 255, 0.045);
         }
-
         .fs-controls .fs-ctrl-btn:active {
             transform: translateY(2px) scale(0.965);
-
             box-shadow:
                 inset 0 3px 8px rgba(0, 0, 0, 0.85),
                 inset 0 1px 1px rgba(255, 255, 255, 0.08),
                 0 8px 16px rgba(0, 0, 0, 0.7);
         }
-
-        /* Active shuffle / repeat state */
         .fs-controls .fs-ctrl-btn.active:not(.fs-play-btn) {
             color: rgba(255, 255, 255, 0.95);
-
             background:
                 linear-gradient(
                     180deg,
@@ -631,11 +607,8 @@
                     rgba(0, 0, 0, 0.18) 100%
                 ),
                 linear-gradient(145deg, #2a2a2e 0%, #151518 55%, #09090a 100%);
-
             border-color: rgba(255, 255, 255, 0.16);
         }
-
-        /* Tiny active indicator dot */
         .fs-controls .fs-ctrl-btn.active:not(.fs-play-btn)::after {
             content: "";
             position: absolute;
@@ -649,15 +622,11 @@
             background: #ffffff;
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
         }
-
-        /* Large raised off-white central play/pause button */
         .fs-controls .fs-play-btn {
             width: 68px !important;
             height: 68px !important;
             border-radius: 22px !important;
-
             color: #000000 !important;
-
             background:
                 linear-gradient(
                     180deg,
@@ -665,9 +634,7 @@
                     #f2f2ee 36%,
                     #d7d7cf 100%
                 ) !important;
-
             border: 1px solid rgba(255, 255, 255, 0.95);
-
             box-shadow:
                 inset 0 1px 1px rgba(255, 255, 255, 0.95),
                 inset 0 -2px 5px rgba(0, 0, 0, 0.16),
@@ -675,8 +642,6 @@
                 0 10px 22px rgba(255, 255, 255, 0.08),
                 0 0 0 8px rgba(255, 255, 255, 0.025);
         }
-
-        /* Light button glossy/chamfer highlight */
         .fs-controls .fs-play-btn::before {
             background:
                 radial-gradient(
@@ -687,8 +652,6 @@
                 );
             opacity: 0.75;
         }
-
-        /* Solid black play/pause icon */
         .fs-controls .fs-play-btn svg {
             width: 27px !important;
             height: 27px !important;
@@ -697,10 +660,8 @@
             opacity: 1;
             filter: none;
         }
-
         .fs-controls .fs-play-btn:hover {
             transform: translateY(-2px) scale(1.025);
-
             background:
                 linear-gradient(
                     180deg,
@@ -708,7 +669,6 @@
                     #f7f7f2 36%,
                     #dfdfd8 100%
                 ) !important;
-
             box-shadow:
                 inset 0 1px 1px rgba(255, 255, 255, 1),
                 inset 0 -2px 5px rgba(0, 0, 0, 0.14),
@@ -716,76 +676,30 @@
                 0 12px 26px rgba(255, 255, 255, 0.1),
                 0 0 0 9px rgba(255, 255, 255, 0.03);
         }
-
         .fs-controls .fs-play-btn:active {
             transform: translateY(2px) scale(0.965);
-
             box-shadow:
                 inset 0 4px 10px rgba(0, 0, 0, 0.22),
                 inset 0 1px 1px rgba(255, 255, 255, 0.7),
                 0 12px 24px rgba(0, 0, 0, 0.75);
         }
-
-        /* Keyboard accessibility */
         .fs-controls .fs-ctrl-btn:focus-visible {
             outline: 2px solid rgba(255, 255, 255, 0.65);
             outline-offset: 4px;
         }
-
-        /* Slightly larger controls on wider screens */
         @media (min-width: 430px) {
-            .fs-controls {
-                gap: 12px;
-            }
-
-            .fs-controls .fs-ctrl-btn {
-                width: 54px;
-                height: 54px;
-                border-radius: 18px;
-            }
-
-            .fs-controls .fs-play-btn {
-                width: 76px !important;
-                height: 76px !important;
-                border-radius: 24px !important;
-            }
-
-            .fs-controls .fs-play-btn svg {
-                width: 30px !important;
-                height: 30px !important;
-            }
+            .fs-controls { gap: 12px; }
+            .fs-controls .fs-ctrl-btn { width: 54px; height: 54px; border-radius: 18px; }
+            .fs-controls .fs-play-btn { width: 76px !important; height: 76px !important; border-radius: 24px !important; }
+            .fs-controls .fs-play-btn svg { width: 30px !important; height: 30px !important; }
         }
-
-        /* Premium desktop scale */
         @media (min-width: 769px) {
-            .fs-controls {
-                gap: 14px;
-                margin: 24px 0 28px;
-            }
-
-            .fs-controls .fs-ctrl-btn {
-                width: 58px;
-                height: 58px;
-                border-radius: 20px;
-            }
-
-            .fs-controls .fs-ctrl-btn svg {
-                width: 22px;
-                height: 22px;
-            }
-
-            .fs-controls .fs-play-btn {
-                width: 84px !important;
-                height: 84px !important;
-                border-radius: 27px !important;
-            }
-
-            .fs-controls .fs-play-btn svg {
-                width: 32px !important;
-                height: 32px !important;
-            }
+            .fs-controls { gap: 14px; margin: 24px 0 28px; }
+            .fs-controls .fs-ctrl-btn { width: 58px; height: 58px; border-radius: 20px; }
+            .fs-controls .fs-ctrl-btn svg { width: 22px; height: 22px; }
+            .fs-controls .fs-play-btn { width: 84px !important; height: 84px !important; border-radius: 27px !important; }
+            .fs-controls .fs-play-btn svg { width: 32px !important; height: 32px !important; }
         }
-        /* END NEW SKEUOMORPHIC CONTROLS */
 
         .fs-options-panel {
             display: flex; justify-content: space-around; background: rgba(255,255,255,0.04);
@@ -850,6 +764,70 @@
         @keyframes slideUpBounce { from { transform: translateY(60px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
         @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
         @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* ============================
+           Premium Marquee (Production-ready)
+           ============================ */
+        .marquee{
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+            display: block;
+            contain: content;
+        }
+        .marquee__track{
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            transform: translate3d(0,0,0);
+            will-change: transform;
+            backface-visibility: hidden;
+        }
+        .marquee__text{
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .marquee__gap{
+            width: var(--marquee-gap);
+            flex: 0 0 auto;
+        }
+        .marquee:not(.is-animating) .marquee__gap,
+        .marquee:not(.is-animating) .marquee__clone{
+            display: none;
+        }
+
+        /* Premium edge fade with mask */
+        @supports (-webkit-mask-image: linear-gradient(#000,#000)) or (mask-image: linear-gradient(#000,#000)) {
+            .marquee{
+                -webkit-mask-image: linear-gradient(
+                    to right,
+                    transparent,
+                    #000 var(--marquee-fade),
+                    #000 calc(100% - var(--marquee-fade)),
+                    transparent
+                );
+                        mask-image: linear-gradient(
+                    to right,
+                    transparent,
+                    #000 var(--marquee-fade),
+                    #000 calc(100% - var(--marquee-fade)),
+                    transparent
+                );
+                -webkit-mask-repeat: no-repeat;
+                        mask-repeat: no-repeat;
+            }
+        }
+
+        /* Make sure old ellipsis rules don't fight marquee */
+        .mini-player-title, .mini-player-artist, .fs-title, .fs-artist{
+            overflow: visible !important;
+            text-overflow: clip !important;
+            white-space: nowrap !important;
+        }
+
+        @media (prefers-reduced-motion: reduce){
+            .marquee__track{ transform: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -941,12 +919,29 @@
         </section>
     </div>
 
+    <!-- MINI PLAYER (UPDATED: marquee wrappers) -->
     <div class="mini-player" id="miniPlayer" onclick="openFullscreen()">
         <img class="mini-player-img" id="miniPlayerImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="artwork">
         <div class="mini-player-info">
-            <div class="mini-player-title" id="miniPlayerTitle">Not Playing</div>
-            <div class="mini-player-artist" id="miniPlayerArtist">—</div>
+            <!-- Title: limit 15, slightly slower -->
+            <div class="marquee" id="miniTitleMarquee" data-limit="15" data-speed="22" data-pause="1000">
+                <div class="marquee__track">
+                    <span class="mini-player-title marquee__text" id="miniPlayerTitle">Not Playing</span>
+                    <span class="marquee__gap" aria-hidden="true"></span>
+                    <span class="mini-player-title marquee__text marquee__clone" aria-hidden="true"></span>
+                </div>
+            </div>
+
+            <!-- Artist: limit 10, slightly faster -->
+            <div class="marquee" id="miniArtistMarquee" data-limit="10" data-speed="30" data-pause="800">
+                <div class="marquee__track">
+                    <span class="mini-player-artist marquee__text" id="miniPlayerArtist">—</span>
+                    <span class="marquee__gap" aria-hidden="true"></span>
+                    <span class="mini-player-artist marquee__text marquee__clone" aria-hidden="true"></span>
+                </div>
+            </div>
         </div>
+
         <div class="mini-player-controls" onclick="event.stopPropagation()">
             <button class="mini-btn" onclick="prevTrack()" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
             <button class="mini-btn mini-btn-play" id="miniPlayBtn" onclick="togglePlay()" aria-label="Play"><svg id="miniPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
@@ -979,9 +974,25 @@
                 <div class="fs-info-section">
                     <div class="fs-title-row">
                         <div style="flex:1; min-width:0;">
-                            <h1 class="fs-title" id="fsTitle" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Not Playing</h1>
-                            <p class="fs-artist" id="fsArtist" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</p>
+                            <!-- FULLSCREEN TITLE (UPDATED: marquee wrapper) -->
+                            <div class="marquee" id="fsTitleMarquee" data-limit="15" data-speed="20" data-pause="1100">
+                                <div class="marquee__track">
+                                    <h1 class="fs-title marquee__text" id="fsTitle">Not Playing</h1>
+                                    <span class="marquee__gap" aria-hidden="true"></span>
+                                    <span class="fs-title marquee__text marquee__clone" aria-hidden="true"></span>
+                                </div>
+                            </div>
+
+                            <!-- FULLSCREEN ARTIST (UPDATED: marquee wrapper) -->
+                            <div class="marquee" id="fsArtistMarquee" data-limit="10" data-speed="28" data-pause="900">
+                                <div class="marquee__track">
+                                    <p class="fs-artist marquee__text" id="fsArtist">—</p>
+                                    <span class="marquee__gap" aria-hidden="true"></span>
+                                    <span class="fs-artist marquee__text marquee__clone" aria-hidden="true"></span>
+                                </div>
+                            </div>
                         </div>
+
                         <div style="display:flex; align-items:center; gap:8px;">
                             <!-- Compact Sleep Timer Trigger -->
                             <button class="fs-ctrl-btn" id="sleepTimerBtn" onclick="toggleSleepDropdown(event)" style="position:relative;" aria-label="Sleep Timer">
@@ -1029,14 +1040,12 @@
                             <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
                         </button>
                     </div>
-                    <!-- END UPDATED CONTROLS -->
 
                     <div class="fs-options-panel">
                         <button class="fs-opt-btn" id="fsQueueBtn" onclick="toggleQueue()"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>Up Next</button>
                         <button class="fs-opt-btn" onclick="shareTrack()"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>Share Link</button>
                     </div>
 
-                    <!-- Fullscreen Queue Sheet overlay -->
                     <div class="queue-panel" id="queuePanel">
                         <div class="queue-header">
                             <span>UP NEXT</span>
@@ -1059,6 +1068,96 @@
 
     <script>
         'use strict';
+
+        /* ============================
+           Marquee Engine (Production-ready)
+           - Rule: animate ONLY if text length > limit
+           - Smooth right-to-left, seamless loop using clone
+           - Pause at start & end for premium feel
+           - Mobile optimized: translate3d + contain + pause on hidden tab
+           ============================ */
+        const Marquee = (() => {
+            const instances = new Set();
+            const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+            const ro = new ResizeObserver(entries => {
+                for (const e of entries) refresh(e.target);
+            });
+
+            function stop(m) {
+                m.classList.remove('is-animating');
+                if (m._anim) { m._anim.cancel(); m._anim = null; }
+                const track = m.querySelector('.marquee__track');
+                if (track) track.style.transform = 'translate3d(0,0,0)';
+            }
+
+            function refresh(m) {
+                if (!m) return;
+                const track = m.querySelector('.marquee__track');
+                const text = m.querySelector('.marquee__text');
+                const clone = m.querySelector('.marquee__clone');
+                if (!track || !text || !clone) return;
+
+                if (reduceMotion?.matches) return stop(m);
+
+                const content = (text.textContent || '').trim();
+                const limit = parseInt(m.dataset.limit || '9999', 10);
+
+                // Requirement: only if length exceeds limit
+                if (content.length <= limit) return stop(m);
+
+                clone.textContent = content;
+
+                // Measure distance (text width + gap)
+                const gap = parseFloat(getComputedStyle(m).getPropertyValue('--marquee-gap')) || 34;
+                const textW = Math.ceil(text.getBoundingClientRect().width);
+                const distance = Math.max(1, Math.ceil(textW + gap));
+
+                const pxPerSec = parseFloat(m.dataset.speed || '28'); // px/sec
+                const pauseMs = parseInt(m.dataset.pause || '900', 10);
+
+                const moveMs = (distance / pxPerSec) * 1000;
+                const total = pauseMs + moveMs + pauseMs;
+
+                if (m._anim) m._anim.cancel();
+                m.classList.add('is-animating');
+
+                m._anim = track.animate([
+                    { transform: 'translate3d(0,0,0)', offset: 0 },
+                    { transform: 'translate3d(0,0,0)', offset: pauseMs / total },
+                    { transform: `translate3d(${-distance}px,0,0)`, offset: (pauseMs + moveMs) / total },
+                    { transform: `translate3d(${-distance}px,0,0)`, offset: 1 }
+                ], {
+                    duration: total,
+                    iterations: Infinity,
+                    easing: 'linear'
+                });
+            }
+
+            function refreshAll() {
+                requestAnimationFrame(() => instances.forEach(refresh));
+            }
+
+            function init() {
+                document.querySelectorAll('.marquee').forEach(m => {
+                    instances.add(m);
+                    ro.observe(m);
+                });
+
+                document.addEventListener('visibilitychange', () => {
+                    const hidden = document.hidden;
+                    instances.forEach(m => {
+                        if (!m._anim) return;
+                        hidden ? m._anim.pause() : m._anim.play();
+                    });
+                });
+
+                reduceMotion?.addEventListener?.('change', refreshAll);
+                refreshAll();
+            }
+
+            return { init, refreshAll, refresh, stop };
+        })();
+
         const PIPED_INSTANCES = [
             'https://pipedapi.kavin.rocks',
             'https://pipedapi.adminforge.de',
@@ -1228,6 +1327,9 @@
             updateAtmosphericBackground();
             setupMediaSession(t);
             renderQueueList();
+
+            /* Refresh marquees after text updates */
+            Marquee.refreshAll();
         }
 
         function togglePlay() {
@@ -1362,6 +1464,9 @@
             isFullscreenOpen = true;
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
+
+            /* Recalculate marquee widths after layout change */
+            requestAnimationFrame(() => Marquee.refreshAll());
         }
 
         function closeFullscreen() {
@@ -1892,6 +1997,9 @@
             setupEventListeners();
             setupSwipeGesture();
             setupScrubbing();
+
+            /* Init marquee system */
+            Marquee.init();
 
             loadAndRenderHome().then(() => {
                 tracks = window.homeFeaturedTracks.length > 0 ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
