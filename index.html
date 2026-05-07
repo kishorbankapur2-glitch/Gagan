@@ -282,11 +282,7 @@
         .user-menu-item:hover { background: rgba(255,255,255,0.06); }
         .user-menu-item svg { width: 16px; height: 16px; fill: currentColor; }
 
-        /* =============================================
-           HOME PAGE - OPENTUNE STYLE
-           ============================================= */
-
-        /* Greeting section — compact like OpenTune */
+        /* GREETINGS & FEED */
         .home-greeting {
             padding: 20px 16px 10px;
             display: flex;
@@ -322,7 +318,7 @@
         .mood-chip:hover { background: #2c2c2e; color: #fff; }
         .mood-chip.active { background: #ffffff; color: #000000; border-color: #fff; }
 
-        /* Featured large cards — horizontal scroll */
+        /* Featured large cards */
         .featured-section { padding: 4px 0 20px; }
         .featured-row {
             display: flex;
@@ -459,7 +455,7 @@
             text-overflow: ellipsis;
         }
 
-        /* Second row of kl cards — playlists with circle style */
+        /* circle list */
         .kl-grid-2 {
             display: flex;
             gap: 14px;
@@ -697,7 +693,7 @@
             pointer-events: none;
         }
 
-        /* Fullscreen Player */
+        /* Fullscreen Player — Lock Viewport Height */
         .fullscreen-player {
             position: fixed;
             inset: 0;
@@ -709,6 +705,8 @@
             opacity: 0;
             transform: scale(1.02);
             transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+            height: 100vh;
+            height: 100dvh;
         }
         .fullscreen-player.active { display: flex; opacity: 1; transform: scale(1); }
         .fullscreen-bg {
@@ -721,6 +719,7 @@
             transition: background 1s var(--ease);
         }
         .fullscreen-bg::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 1; }
+        
         .fs-content-wrap {
             flex: 1;
             display: flex;
@@ -732,8 +731,9 @@
             position: relative;
             z-index: 10;
             justify-content: space-between;
+            overflow: hidden; /* Prevent vertical scrolling */
         }
-        .fs-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .fs-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
         .fs-top-info { display: flex; flex-direction: column; gap: 2px; }
         .fs-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-subdued); font-weight: 700; }
         .fs-playlist-name { font-size: 0.85rem; font-weight: 500; color: #ffffff; }
@@ -750,11 +750,20 @@
             transition: all 0.2s var(--ease);
         }
         .fs-icon-btn:hover { background: rgba(255,255,255,0.12); }
-        .fs-main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
+        
+        /* Flex distribution inside mobile player sheet */
+        .fs-main { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-around; 
+            gap: 24px; 
+            overflow: hidden;
+        }
         .fs-album-wrap {
             width: 100%;
             aspect-ratio: 1;
-            max-width: 330px;
+            max-width: 300px;
             margin: 0 auto;
             position: relative;
             border-radius: 20px;
@@ -762,18 +771,50 @@
             box-shadow: 0 20px 50px rgba(255,255,255,0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: transform 0.3s var(--ease);
+            flex-shrink: 0;
         }
         .fs-album-art { width: 100%; height: 100%; object-fit: cover; }
-        .fs-info-section { width: 100%; display: flex; flex-direction: column; }
-        .fs-title-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; gap: 16px; }
-        .fs-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; }
-        .fs-artist { font-size: 1rem; color: var(--text-subdued); margin-bottom: 24px; font-weight: 500; }
+        .fs-info-section { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+        .fs-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; gap: 16px; }
+        .fs-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; }
+        .fs-artist { font-size: 0.95rem; color: var(--text-subdued); margin-bottom: 4px; font-weight: 500; }
 
         @media (min-width: 769px) {
             .fs-content-wrap { max-width: 1000px !important; height: 100vh; padding: 40px 32px !important; }
             .fs-main { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 54px !important; flex: 1; }
             .fs-album-wrap { max-width: 440px !important; width: 440px !important; height: 440px !important; margin: 0 !important; flex-shrink: 0; border-radius: 24px; }
-            .fs-info-section { flex: 1; justify-content: center; }
+            .fs-info-section { flex: 1; justify-content: center; gap: 24px; }
+            .fs-title { font-size: 1.8rem; }
+            .fs-artist { font-size: 1.1rem; margin-bottom: 12px; }
+        }
+
+        /* Strict responsive adjustments for smaller mobile screens */
+        @media (max-width: 768px) {
+            .fs-content-wrap {
+                padding: 16px 20px calc(12px + env(safe-area-inset-bottom));
+            }
+            .fs-main {
+                gap: 12px;
+            }
+            .fs-album-wrap {
+                max-width: 250px;
+                max-height: 28vh;
+            }
+            .fs-title {
+                font-size: 1.25rem;
+            }
+            .fs-artist {
+                font-size: 0.85rem;
+            }
+            .fs-controls {
+                margin: 6px 0 12px;
+            }
+            .fs-options-panel {
+                margin-bottom: 8px;
+            }
+            .swipe-down-hint {
+                margin-top: 4px;
+            }
         }
 
         .fs-progress-container { width: 100%; padding: 8px 0; cursor: pointer; }
@@ -794,7 +835,7 @@
         .fs-progress-container:hover .fs-progress-thumb { transform: translateY(-50%) scale(1.25); }
         .fs-time { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-subdued); font-weight: 500; margin-top: 6px; }
 
-        .fs-controls { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 24px; }
+        .fs-controls { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 16px; }
         .fs-ctrl-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-subdued); transition: all 0.2s; }
         .fs-ctrl-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
         .fs-ctrl-btn.active { color: #ffffff; }
@@ -810,27 +851,65 @@
             border: 1px solid var(--glass-border);
             border-radius: 14px;
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
         .fs-opt-btn { font-size: 0.72rem; color: var(--text-subdued); display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; }
         .fs-opt-btn:hover { color: #fff; }
         .fs-opt-btn.active { color: #ffffff; }
         .fs-opt-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
+        /* Fullscreen Queue Overlay Transformation */
         .queue-panel {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 12, 0.98);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            z-index: 110;
             display: none;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 14px;
-            margin-top: 12px;
-            max-height: 180px;
-            overflow-y: auto;
+            flex-direction: column;
+            padding: 24px calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+            animation: slideUpSheet 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .queue-panel.show { display: block; }
-        .queue-header { font-size: 0.78rem; font-weight: 700; color: #ffffff; margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .queue-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; }
+        .queue-panel.show { display: flex; }
+        .queue-header { font-size: 1.1rem; font-weight: 800; color: #ffffff; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px; }
+        .queue-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 10px; border-radius: 10px; font-size: 0.88rem; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .queue-item:hover { background: rgba(255,255,255,0.06); }
+        #queueList { flex: 1; overflow-y: auto; padding-right: 4px; }
+
+        /* Glassmorphic Sleep Timer Dropdown */
+        .sleep-dropdown {
+            position: absolute;
+            bottom: 50px;
+            right: 0;
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border-strong);
+            border-radius: 14px;
+            padding: 6px;
+            min-width: 120px;
+            z-index: 150;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            animation: slideDown 0.2s var(--ease);
+        }
+        .sleep-dropdown.active { display: flex; }
+        .sleep-dropdown-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-subdued);
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .sleep-dropdown-item:hover, .sleep-dropdown-item.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
 
         .toast {
             position: fixed;
@@ -854,10 +933,6 @@
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        .sleep-timer-options { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; }
-        .sleep-btn { padding: 6px 14px; border-radius: 100px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); font-size: 0.72rem; white-space: nowrap; transition: 0.2s; }
-        .sleep-btn:hover, .sleep-btn.active { border-color: #ffffff; background: rgba(255, 255, 255, 0.08); color: #ffffff; }
-
         #youtube-player { position: absolute; top: -9999px; left: -9999px; }
 
         .skeleton {
@@ -867,12 +942,13 @@
         }
         @keyframes loadingSkeleton { to { background-position: -200% 0; } }
 
-        .swipe-down-hint { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.7rem; color: var(--text-subdued); margin-top: 16px; }
+        .swipe-down-hint { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.7rem; color: var(--text-subdued); margin-top: 12px; flex-shrink: 0; }
         .swipe-down-hint svg { width: 14px; height: 14px; fill: currentColor; animation: bounce 1.5s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUpBounce { from { transform: translateY(60px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
         @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -928,7 +1004,6 @@
 
         <!-- HOME VIEW -->
         <div id="homeView">
-            <!-- Greeting -->
             <div class="home-greeting">
                 <div>
                     <div class="home-greeting-text" id="greeting">good evening</div>
@@ -936,7 +1011,6 @@
                 </div>
             </div>
 
-            <!-- Mood chips -->
             <div class="mood-chips-row" id="moodChipsRow">
                 <button class="mood-chip active" onclick="onMoodChip(this,'')">For You</button>
                 <button class="mood-chip" onclick="onMoodChip(this,'romantic hindi songs')">Romance</button>
@@ -948,12 +1022,10 @@
                 <button class="mood-chip" onclick="onMoodChip(this,'workout gym music')">Workout</button>
             </div>
 
-            <!-- Featured large cards -->
             <div class="featured-section">
                 <div class="featured-row" id="featuredRow"></div>
             </div>
 
-            <!-- Keep Listening -->
             <div class="kl-section">
                 <div class="kl-header">Keep listening</div>
                 <div class="kl-grid" id="klGrid"></div>
@@ -1008,11 +1080,26 @@
                 </div>
                 <div class="fs-info-section">
                     <div class="fs-title-row">
-                        <div>
-                            <h1 class="fs-title" id="fsTitle">Not Playing</h1>
-                            <p class="fs-artist" id="fsArtist">—</p>
+                        <div style="flex:1; min-width:0;">
+                            <h1 class="fs-title" id="fsTitle" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Not Playing</h1>
+                            <p class="fs-artist" id="fsArtist" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</p>
                         </div>
-                        <button class="fs-ctrl-btn" id="likeBtn" onclick="toggleLike()" style="margin-top:2px;"><svg id="likeIcon" viewBox="0 0 24 24" width="22" height="22"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <!-- Compact Sleep Timer Trigger next to Like -->
+                            <button class="fs-ctrl-btn" id="sleepTimerBtn" onclick="toggleSleepDropdown(event)" style="position:relative;" aria-label="Sleep Timer">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                                <span id="sleepBadge" style="position:absolute; top:-3px; right:-3px; background:#ffffff; color:#000000; font-size:0.58rem; font-weight:800; border-radius:50%; width:15px; height:15px; display:none; align-items:center; justify-content:center; border:1px solid #000;"></span>
+                                
+                                <div class="sleep-dropdown" id="sleepDropdown" onclick="event.stopPropagation()">
+                                    <div class="sleep-dropdown-item" onclick="selectSleepTime(15)">15 Min</div>
+                                    <div class="sleep-dropdown-item" onclick="selectSleepTime(30)">30 Min</div>
+                                    <div class="sleep-dropdown-item" onclick="selectSleepTime(60)">60 Min</div>
+                                    <div class="sleep-dropdown-item" onclick="selectSleepTime(0)">Off</div>
+                                </div>
+                            </button>
+                            <!-- Like Button -->
+                            <button class="fs-ctrl-btn" id="likeBtn" onclick="toggleLike()"><svg id="likeIcon" viewBox="0 0 24 24" width="22" height="22"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+                        </div>
                     </div>
                     <div class="fs-progress-container" id="fsProgressContainer">
                         <div class="fs-progress-bar">
@@ -1036,19 +1123,16 @@
                         <button class="fs-opt-btn" id="fsQueueBtn" onclick="toggleQueue()"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>Up Next</button>
                         <button class="fs-opt-btn" onclick="shareTrack()"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>Share Link</button>
                     </div>
+
+                    <!-- Fullscreen Queue Sheet overlay inside Player wrap -->
                     <div class="queue-panel" id="queuePanel">
-                        <div class="queue-header">UP NEXT <span onclick="toggleQueue()" style="cursor:pointer; color:var(--text-subdued);">Minimize</span></div>
+                        <div class="queue-header">
+                            <span>UP NEXT</span>
+                            <span onclick="toggleQueue()" style="cursor:pointer; color:var(--text-subdued); font-size:0.9rem;">Close</span>
+                        </div>
                         <div id="queueList"></div>
                     </div>
-                    <div style="margin-top: 10px;">
-                        <span style="font-size:0.7rem; font-weight:700; color:var(--text-subdued);">SLEEP TIMER</span>
-                        <div class="sleep-timer-options" id="sleepOptions">
-                            <button class="sleep-btn" data-min="15">15 Min</button>
-                            <button class="sleep-btn" data-min="30">30 Min</button>
-                            <button class="sleep-btn" data-min="60">60 Min</button>
-                            <button class="sleep-btn active" data-min="0">Off</button>
-                        </div>
-                    </div>
+
                     <div class="swipe-down-hint">
                         <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
                         <span>Swipe down to close player</span>
@@ -1072,7 +1156,6 @@
             'https://pipedapi.syncstream.org'
         ];
 
-        // Backup static global tracklist (In case internet is fully down)
         const BACKUP_TRACKS = [
             { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', duration: 279, meta: '4:39' },
             { id: '1Ek8X0idI44', title: 'Night Changes', artist: 'One Direction', duration: 240, meta: '4:00' },
@@ -1101,7 +1184,6 @@
         let isDragging = false;
         let isScrubbing = false;
 
-        // Dynamic home holders
         window.homeFeaturedTracks = [];
         window.homeKLTracks = [];
         window.homeKLPlaylists = [];
@@ -1342,6 +1424,7 @@
         function setupSwipeGesture() {
             const fs = $('fullscreenPlayer');
             fs.addEventListener('touchstart', (e) => {
+                if (e.target.closest('#queuePanel') || e.target.closest('#sleepDropdown')) return;
                 touchStartY = e.touches[0].clientY;
                 isDragging = true;
                 fs.style.transition = 'none';
@@ -1365,6 +1448,7 @@
             $('app').classList.add('fs-open');
             isFullscreenOpen = true;
             document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
         }
 
         function closeFullscreen() {
@@ -1373,6 +1457,7 @@
             $('fullscreenPlayer').style.transform = '';
             isFullscreenOpen = false;
             document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
         }
 
         function updateNavIndicatorSlab() {
@@ -1387,7 +1472,6 @@
         function saveSearchQuery(q) {
             if (!q || q.trim().length < 2) return;
             let history = Storage.get('swar_last_searches') || [];
-            // Remove duplication
             history = history.filter(item => item.toLowerCase() !== q.trim().toLowerCase());
             history.unshift(q.trim());
             if (history.length > 5) history.pop();
@@ -1420,7 +1504,7 @@
                     return { id, title: (it.title || 'Unknown Title').replace(/&quot;/g, '"'), artist: it.uploaderName || 'Unknown Artist', duration: it.duration || 0 };
                 });
                 renderTrackGrid();
-                saveSearchQuery(query); // Persist search behavior
+                saveSearchQuery(query);
             } catch(err) {
                 if (err.name !== 'AbortError') {
                     $('contentArea').innerHTML = `<div style="text-align:center; padding: 60px 20px;"><h3 style="margin-bottom:8px;">Search Instance Idle</h3><p style="color:var(--text-subdued); font-size:0.85rem;">Try again shortly or paste direct YouTube Stream link.</p></div>`;
@@ -1482,13 +1566,16 @@
         function renderQueueList() {
             const upNext = tracks.slice(currentTrackIndex + 1);
             if (upNext.length === 0) {
-                $('queueList').innerHTML = `<div style="font-size:0.75rem; color:var(--text-subdued); padding:4px;">No upcoming tracks</div>`;
+                $('queueList').innerHTML = `<div style="font-size:0.85rem; color:var(--text-subdued); padding:20px 10px; text-align:center;">No upcoming tracks in the list</div>`;
                 return;
             }
             $('queueList').innerHTML = upNext.map((t, i) => `
                 <div class="queue-item" onclick="playTrack(${currentTrackIndex + 1 + i})">
-                    <span>${escapeHtml(t.title)}</span>
-                    <span style="color:var(--text-subdued); font-size:0.72rem;">${escapeHtml(t.artist)}</span>
+                    <div style="flex:1; min-width:0; padding-right:12px;">
+                        <div style="font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(t.title)}</div>
+                        <div style="color:var(--text-subdued); font-size:0.75rem; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(t.artist)}</div>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="opacity:0.6;"><path d="M8 5v14l11-7z"/></svg>
                 </div>
             `).join('');
         }
@@ -1510,7 +1597,6 @@
                 </div>`;
         }
 
-        /* ── Dynamic Home Loader (Replaces Static Default Lists) ── */
         async function fetchTracksForHome(query, limit = 5) {
             try {
                 const res = await searchAcrossInstances(query);
@@ -1553,7 +1639,6 @@
             const fallbacks = ['trending acoustic', 'lofi chill beats', 'atmospheric pop', 'indie folk', 'synthwave electronic', 'chill commute music'];
             const shuffledFallbacks = [...fallbacks].sort(() => Math.random() - 0.5);
 
-            // Dynamically assign queries based on past searches or random fallback keywords
             const qA = history[0] || shuffledFallbacks[0];
             const qB = history[1] || shuffledFallbacks[1];
             const qC = history[2] || shuffledFallbacks[2];
@@ -1562,14 +1647,12 @@
                 ? `Personalized from your search behavior.` 
                 : `Monochrome dynamic interface.`;
 
-            // Asynchronous parallel API loading
             const [tracksA, tracksB, tracksC] = await Promise.all([
                 fetchTracksForHome(qA, 5),
                 fetchTracksForHome(qB, 5),
                 fetchTracksForHome(qC, 5)
             ]);
 
-            // Assign variables with backup safeguards
             window.homeFeaturedTracks = tracksA.length > 0 ? tracksA : BACKUP_TRACKS.slice(0, 5);
             window.homeKLTracks = tracksB.length > 0 ? tracksB : BACKUP_TRACKS.slice(2, 6);
             window.homeKLPlaylists = tracksC.length > 0 ? tracksC : BACKUP_TRACKS.slice(1, 5);
@@ -1646,7 +1729,7 @@
             }
         }
 
-        /* ── Auth ── */
+        /* Auth */
         function signIn() {
             const name = $('nameInput').value.trim();
             if (!name) { showToast('Please provide your name'); return; }
@@ -1689,22 +1772,61 @@
             delete $('picUploader').dataset.img;
         }
 
+        /* Upgraded Modular Sleep Timer system */
+        function toggleSleepDropdown(event) {
+            event.stopPropagation();
+            $('sleepDropdown').classList.toggle('active');
+        }
+
+        function closeSleepDropdown() {
+            $('sleepDropdown').classList.remove('active');
+        }
+
+        function selectSleepTime(min) {
+            handleSleepTimer(min);
+            closeSleepDropdown();
+        }
+
         function handleSleepTimer(minutes) {
             if (sleepTimer) clearTimeout(sleepTimer);
-            document.querySelectorAll('.sleep-btn').forEach(b => b.classList.remove('active'));
+            
+            const dropdownItems = document.querySelectorAll('.sleep-dropdown-item');
+            dropdownItems.forEach(b => b.classList.remove('active'));
+            
+            const badge = $('sleepBadge');
+            
             if (minutes > 0) {
                 sleepTimer = setTimeout(() => {
-                    if (player && isPlaying) { player.pauseVideo(); showToast('Playback suspended by sleep timer'); }
-                    sleepTimer = null; sleepEndTime = null;
+                    if (player && isPlaying) { 
+                        player.pauseVideo(); 
+                        showToast('Playback suspended by sleep timer'); 
+                    }
+                    sleepTimer = null; 
+                    sleepEndTime = null;
+                    badge.style.display = 'none';
                 }, minutes * 60 * 1000);
+                
                 sleepEndTime = Date.now() + (minutes * 60 * 1000);
-                const btn = document.querySelector(`.sleep-btn[data-min="${minutes}"]`);
-                if (btn) btn.classList.add('active');
+                
+                dropdownItems.forEach(item => {
+                    if (item.textContent.includes(minutes + ' Min')) {
+                        item.classList.add('active');
+                    }
+                });
+                
+                badge.textContent = minutes;
+                badge.style.display = 'flex';
                 showToast(`Sleep timer active: ${minutes} Min`);
             } else {
-                sleepTimer = null; sleepEndTime = null;
-                const btn = document.querySelector(`.sleep-btn[data-min="0"]`);
-                if (btn) btn.classList.add('active');
+                sleepTimer = null; 
+                sleepEndTime = null;
+                badge.style.display = 'none';
+                
+                dropdownItems.forEach(item => {
+                    if (item.textContent.includes('Off')) {
+                        item.classList.add('active');
+                    }
+                });
                 showToast('Sleep timer deactivated');
             }
         }
@@ -1712,7 +1834,6 @@
         function setupEventListeners() {
             const searchInput = $('searchInput');
 
-            // HEADER SEARCH TAP EVENT -> NAVIGATE TO SEARCH PANEL AUTOMATICALLY
             searchInput.addEventListener('focus', () => {
                 if (currentView !== 'search') {
                     navigateTo('search');
@@ -1745,11 +1866,10 @@
                 reader.readAsDataURL(file);
             });
 
-            document.querySelectorAll('.sleep-btn').forEach(btn => {
-                btn.addEventListener('click', () => handleSleepTimer(parseInt(btn.dataset.min)));
+            document.addEventListener('click', () => {
+                closeUserMenu();
+                closeSleepDropdown();
             });
-
-            document.addEventListener('click', () => closeUserMenu());
             window.addEventListener('resize', updateNavIndicatorSlab);
         }
 
@@ -1794,7 +1914,6 @@
             searchMusic(q);
         }
 
-        // Dropdowns and UI Controls
         function toggleUserMenu(e) { e.stopPropagation(); $('userMenu').classList.toggle('active'); }
         function closeUserMenu() { $('userMenu').classList.remove('active'); }
 
@@ -1838,7 +1957,9 @@
             else navigator.clipboard.writeText(url).then(() => showToast('Direct link copied to clipboard'));
         }
 
-        function toggleQueue() { $('queuePanel').classList.toggle('show'); }
+        function toggleQueue() { 
+            $('queuePanel').classList.toggle('show'); 
+        }
 
         function setGreeting() {
             const h = new Date().getHours();
@@ -1859,7 +1980,6 @@
             setupSwipeGesture();
             setupScrubbing();
 
-            // Load Dynamic Dynamic Songs 
             loadAndRenderHome().then(() => {
                 tracks = window.homeFeaturedTracks.length > 0 ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
             });
