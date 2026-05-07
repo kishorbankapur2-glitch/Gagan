@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://i.ytimg.com https://img.youtube.com; frame-src https://www.youtube.com;">
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
@@ -385,9 +383,7 @@
             z-index: 1; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 4px 12px rgba(0,0,0,0.4); pointer-events: none;
         }
 
-        /* ==========================================================
-           FULLSCREEN PLAYER — BIGGER, BORDERLESS ROUNDED-SQUARE ALBUM ART
-           ========================================================== */
+        /* Fullscreen Player */
         .fullscreen-player {
             position: fixed; inset: 0; z-index: 1000; display: none; flex-direction: column; overflow: hidden;
             background: #000000; opacity: 0; transform: scale(1.02); transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
@@ -425,7 +421,6 @@
             flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 20px; overflow: hidden;
         }
 
-        /* 🔥 UPDATED: Perfect Borderless Rounded Square Album Wrap (NO SIDE BORDERS) */
         .fs-album-wrap {
             width: 82vw;
             height: 82vw;
@@ -434,24 +429,23 @@
             aspect-ratio: 1 / 1 !important;
             margin: 0 auto;
             position: relative;
-            border-radius: 28px !important; /* Elegant Rounded Square */
+            border-radius: 28px !important;
             overflow: hidden;
             background: none !important;
             border: none !important;
             outline: none !important;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); /* Subtle depth shadow */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             flex-shrink: 0;
         }
 
-        /* 🔥 UPDATED: Full Scale Album Art with Object-Fit Cover to Prevent Side Bars */
         .fs-album-art { 
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover !important; /* Crops cleanly into a square, eliminating black side bars */
+            object-fit: cover !important;
             display: block;
             border: none !important;
             outline: none !important;
-            transform: scale(1.04); /* Very minor zoom to completely hide any YT thumbnail outer artifacts */
+            transform: scale(1.04);
             transition: transform 0.3s var(--ease);
         }
 
@@ -464,8 +458,6 @@
         @media (min-width: 769px) {
             .fs-content-wrap { max-width: 1000px !important; height: 100vh; padding: 40px 32px !important; }
             .fs-main { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 54px !important; flex: 1; }
-            
-            /* 🔥 Desktop specific bigger rounded square album wrap */
             .fs-album-wrap { 
                 max-width: 440px !important; 
                 width: 440px !important; 
@@ -484,8 +476,6 @@
         @media (max-width: 768px) {
             .fs-content-wrap { padding: 16px 20px calc(12px + env(safe-area-inset-bottom)); }
             .fs-main { gap: 12px; }
-            
-            /* 🔥 Mobile specific rounded square size */
             .fs-album-wrap { 
                 width: 78vw !important; 
                 height: 78vw !important; 
@@ -567,8 +557,6 @@
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        #youtube-player { position: absolute; top: -9999px; left: -9999px; }
-
         .skeleton {
             background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
             background-size: 200% 100%; animation: loadingSkeleton 1.5s infinite;
@@ -603,17 +591,6 @@
             <input type="text" class="input-field" id="nameInput" placeholder="Enter your name" maxlength="20" autocomplete="off">
             <button class="btn-primary" onclick="signIn()">Get Started</button>
             <a class="skip-link" onclick="skipSignIn()">Continue as Guest</a>
-            const adBlocker = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-            if (node.tagName === 'SCRIPT' && (node.src.includes('ads') || node.src.includes('analytics'))) {
-                node.remove();
-            }
-        });
-    });
-});
-adBlocker.observe(document.documentElement, { childList: true, subtree: true });
-
         </div>
     </div>
 
@@ -784,7 +761,6 @@ adBlocker.observe(document.documentElement, { childList: true, subtree: true });
     </div>
 
     <div class="toast" id="toast"></div>
-    <div id="youtube-player"></div>
 
     <script>
         'use strict';
@@ -805,7 +781,7 @@ adBlocker.observe(document.documentElement, { childList: true, subtree: true });
             { id: 'tgOu00H6KTo', title: 'Closer', artist: 'The Chainsmokers', duration: 245, meta: '4:05' }
         ];
 
-        let player = null;
+        let audioPlayer = null;
         let isPlaying = false;
         let isPlayerReady = false;
         let currentTrackIndex = 0;
@@ -867,69 +843,60 @@ adBlocker.observe(document.documentElement, { childList: true, subtree: true });
             if (show) overlay.classList.add('show');
             else overlay.classList.remove('show');
         }
-if (playerElement) {
-    playerElement.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
-}
-        
-        function initYouTubePlayer() {
-            if (typeof YT !== 'undefined' && YT.Player) {
-                createPlayer();
-            } else {
-                window.onYouTubeIframeAPIReady = function() { createPlayer(); };
-                const script = document.createElement('script');
-                script.src = 'https://www.youtube.com/iframe_api';
-                document.head.appendChild(script);
-            }
-        }
 
-        function createPlayer() {
-            showPlayerLoading(true);
-            player = new YT.Player('youtube-player', {
-                height: '0', width: '0',
-                playerVars: { playsinline: 1, controls: 0, origin: window.location.origin, enablejsapi: 1 },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError
-                }
-            });
-        }
-
-        function onPlayerReady() {
-            isPlayerReady = true;
-            const initialVol = Storage.get('swar_vol') ?? 85;
-            player.setVolume(initialVol);
-            showPlayerLoading(false);
-        }
-
-        function onPlayerStateChange(event) {
-            const playPath = '<path d="M8 5v14l11-7z"/>';
-            const pausePath = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-            if (event.data === YT.PlayerState.PLAYING) {
+        /* Direct Ad-Free Streaming Audio Engine */
+        function initPlayer() {
+            audioPlayer = new Audio();
+            audioPlayer.preload = "auto";
+            
+            audioPlayer.addEventListener('play', () => {
                 isPlaying = true;
-                $('miniPlayIcon').innerHTML = pausePath;
-                $('fsPlayIcon').innerHTML = pausePath;
+                updatePlayStateUI(true);
                 startProgress();
                 updateMediaSessionState();
-            } else {
+            });
+
+            audioPlayer.addEventListener('pause', () => {
                 isPlaying = false;
-                $('miniPlayIcon').innerHTML = playPath;
-                $('fsPlayIcon').innerHTML = playPath;
+                updatePlayStateUI(false);
                 clearInterval(progressInterval);
                 updateMediaSessionState();
-                if (event.data === YT.PlayerState.ENDED) handleTrackEnd();
+            });
+
+            audioPlayer.addEventListener('ended', () => {
+                handleTrackEnd();
+            });
+
+            audioPlayer.addEventListener('error', () => {
+                onPlayerError();
+            });
+
+            isPlayerReady = true;
+            const initialVol = Storage.get('swar_vol') ?? 0.85;
+            audioPlayer.volume = initialVol;
+        }
+
+        function updatePlayStateUI(playing) {
+            const playPath = '<path d="M8 5v14l11-7z"/>';
+            const pausePath = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            if (playing) {
+                $('miniPlayIcon').innerHTML = pausePath;
+                $('fsPlayIcon').innerHTML = pausePath;
+            } else {
+                $('miniPlayIcon').innerHTML = playPath;
+                $('fsPlayIcon').innerHTML = playPath;
             }
         }
 
         function onPlayerError() {
-            showToast('Error playing stream, skipping...');
+            showToast('Decentralized stream timeout, skipping...');
             setTimeout(() => nextTrack(), 1500);
         }
 
         function handleTrackEnd() {
             if (repeatMode === 2) {
-                player.seekTo(0);
-                player.playVideo();
+                audioPlayer.currentTime = 0;
+                audioPlayer.play().catch(() => {});
             } else if (repeatMode === 1 || currentTrackIndex < tracks.length - 1) {
                 nextTrack();
             } else if (isShuffleOn && tracks.length > 1) {
@@ -937,15 +904,45 @@ if (playerElement) {
             }
         }
 
-        function playTrack(i) {
+        /* Concurrent Ad-Free Stream Extractor */
+        async function getAdFreeStreamUrl(videoId) {
+            const shuffled = [...PIPED_INSTANCES].sort(() => Math.random() - 0.5).slice(0, 3);
+            const promises = shuffled.map(async (ins) => {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 4500);
+                try {
+                    const res = await fetch(`${ins}/streams/${videoId}`, { signal: controller.signal });
+                    clearTimeout(timeout);
+                    if (!res.ok) throw new Error();
+                    const d = await res.json();
+                    if (!d.audioStreams || d.audioStreams.length === 0) throw new Error();
+                    // Select ad-free audio-only direct stream (m4a codec chosen for perfect compatibility)
+                    const stream = d.audioStreams.find(s => s.mimeType.includes('audio/mp4')) || d.audioStreams[0];
+                    return stream.url;
+                } catch(e) { clearTimeout(timeout); throw e; }
+            });
+            return await Promise.any(promises);
+        }
+
+        async function playTrack(i) {
             if (!isPlayerReady) { showToast('Interface Loading...'); return; }
             if (!tracks[i]) return;
             currentTrackIndex = i;
             const t = tracks[i];
+
+            showPlayerLoading(true);
             try {
-                player.loadVideoById(t.id);
-                player.playVideo();
-            } catch(err) { showToast('Decoding Error'); return; }
+                const adFreeUrl = await getAdFreeStreamUrl(t.id);
+                audioPlayer.src = adFreeUrl;
+                await audioPlayer.play();
+            } catch (err) {
+                showToast('Stream offline. Skipping...');
+                setTimeout(() => nextTrack(), 1500);
+                return;
+            } finally {
+                showPlayerLoading(false);
+            }
+
             const thumb = getThumbnail(t.id);
             $('miniPlayerImg').src = thumb;
             $('miniPlayerImg').onerror = function() { this.src = getThumbnailFallback(t.id); };
@@ -964,17 +961,15 @@ if (playerElement) {
 
         function togglePlay() {
             if (!isPlayerReady) { showToast('Player preparing...'); return; }
-            const state = player.getPlayerState();
-            if (state === -1 || state === 5) {
+            if (!audioPlayer.src) {
                 if (tracks.length > 0) playTrack(currentTrackIndex);
             } else if (isPlaying) {
-                player.pauseVideo();
+                audioPlayer.pause();
             } else {
-                player.playVideo();
+                audioPlayer.play().catch(() => {});
             }
         }
 
-        /* Navigations & Utilities */
         function nextTrack() {
             if (tracks.length === 0) return;
             if (isShuffleOn && tracks.length > 1) {
@@ -989,7 +984,7 @@ if (playerElement) {
 
         function prevTrack() {
             if (tracks.length === 0) return;
-            if (player && player.getCurrentTime && player.getCurrentTime() > 3) { player.seekTo(0); return; }
+            if (audioPlayer && audioPlayer.currentTime > 3) { audioPlayer.currentTime = 0; return; }
             currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
             playTrack(currentTrackIndex);
         }
@@ -997,9 +992,9 @@ if (playerElement) {
         function startProgress() {
             clearInterval(progressInterval);
             progressInterval = setInterval(() => {
-                if (player && player.getCurrentTime && isPlaying && !isScrubbing) {
-                    const c = player.getCurrentTime();
-                    const d = player.getDuration() || tracks[currentTrackIndex].duration || 0;
+                if (audioPlayer && isPlaying && !isScrubbing) {
+                    const c = audioPlayer.currentTime;
+                    const d = audioPlayer.duration || tracks[currentTrackIndex].duration || 0;
                     if (d > 0) {
                         const pct = (c / d) * 100;
                         $('miniProgress').style.width = pct + '%';
@@ -1023,13 +1018,13 @@ if (playerElement) {
                 if (!isScrubbing) return;
                 const pct = getTouchPct(e);
                 $('fsProgress').style.width = (pct * 100) + '%';
-                if (player && player.getDuration) $('fsCurrentTime').textContent = formatDuration(pct * player.getDuration());
+                if (audioPlayer && audioPlayer.duration) $('fsCurrentTime').textContent = formatDuration(pct * audioPlayer.duration);
             };
             const onEnd = (e) => {
                 if (!isScrubbing) return;
                 isScrubbing = false;
                 const pct = getTouchPct(e);
-                if (player && player.getDuration) player.seekTo(pct * player.getDuration());
+                if (audioPlayer && audioPlayer.duration) audioPlayer.currentTime = pct * audioPlayer.duration;
             };
             container.addEventListener('mousedown', onStart);
             window.addEventListener('mousemove', onMove);
@@ -1053,7 +1048,7 @@ if (playerElement) {
                 navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
                 navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
                 navigator.mediaSession.setActionHandler('seekto', (details) => {
-                    if (player && player.seekTo) player.seekTo(details.seekTime);
+                    if (audioPlayer) audioPlayer.currentTime = details.seekTime;
                 });
             }
         }
@@ -1129,7 +1124,7 @@ if (playerElement) {
             const match = query.match(ytRegex);
             if (match && match[1]) {
                 const videoId = match[1];
-                const newTrack = { id: videoId, title: 'Imported Native Stream', artist: 'Source Link', duration: 0 };
+                const newTrack = { id: videoId, title: 'Imported Stream Link', artist: 'Source Link', duration: 0 };
                 tracks = [newTrack, ...tracks];
                 renderTrackGrid();
                 playTrack(0);
@@ -1442,8 +1437,8 @@ if (playerElement) {
             
             if (minutes > 0) {
                 sleepTimer = setTimeout(() => {
-                    if (player && isPlaying) { 
-                        player.pauseVideo(); 
+                    if (audioPlayer && isPlaying) { 
+                        audioPlayer.pause(); 
                         showToast('Playback suspended by sleep timer'); 
                     }
                     sleepTimer = null; 
@@ -1629,7 +1624,7 @@ if (playerElement) {
                 tracks = window.homeFeaturedTracks.length > 0 ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
             });
 
-            initYouTubePlayer();
+            initPlayer();
             setTimeout(updateNavIndicatorSlab, 300);
         });
     </script>
