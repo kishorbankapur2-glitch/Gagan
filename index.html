@@ -332,6 +332,7 @@
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: x mandatory;
+            min-height: 275px;
         }
         .featured-row::-webkit-scrollbar { display: none; }
         .featured-card {
@@ -395,6 +396,7 @@
             overflow-x: auto;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
+            min-height: 140px;
         }
         .kl-grid::-webkit-scrollbar { display: none; }
         .kl-card {
@@ -466,6 +468,7 @@
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
             margin-top: 20px;
+            min-height: 130px;
         }
         .kl-grid-2::-webkit-scrollbar { display: none; }
         .kl-card-2 {
@@ -503,7 +506,7 @@
             text-overflow: ellipsis;
         }
 
-        /* Quick picks grid (old home, reused for non-home views) */
+        /* Quick picks grid */
         .quick-picks {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -537,7 +540,7 @@
         .section-header { margin-bottom: 16px; }
         .section-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.03em; }
 
-        /* Track Grid (search / library results) */
+        /* Track Grid */
         .track-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
@@ -929,7 +932,7 @@
             <div class="home-greeting">
                 <div>
                     <div class="home-greeting-text" id="greeting">good evening</div>
-                    <div class="home-greeting-sub">Monochrome curated audio.</div>
+                    <div class="home-greeting-sub" id="greetingSub">Monochrome curated audio.</div>
                 </div>
             </div>
 
@@ -1068,40 +1071,14 @@
             'https://api.piped.private.coffee',
             'https://pipedapi.syncstream.org'
         ];
-        const DEFAULT_TRACKS = [
-            { id: 'kJQP7kiw5Fk', title: 'Despacito', artist: 'Luis Fonsi', duration: 282 },
-            { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', duration: 263 },
-            { id: 'papuvlVeZg8', title: 'Kesariya', artist: 'Arijit Singh', duration: 268 },
-            { id: 'BddP6PYo2gs', title: 'Tum Hi Ho', artist: 'Arijit Singh', duration: 262 },
-            { id: 'jHNNMj5bNQw', title: 'Channa Mereya', artist: 'Arijit Singh', duration: 290 },
-            { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Bruno Mars', duration: 270 }
-        ];
 
-        // Featured cards data (large album art style)
-        const FEATURED_TRACKS = [
-            { id: 'papuvlVeZg8', title: 'Kesariya', artist: 'Arijit Singh' },
-            { id: 'BddP6PYo2gs', title: 'Tum Hi Ho', artist: 'Arijit Singh' },
-            { id: 'jHNNMj5bNQw', title: 'Channa Mereya', artist: 'Arijit Singh' },
-            { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Bruno Mars' },
-            { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran' },
-        ];
-
-        // Keep Listening row 1 (square thumbnails)
-        const KL_TRACKS = [
-            { id: 'kJQP7kiw5Fk', title: 'Despacito', artist: 'Luis Fonsi', meta: '4:42' },
-            { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', meta: '4:23' },
-            { id: 'papuvlVeZg8', title: 'Kesariya', artist: 'Arijit Singh', meta: '4:28' },
-            { id: 'BddP6PYo2gs', title: 'Tum Hi Ho', artist: 'Arijit Singh', meta: '4:22' },
-            { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Bruno Mars', meta: '4:30' },
-        ];
-
-        // Keep Listening row 2 (circle / playlist style)
-        const KL_PLAYLISTS = [
-            { id: 'papuvlVeZg8', title: 'Bollywood Hits', meta: '12 songs', query: 'bollywood hits 2024' },
-            { id: 'JGwWNGJdvx8', title: 'Pop Essentials', meta: '8 songs', query: 'pop essentials 2024' },
-            { id: 'kJQP7kiw5Fk', title: 'Latin Vibes', meta: '10 songs', query: 'latin pop hits' },
-            { id: 'OPf0YbXqDm0', title: 'Funk & Soul', meta: '7 songs', query: 'funk soul classic hits' },
-            { id: 'jHNNMj5bNQw', title: 'Arijit Mix', meta: '15 songs', query: 'arijit singh hits' },
+        // Backup static global tracklist (In case internet is fully down)
+        const BACKUP_TRACKS = [
+            { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', duration: 279, meta: '4:39' },
+            { id: '1Ek8X0idI44', title: 'Night Changes', artist: 'One Direction', duration: 240, meta: '4:00' },
+            { id: 'fKopy74weus', title: 'Starboy', artist: 'The Weeknd', duration: 230, meta: '3:50' },
+            { id: '3AtDnEC4zak', title: 'Attention', artist: 'Charlie Puth', duration: 210, meta: '3:30' },
+            { id: 'tgOu00H6KTo', title: 'Closer', artist: 'The Chainsmokers', duration: 245, meta: '4:05' }
         ];
 
         let player = null;
@@ -1123,6 +1100,11 @@
         let touchStartY = 0;
         let isDragging = false;
         let isScrubbing = false;
+
+        // Dynamic home holders
+        window.homeFeaturedTracks = [];
+        window.homeKLTracks = [];
+        window.homeKLPlaylists = [];
 
         const Storage = {
             get(key) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch { return null; } },
@@ -1402,6 +1384,16 @@
             }
         }
 
+        function saveSearchQuery(q) {
+            if (!q || q.trim().length < 2) return;
+            let history = Storage.get('swar_last_searches') || [];
+            // Remove duplication
+            history = history.filter(item => item.toLowerCase() !== q.trim().toLowerCase());
+            history.unshift(q.trim());
+            if (history.length > 5) history.pop();
+            Storage.set('swar_last_searches', history);
+        }
+
         async function searchMusic(query) {
             if (!query || !query.trim()) return;
             const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
@@ -1428,6 +1420,7 @@
                     return { id, title: (it.title || 'Unknown Title').replace(/&quot;/g, '"'), artist: it.uploaderName || 'Unknown Artist', duration: it.duration || 0 };
                 });
                 renderTrackGrid();
+                saveSearchQuery(query); // Persist search behavior
             } catch(err) {
                 if (err.name !== 'AbortError') {
                     $('contentArea').innerHTML = `<div style="text-align:center; padding: 60px 20px;"><h3 style="margin-bottom:8px;">Search Instance Idle</h3><p style="color:var(--text-subdued); font-size:0.85rem;">Try again shortly or paste direct YouTube Stream link.</p></div>`;
@@ -1517,10 +1510,78 @@
                 </div>`;
         }
 
-        /* ── Home Page Renders ── */
-        function renderFeaturedRow() {
-            $('featuredRow').innerHTML = FEATURED_TRACKS.map((t, idx) => `
-                <div class="featured-card" onclick="playFeatured(${idx})">
+        /* ── Dynamic Home Loader (Replaces Static Default Lists) ── */
+        async function fetchTracksForHome(query, limit = 5) {
+            try {
+                const res = await searchAcrossInstances(query);
+                if (res && res.items) {
+                    return res.items
+                        .filter(it => it.url && it.url.includes('/watch?v='))
+                        .slice(0, limit)
+                        .map(it => {
+                            const parts = it.url.split('v=');
+                            const id = parts[1] ? parts[1].split('&')[0] : '';
+                            return {
+                                id,
+                                title: (it.title || 'Unknown Title').replace(/&quot;/g, '"'),
+                                artist: it.uploaderName || 'Unknown Artist',
+                                duration: it.duration || 0,
+                                meta: formatDuration(it.duration || 240)
+                            };
+                        });
+                }
+            } catch (e) {
+                console.warn("Home load failed for query:", query, e);
+            }
+            return [];
+        }
+
+        function renderHomeSkeletons() {
+            const skeletonCard = `<div class="featured-card skeleton"></div>`;
+            const skeletonSquare = `<div class="kl-card skeleton" style="height:170px; border-radius:12px;"></div>`;
+            const skeletonCircle = `<div class="kl-card-2 skeleton" style="height:150px; border-radius:50%;"></div>`;
+
+            $('featuredRow').innerHTML = Array(4).fill(skeletonCard).join('');
+            $('klGrid').innerHTML = Array(4).fill(skeletonSquare).join('');
+            $('klGrid2').innerHTML = Array(4).fill(skeletonCircle).join('');
+        }
+
+        async function loadAndRenderHome() {
+            renderHomeSkeletons();
+
+            const history = Storage.get('swar_last_searches') || [];
+            const fallbacks = ['trending acoustic', 'lofi chill beats', 'atmospheric pop', 'indie folk', 'synthwave electronic', 'chill commute music'];
+            const shuffledFallbacks = [...fallbacks].sort(() => Math.random() - 0.5);
+
+            // Dynamically assign queries based on past searches or random fallback keywords
+            const qA = history[0] || shuffledFallbacks[0];
+            const qB = history[1] || shuffledFallbacks[1];
+            const qC = history[2] || shuffledFallbacks[2];
+
+            $('greetingSub').textContent = history.length > 0 
+                ? `Personalized from your search behavior.` 
+                : `Monochrome dynamic interface.`;
+
+            // Asynchronous parallel API loading
+            const [tracksA, tracksB, tracksC] = await Promise.all([
+                fetchTracksForHome(qA, 5),
+                fetchTracksForHome(qB, 5),
+                fetchTracksForHome(qC, 5)
+            ]);
+
+            // Assign variables with backup safeguards
+            window.homeFeaturedTracks = tracksA.length > 0 ? tracksA : BACKUP_TRACKS.slice(0, 5);
+            window.homeKLTracks = tracksB.length > 0 ? tracksB : BACKUP_TRACKS.slice(2, 6);
+            window.homeKLPlaylists = tracksC.length > 0 ? tracksC : BACKUP_TRACKS.slice(1, 5);
+
+            renderDynamicFeaturedRow(window.homeFeaturedTracks);
+            renderDynamicKLGrid(window.homeKLTracks);
+            renderDynamicKLGrid2(window.homeKLPlaylists);
+        }
+
+        function renderDynamicFeaturedRow(arr) {
+            $('featuredRow').innerHTML = arr.map((t, idx) => `
+                <div class="featured-card" onclick="playDynamicFeatured(${idx})">
                     <img class="featured-card-bg" src="${getThumbnail(t.id)}" loading="lazy"
                          onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
                     <div class="featured-card-overlay"></div>
@@ -1532,9 +1593,9 @@
             `).join('');
         }
 
-        function renderKLGrid() {
-            $('klGrid').innerHTML = KL_TRACKS.map((t, idx) => `
-                <div class="kl-card" onclick="playKL(${idx})">
+        function renderDynamicKLGrid(arr) {
+            $('klGrid').innerHTML = arr.map((t, idx) => `
+                <div class="kl-card" onclick="playDynamicKL(${idx})">
                     <div class="kl-card-img-wrap">
                         <img class="kl-card-img" src="${getThumbnail(t.id)}" loading="lazy"
                              onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
@@ -1543,32 +1604,34 @@
                         </div>
                     </div>
                     <div class="kl-card-title">${escapeHtml(t.title)}</div>
-                    <div class="kl-card-meta">${escapeHtml(t.artist)} • ${t.meta}</div>
+                    <div class="kl-card-meta">${escapeHtml(t.artist)} • ${t.meta || '3:30'}</div>
                 </div>
             `).join('');
         }
 
-        function renderKLGrid2() {
-            $('klGrid2').innerHTML = KL_PLAYLISTS.map((p, idx) => `
-                <div class="kl-card-2" onclick="quickSearch(${JSON.stringify(p.query)})">
+        function renderDynamicKLGrid2(arr) {
+            $('klGrid2').innerHTML = arr.map((t, idx) => `
+                <div class="kl-card-2" onclick="quickSearch('${escapeHtml(t.title)}')">
                     <div class="kl-card-2-img-wrap">
-                        <img class="kl-card-2-img" src="${getThumbnail(p.id)}" loading="lazy"
-                             onerror="this.onerror=null;this.src='${getThumbnailFallback(p.id)}'">
+                        <img class="kl-card-2-img" src="${getThumbnail(t.id)}" loading="lazy"
+                             onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
                     </div>
-                    <div class="kl-card-2-title">${escapeHtml(p.title)}</div>
-                    <div class="kl-card-2-meta">${escapeHtml(p.meta)}</div>
+                    <div class="kl-card-2-title">${escapeHtml(t.title)}</div>
+                    <div class="kl-card-2-meta">Related Mix</div>
                 </div>
             `).join('');
         }
 
-        function playFeatured(idx) {
-            tracks = [...FEATURED_TRACKS];
+        function playDynamicFeatured(idx) {
+            if (!window.homeFeaturedTracks || !window.homeFeaturedTracks[idx]) return;
+            tracks = [...window.homeFeaturedTracks];
             currentTrackIndex = idx;
             playTrack(idx);
         }
 
-        function playKL(idx) {
-            tracks = [...KL_TRACKS];
+        function playDynamicKL(idx) {
+            if (!window.homeKLTracks || !window.homeKLTracks[idx]) return;
+            tracks = [...window.homeKLTracks];
             currentTrackIndex = idx;
             playTrack(idx);
         }
@@ -1577,9 +1640,7 @@
             document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             if (!query) {
-                renderFeaturedRow();
-                renderKLGrid();
-                renderKLGrid2();
+                loadAndRenderHome();
             } else {
                 quickSearch(query);
             }
@@ -1650,12 +1711,21 @@
 
         function setupEventListeners() {
             const searchInput = $('searchInput');
+
+            // HEADER SEARCH TAP EVENT -> NAVIGATE TO SEARCH PANEL AUTOMATICALLY
+            searchInput.addEventListener('focus', () => {
+                if (currentView !== 'search') {
+                    navigateTo('search');
+                }
+            });
+
             searchInput.addEventListener('input', (e) => {
                 clearTimeout(searchDebounceTimer);
                 const q = e.target.value.trim();
                 if (!q) { if (currentView === 'search') goHome(); return; }
                 searchDebounceTimer = setTimeout(() => searchMusic(q), 400);
             });
+
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     clearTimeout(searchDebounceTimer);
@@ -1663,6 +1733,7 @@
                     if (q) searchMusic(q);
                 }
             });
+
             $('picUpload').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -1673,9 +1744,11 @@
                 };
                 reader.readAsDataURL(file);
             });
+
             document.querySelectorAll('.sleep-btn').forEach(btn => {
                 btn.addEventListener('click', () => handleSleepTimer(parseInt(btn.dataset.min)));
             });
+
             document.addEventListener('click', () => closeUserMenu());
             window.addEventListener('resize', updateNavIndicatorSlab);
         }
@@ -1692,7 +1765,7 @@
                 $('homeView').style.display = 'block';
                 $('otherView').style.display = 'none';
                 $('searchInput').value = '';
-                tracks = [...DEFAULT_TRACKS];
+                tracks = window.homeFeaturedTracks.length > 0 ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
             } else {
                 $('homeView').style.display = 'none';
                 $('otherView').style.display = 'block';
@@ -1721,6 +1794,7 @@
             searchMusic(q);
         }
 
+        // Dropdowns and UI Controls
         function toggleUserMenu(e) { e.stopPropagation(); $('userMenu').classList.toggle('active'); }
         function closeUserMenu() { $('userMenu').classList.remove('active'); }
 
@@ -1785,12 +1859,12 @@
             setupSwipeGesture();
             setupScrubbing();
 
-            tracks = [...DEFAULT_TRACKS];
-            renderFeaturedRow();
-            renderKLGrid();
-            renderKLGrid2();
-            initYouTubePlayer();
+            // Load Dynamic Dynamic Songs 
+            loadAndRenderHome().then(() => {
+                tracks = window.homeFeaturedTracks.length > 0 ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
+            });
 
+            initYouTubePlayer();
             setTimeout(updateNavIndicatorSlab, 300);
         });
     </script>
