@@ -493,18 +493,18 @@
             }
             .fs-title { font-size: 1.3rem; }
             .fs-artist { font-size: 0.88rem; }
+            .fs-options-panel { margin-bottom: 6px; }
+            .swipe-down-hint { margin-top: 2px; }
         }
 
-        /* ==========================================================
-           NEW: OpenTune-style Progress Bar (Very Thin, Minimal)
-           ========================================================== */
-        .fs-progress-container { width: 100%; padding: 6px 0; cursor: pointer; }
-        .fs-progress-bar { width: 100%; height: 3px; background: #2a2a2a; position: relative; }
-        .fs-progress-fill { height: 100%; background: #ffffff; width: 0%; position: relative; }
+        .fs-progress-container { width: 100%; padding: 8px 0; cursor: pointer; }
+        .fs-progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.15); border-radius: 100px; position: relative; }
+        .fs-progress-fill { height: 100%; background: #ffffff; border-radius: 100px; width: 0%; position: relative; }
         .fs-progress-thumb {
-            position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
-            width: 8px; height: 8px; background: #fff; border-radius: 50%;
+            position: absolute; right: -5px; top: 50%; transform: translateY(-50%) scale(0.8);
+            width: 10px; height: 10px; background: #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.5); transition: transform 0.2s;
         }
+        .fs-progress-container:hover .fs-progress-thumb { transform: translateY(-50%) scale(1.25); }
         .fs-time { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-subdued); font-weight: 500; margin-top: 6px; }
 
         /* ==========================================================
@@ -701,21 +701,14 @@
             .fs-controls .fs-play-btn svg { width: 32px !important; height: 32px !important; }
         }
 
-        /* ==========================================================
-           UPDATED: Compact Options Panel for Mobile
-           ========================================================== */
         .fs-options-panel {
-            display: flex; justify-content: space-around; 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            border-radius: 12px; 
-            padding: 6px 8px; 
-            margin: 8px 0 4px;
+            display: flex; justify-content: space-around; background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border); border-radius: 14px; padding: 10px; margin-bottom: 12px;
         }
-        .fs-opt-btn { font-size: 0.65rem; color: var(--text-subdued); display: flex; flex-direction: column; align-items: center; gap: 3px; font-weight: 600; }
+        .fs-opt-btn { font-size: 0.72rem; color: var(--text-subdued); display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; }
         .fs-opt-btn:hover { color: #fff; }
         .fs-opt-btn.active { color: #ffffff; }
-        .fs-opt-btn svg { width: 14px; height: 14px; fill: currentColor; }
+        .fs-opt-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
         /* Fullscreen Queue Overlay */
         .queue-panel {
@@ -764,7 +757,7 @@
         }
         @keyframes loadingSkeleton { to { background-position: -200% 0; } }
 
-        .swipe-down-hint { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.65rem; color: var(--text-subdued); margin-top: 4px; flex-shrink: 0; }
+        .swipe-down-hint { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.7rem; color: var(--text-subdued); margin-top: 12px; flex-shrink: 0; }
         .swipe-down-hint svg { width: 14px; height: 14px; fill: currentColor; animation: bounce 1.5s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -834,28 +827,6 @@
 
         @media (prefers-reduced-motion: reduce){
             .marquee__track{ transform: none !important; }
-        }
-
-        /* ==========================================================
-           NEW: Mobile-specific adjustments for compact layout
-           ========================================================== */
-        @media (max-width: 768px) {
-            .fs-info-section {
-                gap: 8px !important;
-            }
-            
-            .fs-controls {
-                margin: 12px 0 14px !important;
-            }
-            
-            .fs-options-panel {
-                padding: 6px 8px !important;
-                margin: 6px 0 4px !important;
-            }
-            
-            .swipe-down-hint {
-                margin-top: 4px !important;
-            }
         }
     </style>
 </head>
@@ -1039,8 +1010,6 @@
                             <button class="fs-ctrl-btn" id="likeBtn" onclick="toggleLike()"><svg id="likeIcon" viewBox="0 0 24 24" width="22" height="22"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
                         </div>
                     </div>
-                    
-                    <!-- OpenTune-style Progress Bar -->
                     <div class="fs-progress-container" id="fsProgressContainer">
                         <div class="fs-progress-bar">
                             <div class="fs-progress-fill" id="fsProgress">
@@ -1072,7 +1041,6 @@
                         </button>
                     </div>
 
-                    <!-- Options Panel - Now above swipe-down-hint -->
                     <div class="fs-options-panel">
                         <button class="fs-opt-btn" id="fsQueueBtn" onclick="toggleQueue()"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>Up Next</button>
                         <button class="fs-opt-btn" onclick="shareTrack()"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>Share Link</button>
