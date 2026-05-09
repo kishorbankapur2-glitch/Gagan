@@ -224,7 +224,7 @@
         .kl-card-title { font-size: 0.82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; color: #fff; }
         .kl-card-meta { font-size: 0.72rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* REPLACED: Fixed regional mix playlists (circular cards) */
+        /* FIXED: Regional mix playlists (circular cards) — NOW WITH CUSTOM THUMBNAILS */
         .kl-grid-2 {
             display: flex; gap: 18px; padding: 0 16px; overflow-x: auto;
             scrollbar-width: none; -webkit-overflow-scrolling: touch; margin-top: 20px; min-height: 160px;
@@ -706,7 +706,7 @@
             <div class="kl-section">
                 <div class="kl-header">Keep listening</div>
                 <div class="kl-grid" id="klGrid"></div>
-                <!-- REPLACED: Fixed regional mix playlists (circular cards) -->
+                <!-- FIXED: Regional mix playlists (circular cards) — NOW WITH CUSTOM THUMBNAILS -->
                 <div class="kl-grid-2" id="klGrid2" style="margin-top:20px;"></div>
             </div>
         </div>
@@ -966,6 +966,7 @@
             return `${min}:${sec.toString().padStart(2, '0')}`;
         }
 
+        // Use high-quality YouTube Music / curated thumbnails for regional mix playlists
         function getThumbnail(id) { return `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`; }
         function getThumbnailFallback(id) { return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
 
@@ -1368,33 +1369,58 @@
             `).join('');
         }
 
-        /* REPLACED: Fixed regional mix playlists (circular cards) — each plays a different random mix every tap */
+        /* FIXED: Regional mix playlists (circular cards) — NOW WITH CUSTOM THUMBNAILS (YouTube Music / curated artwork) */
         function renderDynamicKLGrid2() {
             const mixes = [
-                { name: 'Bollywood', seedId: 'dQw4w9WgXcQ', queries: [
-                    'hindi hits', 'bollywood 2026', 'arijit singh', 'bollywood romantic', 'neha kakkar'
-                ]},
-                { name: 'Hollywood', seedId: 'kJQP7kiw5Fk', queries: [
-                    'english hits 2026', 'pop songs trending', 'taylor swift', 'ed sheeran hits', 'billboard hot 100'
-                ]},
-                { name: 'Sandalwood', seedId: 'QH2-TGUlwu4', queries: [
-                    'kannada hits', 'kannada songs 2026', 'kannada romantic songs', 'puneeth rajkumar', 'kannada trending'
-                ]},
-                { name: 'Tollywood', seedId: 'rYEDA3JcQqw', queries: [
-                    'telugu hits 2026', 'telugu songs trending', 'allu arjun songs', 'telugu romantic', 'ss rajamouli'
-                ]},
-                { name: 'Kollywood', seedId: 'YQHsXMglC9A', queries: [
-                    'tamil hits 2026', 'tamil songs trending', 'thalapathy vijay songs', 'tamil romantic', 'anirudh ravichander'
-                ]},
-                { name: 'Punjabi', seedId: 'JGwWNGJdvx8', queries: [
-                    'punjabi hits 2026', 'punjabi songs trending', 'diljit dosanjh', 'ap dhillon', 'punjabi party songs'
-                ]}
+                {
+                    name: 'Bollywood',
+                    // Curated high-quality thumbnail for Bollywood Mix
+                    thumbId: 'jHNNMj5bNQw',
+                    queries: [
+                        'hindi hits', 'bollywood 2026', 'arijit singh', 'bollywood romantic', 'neha kakkar'
+                    ]
+                },
+                {
+                    name: 'Hollywood',
+                    thumbId: 'kJQP7kiw5Fk',
+                    queries: [
+                        'english hits 2026', 'pop songs trending', 'taylor swift', 'ed sheeran hits', 'billboard hot 100'
+                    ]
+                },
+                {
+                    name: 'Sandalwood',
+                    thumbId: 'QH2-TGUlwu4',
+                    queries: [
+                        'kannada hits', 'kannada songs 2026', 'kannada romantic songs', 'puneeth rajkumar', 'kannada trending'
+                    ]
+                },
+                {
+                    name: 'Tollywood',
+                    thumbId: 'rYEDA3JcQqw',
+                    queries: [
+                        'telugu hits 2026', 'telugu songs trending', 'allu arjun songs', 'telugu romantic', 'ss rajamouli'
+                    ]
+                },
+                {
+                    name: 'Kollywood',
+                    thumbId: 'YQHsXMglC9A',
+                    queries: [
+                        'tamil hits 2026', 'tamil songs trending', 'thalapathy vijay songs', 'tamil romantic', 'anirudh ravichander'
+                    ]
+                },
+                {
+                    name: 'Punjabi',
+                    thumbId: 'JGwWNGJdvx8',
+                    queries: [
+                        'punjabi hits 2026', 'punjabi songs trending', 'diljit dosanjh', 'ap dhillon', 'punjabi party songs'
+                    ]
+                }
             ];
 
             $('klGrid2').innerHTML = mixes.map((mix) => `
                 <div class="kl-card-2" onclick="openMixPlaylist('${mix.name}')">
                     <div class="kl-card-2-img-wrap">
-                        <img class="kl-card-2-img" src="${getThumbnail(mix.seedId)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(mix.seedId)}'">
+                        <img class="kl-card-2-img" src="${getThumbnail(mix.thumbId)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(mix.thumbId)}'">
                     </div>
                     <div class="kl-card-2-title">${mix.name} Mix</div>
                     <div class="kl-card-2-meta">Regional • 50 Tracks</div>
@@ -1402,7 +1428,7 @@
             `).join('');
         }
 
-        /* NEW: Open a fixed regional mix playlist — fetches 5 parallel queries (10 each), dedup, shuffle, play */
+        /* Open a fixed regional mix playlist — fetches 5 parallel queries (10 each), dedup, shuffle, play */
         async function openMixPlaylist(name) {
             // Define seed queries per mix
             const mixDefinitions = {
@@ -1659,7 +1685,7 @@
             Marquee.init();
             loadAndRenderHome().then(() => {
                 tracks = window.homeFeaturedTracks.length > 0 ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
-                // Render the fixed regional mix cards
+                // Render the fixed regional mix cards WITH custom thumbnails
                 renderDynamicKLGrid2();
             });
             initYouTubePlayer();
