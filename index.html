@@ -224,6 +224,7 @@
         .kl-card-title { font-size: 0.82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; color: #fff; }
         .kl-card-meta { font-size: 0.72rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* REPLACED: Fixed regional mix playlists (circular cards) */
         .kl-grid-2 {
             display: flex; gap: 18px; padding: 0 16px; overflow-x: auto;
             scrollbar-width: none; -webkit-overflow-scrolling: touch; margin-top: 20px; min-height: 160px;
@@ -685,7 +686,7 @@
         <div id="homeView">
             <div class="home-greeting">
                 <div>
-                    <div class="home-greeting-text" id="greeting">good evening</div>
+                    <div class="home-greeting-text" id="greeting">Good Evening</div>
                     <div class="home-greeting-sub" id="greetingSub">Monochrome curated audio.</div>
                 </div>
             </div>
@@ -705,6 +706,7 @@
             <div class="kl-section">
                 <div class="kl-header">Keep listening</div>
                 <div class="kl-grid" id="klGrid"></div>
+                <!-- REPLACED: Fixed regional mix playlists (circular cards) -->
                 <div class="kl-grid-2" id="klGrid2" style="margin-top:20px;"></div>
             </div>
         </div>
@@ -1042,6 +1044,9 @@
             $('miniPlayerImg').onerror = function() { this.src = getThumbnailFallback(t.id); };
             $('miniPlayerTitle').textContent = t.title;
             $('miniPlayerArtist').textContent = t.artist;
+            if (currentView === 'home') {
+                $('greetingSub').textContent = `Now Playing: ${t.title} — ${t.artist}`;
+            }
             $('fsTitle').textContent = t.title;
             $('fsArtist').textContent = t.artist;
             $('fsAlbumArt').src = thumb;
@@ -1049,18 +1054,6 @@
             $('miniPlayer').classList.add('visible');
             updateLikeButton(); updateAtmosphericBackground(); setupMediaSession(t); renderQueueList();
             Marquee.refreshAll();
-            /* Live home greeting update with currently playing track */
-            updateGreetingWithTrack(t);
-        }
-
-        function updateGreetingWithTrack(t) {
-            if (currentView !== 'home') return;
-            const h = new Date().getHours();
-            let greet = 'Good Evening';
-            if (h < 12) greet = 'Good Morning'; else if (h < 18) greet = 'Good Afternoon';
-            const name = user && user.name !== 'Guest User' ? user.name.split(' ')[0] : null;
-            $('greeting').textContent = name ? `${greet}, ${name}` : greet;
-            $('greetingSub').textContent = `Now Playing: ${t.title} — ${t.artist}`;
         }
 
         function togglePlay() {
@@ -1375,53 +1368,130 @@
             `).join('');
         }
 
-        function renderDynamicKLGrid2(arr) {
-            $('klGrid2').innerHTML = arr.map((t, idx) => `
-                <div class="kl-card-2" onclick="openMixPlaylist('${escapeHtml(t.title)}', '${escapeHtml(t.artist)}', '${t.id}')">
+        /* REPLACED: Fixed regional mix playlists (circular cards) — each plays a different random mix every tap */
+        function renderDynamicKLGrid2() {
+            const mixes = [
+                { name: 'Bollywood', seedId: 'dQw4w9WgXcQ', queries: [
+                    'hindi hits', 'bollywood 2026', 'arijit singh', 'bollywood romantic', 'neha kakkar'
+                ]},
+                { name: 'Hollywood', seedId: 'kJQP7kiw5Fk', queries: [
+                    'english hits 2026', 'pop songs trending', 'taylor swift', 'ed sheeran hits', 'billboard hot 100'
+                ]},
+                { name: 'Sandalwood', seedId: 'QH2-TGUlwu4', queries: [
+                    'kannada hits', 'kannada songs 2026', 'kannada romantic songs', 'puneeth rajkumar', 'kannada trending'
+                ]},
+                { name: 'Tollywood', seedId: 'rYEDA3JcQqw', queries: [
+                    'telugu hits 2026', 'telugu songs trending', 'allu arjun songs', 'telugu romantic', 'ss rajamouli'
+                ]},
+                { name: 'Kollywood', seedId: 'YQHsXMglC9A', queries: [
+                    'tamil hits 2026', 'tamil songs trending', 'thalapathy vijay songs', 'tamil romantic', 'anirudh ravichander'
+                ]},
+                { name: 'Punjabi', seedId: 'JGwWNGJdvx8', queries: [
+                    'punjabi hits 2026', 'punjabi songs trending', 'diljit dosanjh', 'ap dhillon', 'punjabi party songs'
+                ]}
+            ];
+
+            $('klGrid2').innerHTML = mixes.map((mix) => `
+                <div class="kl-card-2" onclick="openMixPlaylist('${mix.name}')">
                     <div class="kl-card-2-img-wrap">
-                        <img class="kl-card-2-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
-                        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;" class="mix-hover-overlay">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="#fff"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm3.5 7.5v5h2v-5h-2zm0 7h2v-2h-2v2z"/></svg>
-                        </div>
+                        <img class="kl-card-2-img" src="${getThumbnail(mix.seedId)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(mix.seedId)}'">
                     </div>
-                    <div class="kl-card-2-title">${escapeHtml(t.title)}</div>
-                    <div class="kl-card-2-meta">Mix • Shuffle</div>
+                    <div class="kl-card-2-title">${mix.name} Mix</div>
+                    <div class="kl-card-2-meta">Regional • 50 Tracks</div>
                 </div>
             `).join('');
-            /* hover overlay for circle cards */
-            $('klGrid2').querySelectorAll('.kl-card-2').forEach(card => {
-                const overlay = card.querySelector('.mix-hover-overlay');
-                card.addEventListener('mouseenter', () => { if(overlay) overlay.style.opacity = '1'; });
-                card.addEventListener('mouseleave', () => { if(overlay) overlay.style.opacity = '0'; });
-            });
         }
 
-        async function openMixPlaylist(title, artist, seedId) {
-            showToast('Loading Mix...');
-            /* Fetch 50 songs based on seed title */
-            let mixTracks = [];
-            const queries = [title, artist, title + ' mix', 'songs like ' + title];
-            try {
-                const results = await Promise.allSettled(queries.map(q => fetchTracksForHome(q, 14)));
-                results.forEach(r => { if (r.status === 'fulfilled') mixTracks.push(...r.value); });
-            } catch(e) {}
-            /* Deduplicate by id */
-            const seen = new Set();
-            mixTracks = mixTracks.filter(t => { if (!t.id || seen.has(t.id)) return false; seen.add(t.id); return true; });
-            /* Pad with backups if needed */
-            if (mixTracks.length < 10) mixTracks = [...mixTracks, ...BACKUP_TRACKS];
-            /* Shuffle all */
-            for (let i = mixTracks.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [mixTracks[i], mixTracks[j]] = [mixTracks[j], mixTracks[i]];
+        /* NEW: Open a fixed regional mix playlist — fetches 5 parallel queries (10 each), dedup, shuffle, play */
+        async function openMixPlaylist(name) {
+            // Define seed queries per mix
+            const mixDefinitions = {
+                'Bollywood': [
+                    'hindi hits', 'bollywood 2026', 'arijit singh', 'bollywood romantic', 'neha kakkar'
+                ],
+                'Hollywood': [
+                    'english hits 2026', 'pop songs trending', 'taylor swift', 'ed sheeran hits', 'billboard hot 100'
+                ],
+                'Sandalwood': [
+                    'kannada hits', 'kannada songs 2026', 'kannada romantic songs', 'puneeth rajkumar', 'kannada trending'
+                ],
+                'Tollywood': [
+                    'telugu hits 2026', 'telugu songs trending', 'allu arjun songs', 'telugu romantic', 'ss rajamouli'
+                ],
+                'Kollywood': [
+                    'tamil hits 2026', 'tamil songs trending', 'thalapathy vijay songs', 'tamil romantic', 'anirudh ravichander'
+                ],
+                'Punjabi': [
+                    'punjabi hits 2026', 'punjabi songs trending', 'diljit dosanjh', 'ap dhillon', 'punjabi party songs'
+                ]
+            };
+
+            const queries = mixDefinitions[name];
+            if (!queries) return;
+
+            showToast(`Loading ${name} Mix...`);
+
+            // 2) Fetch 5 parallel Piped API searches, each fetching 10 results
+            const results = await Promise.allSettled(
+                queries.map(q => searchAcrossInstances(q))
+            );
+
+            // 3) Combine all results
+            const allTracks = [];
+            for (const result of results) {
+                if (result.status === 'fulfilled' && result.value && result.value.items) {
+                    const items = result.value.items
+                        .filter(it => it.url && it.url.includes('/watch?v='))
+                        .slice(0, 10) // each query fetches 10 results
+                        .map(it => {
+                            const parts = it.url.split('v=');
+                            const id = parts[1] ? parts[1].split('&')[0] : '';
+                            return {
+                                id,
+                                title: (it.title || 'Unknown Title').replace(/&quot;/g, '"'),
+                                artist: it.uploaderName || 'Unknown Artist',
+                                duration: it.duration || 0
+                            };
+                        });
+                    allTracks.push(...items);
+                }
             }
-            tracks = mixTracks.slice(0, 50);
+
+            // 4) Deduplicate by video ID
+            const seen = new Set();
+            const unique = [];
+            for (const t of allTracks) {
+                if (t.id && !seen.has(t.id)) {
+                    seen.add(t.id);
+                    unique.push(t);
+                }
+            }
+
+            // 5) Fisher-Yates shuffle the full list
+            for (let i = unique.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [unique[i], unique[j]] = [unique[j], unique[i]];
+            }
+
+            // 6) Slice to 50 tracks
+            tracks = unique.slice(0, 50);
+
+            if (tracks.length === 0) {
+                showToast(`No tracks found for ${name} Mix`);
+                return;
+            }
+
+            // 7) Set playback state
             isShuffleOn = true;
             $('shuffleBtn').classList.add('active');
             currentTrackIndex = 0;
+
+            // 8) Play first track
             playTrack(0);
-            $('fsPlayingContext').textContent = `${title} Mix`;
-            showToast(`${tracks.length} songs • Shuffle ON`);
+
+            // 9) Update context and toast
+            $('fsPlayingContext').textContent = `${name} Mix — SWAR`;
+            showToast(`${tracks.length} songs loaded • Shuffle ON`);
         }
 
         function playDynamicFeatured(idx) {
@@ -1589,6 +1659,8 @@
             Marquee.init();
             loadAndRenderHome().then(() => {
                 tracks = window.homeFeaturedTracks.length > 0 ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
+                // Render the fixed regional mix cards
+                renderDynamicKLGrid2();
             });
             initYouTubePlayer();
             setTimeout(updateNavIndicatorSlab, 300);
