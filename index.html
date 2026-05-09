@@ -685,7 +685,7 @@
         <div id="homeView">
             <div class="home-greeting">
                 <div>
-                    <div class="home-greeting-text" id="greeting">good evening</div>
+                    <div class="home-greeting-text" id="greeting">Good Evening</div>
                     <div class="home-greeting-sub" id="greetingSub">Monochrome curated audio.</div>
                 </div>
             </div>
@@ -1042,6 +1042,10 @@
             $('miniPlayerImg').onerror = function() { this.src = getThumbnailFallback(t.id); };
             $('miniPlayerTitle').textContent = t.title;
             $('miniPlayerArtist').textContent = t.artist;
+            /* CHANGE 3: Live home greeting — update #greetingSub when on home view */
+            if (currentView === 'home') {
+                $('greetingSub').textContent = `Now Playing: ${t.title} — ${t.artist}`;
+            }
             $('fsTitle').textContent = t.title;
             $('fsArtist').textContent = t.artist;
             $('fsAlbumArt').src = thumb;
@@ -1049,18 +1053,6 @@
             $('miniPlayer').classList.add('visible');
             updateLikeButton(); updateAtmosphericBackground(); setupMediaSession(t); renderQueueList();
             Marquee.refreshAll();
-            /* Live home greeting update with currently playing track */
-            updateGreetingWithTrack(t);
-        }
-
-        function updateGreetingWithTrack(t) {
-            if (currentView !== 'home') return;
-            const h = new Date().getHours();
-            let greet = 'Good Evening';
-            if (h < 12) greet = 'Good Morning'; else if (h < 18) greet = 'Good Afternoon';
-            const name = user && user.name !== 'Guest User' ? user.name.split(' ')[0] : null;
-            $('greeting').textContent = name ? `${greet}, ${name}` : greet;
-            $('greetingSub').textContent = `Now Playing: ${t.title} — ${t.artist}`;
         }
 
         function togglePlay() {
@@ -1375,52 +1367,89 @@
             `).join('');
         }
 
+        /* CHANGE 1: Mix cards — onclick now calls playMixFromCard instead of quickSearch */
         function renderDynamicKLGrid2(arr) {
             $('klGrid2').innerHTML = arr.map((t, idx) => `
-                <div class="kl-card-2" onclick="openMixPlaylist('${escapeHtml(t.title)}', '${escapeHtml(t.artist)}', '${t.id}')">
+                <div class="kl-card-2" onclick="playMixFromCard('${escapeHtml(t.title)}', '${escapeHtml(t.artist)}')">
                     <div class="kl-card-2-img-wrap">
                         <img class="kl-card-2-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
-                        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;" class="mix-hover-overlay">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="#fff"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm3.5 7.5v5h2v-5h-2zm0 7h2v-2h-2v2z"/></svg>
-                        </div>
                     </div>
                     <div class="kl-card-2-title">${escapeHtml(t.title)}</div>
-                    <div class="kl-card-2-meta">Mix • Shuffle</div>
+                    <div class="kl-card-2-meta">Related Mix</div>
                 </div>
             `).join('');
-            /* hover overlay for circle cards */
-            $('klGrid2').querySelectorAll('.kl-card-2').forEach(card => {
-                const overlay = card.querySelector('.mix-hover-overlay');
-                card.addEventListener('mouseenter', () => { if(overlay) overlay.style.opacity = '1'; });
-                card.addEventListener('mouseleave', () => { if(overlay) overlay.style.opacity = '0'; });
-            });
         }
 
-        async function openMixPlaylist(title, artist, seedId) {
-            showToast('Loading Mix...');
-            /* Fetch 50 songs based on seed title */
-            let mixTracks = [];
-            const queries = [title, artist, title + ' mix', 'songs like ' + title];
-            try {
-                const results = await Promise.allSettled(queries.map(q => fetchTracksForHome(q, 14)));
-                results.forEach(r => { if (r.status === 'fulfilled') mixTracks.push(...r.value); });
-            } catch(e) {}
-            /* Deduplicate by id */
-            const seen = new Set();
-            mixTracks = mixTracks.filter(t => { if (!t.id || seen.has(t.id)) return false; seen.add(t.id); return true; });
-            /* Pad with backups if needed */
-            if (mixTracks.length < 10) mixTracks = [...mixTracks, ...BACKUP_TRACKS];
-            /* Shuffle all */
-            for (let i = mixTracks.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [mixTracks[i], mixTracks[j]] = [mixTracks[j], mixTracks[i]];
+        /* CHANGE 1: New function — fetch ~50 songs from 4 queries, deduplicate, Fisher-Yates shuffle, play */
+        async function playMixFromCard(title, artist) {
+            const queries = [
+                `${title} ${artist} songs`,
+                `${title} music`,
+                `${artist} best songs`,
+                `${title} playlist`
+            ];
+
+            showToast('Loading mix…');
+
+            const results = await Promise.allSettled(
+                queries.map(q => searchAcrossInstances(q))
+            );
+
+            const allTracks = [];
+            for (const result of results) {
+                if (result.status === 'fulfilled' && result.value && result.value.items) {
+                    const filtered = result.value.items
+                        .filter(it => it.url && it.url.includes('/watch?v='))
+                        .map(it => {
+                            const parts = it.url.split('v=');
+                            const id = parts[1] ? parts[1].split('&')[0] : '';
+                            return {
+                                id,
+                                title: (it.title || 'Unknown Title').replace(/&quot;/g, '"'),
+                                artist: it.uploaderName || 'Unknown Artist',
+                                duration: it.duration || 0
+                            };
+                        });
+                    allTracks.push(...filtered);
+                }
             }
-            tracks = mixTracks.slice(0, 50);
+
+            /* Deduplicate by video ID */
+            const seen = new Set();
+            const unique = [];
+            for (const t of allTracks) {
+                if (t.id && !seen.has(t.id)) {
+                    seen.add(t.id);
+                    unique.push(t);
+                }
+            }
+
+            /* Fisher-Yates shuffle */
+            for (let i = unique.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [unique[i], unique[j]] = [unique[j], unique[i]];
+            }
+
+            /* Slice to 50 */
+            tracks = unique.slice(0, 50);
+
+            if (tracks.length === 0) {
+                showToast('No tracks found for this mix');
+                return;
+            }
+
+            /* Set shuffle on */
             isShuffleOn = true;
             $('shuffleBtn').classList.add('active');
+
+            /* Update playing context */
+            $('fsPlayingContext').textContent = `${title} Mix`;
+
+            /* Play from index 0 */
             currentTrackIndex = 0;
             playTrack(0);
-            $('fsPlayingContext').textContent = `${title} Mix`;
+
+            /* Show toast */
             showToast(`${tracks.length} songs • Shuffle ON`);
         }
 
@@ -1572,6 +1601,7 @@
 
         function toggleQueue() { $('queuePanel').classList.toggle('show'); }
 
+        /* CHANGE 5: Good Morning capitals — title case greeting */
         function setGreeting() {
             const h = new Date().getHours();
             let greet = 'Good Evening';
