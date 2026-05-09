@@ -1649,7 +1649,36 @@
             else { likedTracks.set(t.id, t); showToast('Added to favorites'); }
             Storage.set('swar_liked', Array.from(likedTracks.values())); updateLikeButton();
         }
+function renderDynamicKLGrid2() {
+    const mixes = [
+        { name: 'Bollywood', label: 'BOLLYWOOD' },
+        { name: 'Hollywood', label: 'HOLLYWOOD' },
+        { name: 'Sandalwood', label: 'SANDALWOOD' },
+        { name: 'Tollywood', label: 'TOLLYWOOD' },
+        { name: 'Kollywood', label: 'KOLLYWOOD' },
+        { name: 'Punjabi', label: 'PUNJABI' }
+    ];
 
+    function makeSVGThumb(label) {
+        const svg = `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#0a0a0a"/>
+            <line x1="55" y1="105" x2="145" y2="105" stroke="#2a2a2a" stroke-width="1.5"/>
+            <text x="100" y="90" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="28" fill="#ffffff">TOP 50</text>
+            <text x="100" y="125" text-anchor="middle" font-family="Arial,sans-serif" font-weight="400" font-size="${label.length > 9 ? 9 : 11}" fill="#888888" letter-spacing="3">${label}</text>
+        </svg>`;
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
+
+    $('klGrid2').innerHTML = mixes.map((mix) => `
+        <div class="kl-card-2" onclick="openMixPlaylist('${mix.name}')">
+            <div class="kl-card-2-img-wrap">
+                <img class="kl-card-2-img" src="${makeSVGThumb(mix.label)}" loading="lazy">
+            </div>
+            <div class="kl-card-2-title">${mix.name} Mix</div>
+            <div class="kl-card-2-meta">Regional • 50 Tracks</div>
+        </div>
+    `).join('');
+}
         function updateLikeButton() {
             const t = tracks[currentTrackIndex]; if (!t) return;
             const liked = likedTracks.has(t.id);
