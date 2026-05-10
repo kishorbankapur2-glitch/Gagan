@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Swar">
     <title>Swar Music - Premium Monochrome Audio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,6 +152,32 @@
         .track-card h4 { font-size: 0.92rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
         .track-card p { font-size: 0.78rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* ── LIBRARY FOLDER STYLES ── */
+        .lib-folders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+        .lib-folder-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 18px; padding: 20px 16px; cursor: pointer; transition: all 0.3s var(--ease); display: flex; flex-direction: column; gap: 10px; }
+        .lib-folder-card:hover { background: var(--bg-card-hover); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .lib-folder-card.active { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.07); }
+        .lib-folder-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .lib-folder-icon.heart { background: rgba(255,69,58,0.15); }
+        .lib-folder-icon.cache { background: rgba(255,255,255,0.1); }
+        .lib-folder-icon svg { width: 22px; height: 22px; fill: currentColor; }
+        .lib-folder-icon.heart svg { color: #ff453a; }
+        .lib-folder-icon.cache svg { color: rgba(255,255,255,0.8); }
+        .lib-folder-name { font-size: 0.88rem; font-weight: 700; color: #fff; }
+        .lib-folder-count { font-size: 0.72rem; color: var(--text-subdued); }
+        .lib-section-title { font-size: 1rem; font-weight: 700; color: var(--text-subdued); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; margin-top: 4px; }
+        .lib-track-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: background 0.2s; }
+        .lib-track-row:hover { background: rgba(255,255,255,0.06); }
+        .lib-track-row.playing { background: rgba(255,255,255,0.08); }
+        .lib-track-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: #1a1a1a; }
+        .lib-track-info { flex: 1; min-width: 0; }
+        .lib-track-title { font-size: 0.85rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lib-track-artist { font-size: 0.72rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .lib-track-badge { font-size: 0.62rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
+        .lib-track-badge.offline { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+        .lib-offline-banner { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; font-size: 0.8rem; color: var(--text-subdued); }
+        .lib-offline-banner svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; color: rgba(255,255,255,0.5); }
+
         .mini-player { position: fixed; bottom: 84px; left: 20px; right: 20px; z-index: 40; background: var(--glass-bg-strong); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--glass-border-strong); border-radius: 18px; padding: 8px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.8); transform: translateY(120px); opacity: 0; transition: all 0.5s var(--ease); }
         .mini-player.visible { transform: translateY(0); opacity: 1; }
         .mini-player-img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
@@ -185,14 +215,12 @@
         .fs-album-wrap { width: 82vw; height: 82vw; max-width: 340px; max-height: 340px; aspect-ratio: 1/1 !important; margin: 0 auto; position: relative; border-radius: 28px !important; overflow: hidden; background: none !important; border: none !important; box-shadow: 0 20px 40px rgba(0,0,0,0.5); flex-shrink: 0; cursor: pointer; user-select: none; }
         .fs-album-art { width: 100% !important; height: 100% !important; object-fit: cover !important; display: block; transform: scale(1.04); transition: transform 0.3s var(--ease); pointer-events: none; }
 
-        /* Heart pop animation */
         @keyframes heartPop {
             0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
             40%  { transform: translate(-50%,-50%) scale(1.4); opacity: 1; }
             70%  { transform: translate(-50%,-50%) scale(1.1); opacity: 0.9; }
             100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
         }
-        /* Album swipe animations */
         @keyframes slideOutLeft  { from { transform: translateX(0) scale(1.04); opacity:1; } to { transform: translateX(-70px) scale(0.92); opacity:0; } }
         @keyframes slideOutRight { from { transform: translateX(0) scale(1.04); opacity:1; } to { transform: translateX(70px)  scale(0.92); opacity:0; } }
         @keyframes slideInRight  { from { transform: translateX(70px)  scale(0.92); opacity:0; } to { transform: translateX(0) scale(1.04); opacity:1; } }
@@ -396,10 +424,19 @@
 
 <nav class="bottom-nav" id="bottomNav">
     <div class="nav-indicator-slab" id="navIndicatorSlab"></div>
-    <button class="nav-btn active" id="nav-home" onclick="navigateTo('home')"><svg viewBox="0 0 24 24"><path d="M12 3l-8 7v11h6v-6h4v6h6V10l-8-7z"/></svg>Home</button>
-    <button class="nav-btn" id="nav-search" onclick="navigateTo('search')"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>Search</button>
-    <button class="nav-btn" id="nav-library" onclick="navigateTo('library')"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Library</button>
-    <button class="nav-btn" id="nav-profile" onclick="navigateTo('profile')"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Profile</button>
+    <button class="nav-btn active" id="nav-home" onclick="navigateTo('home')">
+        <svg viewBox="0 0 24 24"><path d="M12 3l-8 7v11h6v-6h4v6h6V10l-8-7z"/></svg>Home
+    </button>
+    <button class="nav-btn" id="nav-search" onclick="navigateTo('search')">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>Search
+    </button>
+    <button class="nav-btn" id="nav-library" onclick="navigateTo('library')">
+        <!-- Books / Library icon — OpenTune style -->
+        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>Library
+    </button>
+    <button class="nav-btn" id="nav-profile" onclick="navigateTo('profile')">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Profile
+    </button>
 </nav>
 
 <!-- FULLSCREEN PLAYER -->
@@ -492,6 +529,151 @@
 <script>
 'use strict';
 
+// ═══════════════════════════════════════════════════════
+// SERVICE WORKER — PWA offline support
+// ═══════════════════════════════════════════════════════
+const SW_SCRIPT = `
+const CACHE = 'swar-v1';
+const ASSETS = [
+  './',
+  './index.html',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap'
+];
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{}))
+    .then(() => self.skipWaiting())
+  );
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+self.addEventListener('fetch', e => {
+  const url = e.request.url;
+  // For navigation and app shell — cache first
+  if (e.request.mode === 'navigate' || ASSETS.some(a => url.includes(a))) {
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      })).catch(() => caches.match('./'))
+    );
+    return;
+  }
+  // For thumbnails — cache on first fetch
+  if (url.includes('ytimg.com')) {
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+        if (res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => new Response('', {status: 408})))
+    );
+    return;
+  }
+  // Everything else — network first, fallback to cache
+  e.respondWith(
+    fetch(e.request).catch(() => caches.match(e.request))
+  );
+});
+`;
+
+function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    try {
+        const blob = new Blob([SW_SCRIPT], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl, { scope: './' })
+            .then(reg => {
+                console.log('[Swar SW] Registered, scope:', reg.scope);
+            })
+            .catch(err => console.warn('[Swar SW] Registration failed:', err));
+    } catch(e) { console.warn('[Swar SW] Blob registration failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════
+// SONG CACHE — stores metadata of tracks listened > 20s
+// ═══════════════════════════════════════════════════════
+const SongCache = (() => {
+    const KEY = 'swar_song_cache';
+    let cache = null;
+
+    function load() {
+        if (cache) return cache;
+        try { cache = JSON.parse(localStorage.getItem(KEY)) || {}; } catch { cache = {}; }
+        return cache;
+    }
+
+    function save() {
+        try { localStorage.setItem(KEY, JSON.stringify(cache)); } catch {}
+    }
+
+    function add(track) {
+        load();
+        cache[track.id] = { ...track, cachedAt: Date.now() };
+        save();
+    }
+
+    function remove(id) {
+        load();
+        delete cache[id];
+        save();
+    }
+
+    function getAll() {
+        load();
+        return Object.values(cache).sort((a, b) => (b.cachedAt || 0) - (a.cachedAt || 0));
+    }
+
+    function has(id) {
+        load();
+        return !!cache[id];
+    }
+
+    function count() { return Object.keys(load()).length; }
+
+    return { add, remove, getAll, has, count };
+})();
+
+// Track listen time per song — auto-cache after 20s
+let listenTimerId = null;
+let listenedSeconds = 0;
+let listenTrackId = null;
+
+function startListenTimer(trackId) {
+    if (listenTrackId === trackId) return; // already tracking this song
+    clearInterval(listenTimerId);
+    listenTrackId = trackId;
+    listenedSeconds = 0;
+    listenTimerId = setInterval(() => {
+        if (!isPlaying) return;
+        listenedSeconds++;
+        if (listenedSeconds >= 20) {
+            const t = tracks[currentTrackIndex];
+            if (t && t.id === trackId && !SongCache.has(trackId)) {
+                SongCache.add(t);
+                // subtle notification
+                const el = document.createElement('span');
+                el.textContent = '⬇ Cached for offline';
+                el.style.cssText = 'position:fixed;bottom:100px;right:16px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-size:0.68rem;font-weight:600;padding:5px 12px;border-radius:20px;z-index:4001;animation:fadeIn 0.4s ease;border:1px solid rgba(255,255,255,0.12)';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2500);
+            }
+            clearInterval(listenTimerId);
+        }
+    }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════
+// MARQUEE ENGINE
+// ═══════════════════════════════════════════════════════
 const Marquee = (() => {
     const instances = new Set();
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -643,6 +825,8 @@ function onPlayerStateChange(event) {
         $('miniPlayIcon').innerHTML = pausePath;
         $('fsPlayIcon').innerHTML = pausePath;
         startProgress(); updateMediaSessionState();
+        // Start listen timer for auto-cache
+        if (tracks[currentTrackIndex]) startListenTimer(tracks[currentTrackIndex].id);
     } else {
         isPlaying = false;
         $('miniPlayIcon').innerHTML = playPath;
@@ -680,6 +864,8 @@ function playTrack(i) {
     $('miniPlayer').classList.add('visible');
     updateLikeButton(); updateAtmosphericBackground(); setupMediaSession(t); renderQueueList();
     Marquee.refreshAll();
+    // Reset listen timer for new track
+    listenTrackId = null;
 }
 
 function togglePlay() {
@@ -752,9 +938,6 @@ function setupScrubbing() {
 
 // ═══════════════════════════════════════════════════════
 // ALBUM GESTURES
-// Double tap  → toggle like + heart animation
-// Swipe left  → next track (with slide animation)
-// Swipe right → prev track (with slide animation)
 // ═══════════════════════════════════════════════════════
 function setupAlbumGestures() {
     const albumWrap = $('fsAlbumWrap');
@@ -777,7 +960,6 @@ function setupAlbumGestures() {
         const dx = e.changedTouches[0].clientX - swipeStartX;
         const dy = e.changedTouches[0].clientY - swipeStartY;
 
-        // Horizontal swipe — next / prev
         if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
             const art = $('fsAlbumArt');
             if (dx < 0) {
@@ -798,7 +980,6 @@ function setupAlbumGestures() {
             return;
         }
 
-        // Double tap — like
         if (!swipeMoved) {
             const now = Date.now();
             const diff = now - lastTap;
@@ -947,14 +1128,111 @@ function renderTrackGrid() {
     `).join('')}</div>`;
 }
 
+// ═══════════════════════════════════════════════════════
+// LIBRARY VIEW — 2 folders: Liked + Cached
+// ═══════════════════════════════════════════════════════
 function renderLibraryView() {
-    $('sectionTitle').textContent = 'Saved Vault';
-    const collection = Array.from(likedTracks.values());
-    if (!collection.length) {
-        $('contentArea').innerHTML = '<div style="text-align:center;padding:80px 24px;color:var(--text-subdued)"><svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor" style="margin-bottom:16px;opacity:0.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><h3 style="color:#fff;font-size:1.1rem;margin-bottom:4px">Collection Empty</h3><p style="font-size:0.85rem">Tap heart to assemble your monochrome playlist.</p></div>';
-        return;
+    $('sectionTitle').textContent = 'Your Library';
+    const liked = Array.from(likedTracks.values());
+    const cached = SongCache.getAll();
+    const isOffline = !navigator.onLine;
+
+    $('contentArea').innerHTML = `
+        ${isOffline ? `
+        <div class="lib-offline-banner">
+            <svg viewBox="0 0 24 24"><path d="M1 1l22 22-1.41 1.41-1.56-1.56C16.6 24 14.38 24 12 24c-5.52 0-10-4.48-10-10 0-2.38 0-4.6 1.15-8.03L1 1zM12 4c5.52 0 10 4.48 10 10 0 1.32-.26 2.58-.72 3.73L7.73 4.27C9.13 4 10.52 4 12 4z"/></svg>
+            You're offline. Cached songs are available to play.
+        </div>` : ''}
+
+        <div class="lib-folders">
+            <div class="lib-folder-card ${window._libFolder === 'liked' ? 'active' : ''}" onclick="showLibFolder('liked')">
+                <div class="lib-folder-icon heart">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <div class="lib-folder-name">Liked Songs</div>
+                <div class="lib-folder-count">${liked.length} tracks</div>
+            </div>
+            <div class="lib-folder-card ${window._libFolder === 'cached' ? 'active' : ''}" onclick="showLibFolder('cached')">
+                <div class="lib-folder-icon cache">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                </div>
+                <div class="lib-folder-name">Cached</div>
+                <div class="lib-folder-count">${cached.length} offline songs</div>
+            </div>
+        </div>
+
+        <div id="libFolderContent"></div>
+    `;
+
+    const openFolder = window._libFolder || (liked.length > 0 ? 'liked' : 'cached');
+    showLibFolder(openFolder, true);
+}
+
+function showLibFolder(folder, skipRerender) {
+    window._libFolder = folder;
+    if (!skipRerender) {
+        // Refresh folder card active states
+        document.querySelectorAll('.lib-folder-card').forEach(c => c.classList.remove('active'));
+        const cards = document.querySelectorAll('.lib-folder-card');
+        if (folder === 'liked' && cards[0]) cards[0].classList.add('active');
+        if (folder === 'cached' && cards[1]) cards[1].classList.add('active');
     }
-    tracks = collection; renderTrackGrid();
+
+    const container = document.getElementById('libFolderContent');
+    if (!container) return;
+
+    if (folder === 'liked') {
+        const liked = Array.from(likedTracks.values());
+        if (!liked.length) {
+            container.innerHTML = `<div style="text-align:center;padding:50px 24px;color:var(--text-subdued)">
+                <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor" style="margin-bottom:12px;opacity:0.4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <p style="font-size:0.85rem">Tap ♥ while playing to save songs here.</p>
+            </div>`;
+        } else {
+            tracks = liked;
+            container.innerHTML = `
+                <div class="lib-section-title">Liked Songs</div>
+                ${liked.map((t, i) => `
+                <div class="lib-track-row ${i === currentTrackIndex && tracks === liked ? 'playing' : ''}" onclick="playLibTrack('liked',${i})">
+                    <img class="lib-track-thumb" src="${getThumbnail(t.id)}" onerror="this.src='${getThumbnailFallback(t.id)}'">
+                    <div class="lib-track-info">
+                        <div class="lib-track-title">${escapeHtml(t.title)}</div>
+                        <div class="lib-track-artist">${escapeHtml(t.artist)}</div>
+                    </div>
+                    ${SongCache.has(t.id) ? '<span class="lib-track-badge offline">Offline</span>' : ''}
+                </div>`).join('')}
+            `;
+        }
+    } else {
+        const cached = SongCache.getAll();
+        if (!cached.length) {
+            container.innerHTML = `<div style="text-align:center;padding:50px 24px;color:var(--text-subdued)">
+                <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor" style="margin-bottom:12px;opacity:0.4"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                <p style="font-size:0.85rem">Songs you listen for 20+ seconds get saved here automatically for offline listening.</p>
+            </div>`;
+        } else {
+            tracks = cached;
+            container.innerHTML = `
+                <div class="lib-section-title">Cached — Available Offline</div>
+                ${cached.map((t, i) => `
+                <div class="lib-track-row" onclick="playLibTrack('cached',${i})">
+                    <img class="lib-track-thumb" src="${getThumbnail(t.id)}" onerror="this.src='${getThumbnailFallback(t.id)}'">
+                    <div class="lib-track-info">
+                        <div class="lib-track-title">${escapeHtml(t.title)}</div>
+                        <div class="lib-track-artist">${escapeHtml(t.artist)}</div>
+                    </div>
+                    <span class="lib-track-badge offline">Offline</span>
+                </div>`).join('')}
+            `;
+        }
+    }
+}
+
+function playLibTrack(folder, i) {
+    const source = folder === 'liked' ? Array.from(likedTracks.values()) : SongCache.getAll();
+    tracks = source;
+    currentTrackIndex = i;
+    playTrack(i);
 }
 
 function renderQueueList() {
@@ -1042,7 +1320,7 @@ function renderDynamicKLGrid(arr) {
         <div class="kl-card" onclick="playDynamicKL(${i})">
             <div class="kl-card-img-wrap">
                 <img class="kl-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
-                <div class="kl-play-overlay"><div class="kl-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+                <div class="kl-play-overlay"><div class="kl-play-btn"><svg viewBox="0 0 24 "><path d="M8 5v14l11-7z"/></svg></div></div>
             </div>
             <div class="kl-card-title">${escapeHtml(t.title)}</div>
             <div class="kl-card-meta">${escapeHtml(t.artist)} • ${t.meta || '3:30'}</div>
@@ -1050,10 +1328,6 @@ function renderDynamicKLGrid(arr) {
     `).join('');
 }
 
-// ═══════════════════════════════════════════════════════
-// REGIONAL MIX THUMBNAILS — Spotify "Top 50" SVG style
-// Black bg · white bold "TOP 50" · grey divider · grey label
-// ═══════════════════════════════════════════════════════
 function renderDynamicKLGrid2() {
     const mixes = [
         { name: 'Bollywood',  label: 'BOLLYWOOD'  },
@@ -1203,6 +1477,8 @@ function setupEventListeners() {
     });
     document.addEventListener('click', () => { closeUserMenu(); closeSleepDropdown(); });
     window.addEventListener('resize', updateNavIndicatorSlab);
+    window.addEventListener('online', () => showToast('Back online ✓'));
+    window.addEventListener('offline', () => showToast('Offline — Cached songs available'));
 }
 
 function navigateTo(view) {
@@ -1222,7 +1498,7 @@ function navigateTo(view) {
             $('sectionTitle').textContent = 'Discover Music';
             $('contentArea').innerHTML = '<div style="text-align:center;padding:80px 24px;color:var(--text-subdued)"><svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor" style="margin-bottom:16px;opacity:0.5"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg><h3 style="color:#fff;font-size:1.1rem;margin-bottom:4px">Dynamic Stream Input</h3><p style="font-size:0.85rem">Input search keywords or paste raw stream URL.</p></div>';
             $('searchInput').focus();
-        } else if (view === 'library') renderLibraryView();
+        } else if (view === 'library') { window._libFolder = null; renderLibraryView(); }
         else if (view === 'profile') renderProfileView();
     }
 }
@@ -1271,6 +1547,9 @@ function setGreeting() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    // Register PWA service worker
+    registerServiceWorker();
+
     const savedUser = Storage.get('swar_user');
     if (savedUser) { user = savedUser; hideSignIn(); updateUserUI(); }
     const savedLiked = Storage.get('swar_liked') || [];
