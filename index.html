@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Swar">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="swar.png">
     <title>Swar Music - Premium Monochrome Audio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,6 +38,108 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+        /* ═══════════════════════════════════════════════════
+           SWAR SPLASH SCREEN — Jio Studios style animation
+           Phase 1: Logo slides LEFT, "SWAR" text writes in
+           Phase 2: Tagline fades under
+           Phase 3: Whole thing fades out
+        ═══════════════════════════════════════════════════ */
+        #splash {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #000;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        #splash.fade-out {
+            animation: splashFadeOut 0.55s cubic-bezier(0.4,0,0.2,1) forwards;
+        }
+        @keyframes splashFadeOut {
+            to { opacity: 0; pointer-events: none; }
+        }
+
+        .splash-inner {
+            display: flex; align-items: center; gap: 0;
+            position: relative;
+        }
+
+        /* Icon — starts centered, slides left */
+        .splash-icon {
+            width: 72px; height: 72px;
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            background: #000;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+            flex-shrink: 0;
+            /* Start in center, then animate left */
+            transform: translateX(52px);
+            animation: iconSlideLeft 0.55s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+        }
+        .splash-icon img {
+            width: 100%; height: 100%; object-fit: contain; padding: 10px;
+        }
+        @keyframes iconSlideLeft {
+            to { transform: translateX(0); }
+        }
+
+        /* Text block — fades + slides in from right */
+        .splash-text {
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            width: 0;
+            opacity: 0;
+            margin-left: 0;
+            animation: textReveal 0.5s cubic-bezier(0.16,1,0.3,1) 0.72s forwards;
+        }
+        @keyframes textReveal {
+            to { width: 160px; opacity: 1; margin-left: 16px; }
+        }
+
+        .splash-brand {
+            font-size: 2.6rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: #fff;
+            line-height: 1;
+            white-space: nowrap;
+            /* Letter-by-letter reveal feel via clip */
+            clip-path: inset(0 100% 0 0);
+            animation: textClipReveal 0.5s cubic-bezier(0.16,1,0.3,1) 0.78s forwards;
+        }
+        @keyframes textClipReveal {
+            to { clip-path: inset(0 0% 0 0); }
+        }
+
+        .splash-tagline {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            color: rgba(255,255,255,0.38);
+            text-transform: uppercase;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(4px);
+            animation: taglineFade 0.4s ease 1.15s forwards;
+        }
+        @keyframes taglineFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Subtle shimmer line under the logo */
+        .splash-shimmer {
+            position: absolute;
+            bottom: -12px; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            opacity: 0;
+            animation: shimmerFade 0.6s ease 0.9s forwards;
+        }
+        @keyframes shimmerFade {
+            0% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: scaleX(1); }
+        }
 
         .player-loading-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 24px; transition: opacity 0.5s var(--ease); }
         .player-loading-overlay.show { display: flex; }
@@ -185,14 +293,12 @@
         .fs-album-wrap { width: 82vw; height: 82vw; max-width: 340px; max-height: 340px; aspect-ratio: 1/1 !important; margin: 0 auto; position: relative; border-radius: 28px !important; overflow: hidden; background: none !important; border: none !important; box-shadow: 0 20px 40px rgba(0,0,0,0.5); flex-shrink: 0; cursor: pointer; user-select: none; }
         .fs-album-art { width: 100% !important; height: 100% !important; object-fit: cover !important; display: block; transform: scale(1.04); transition: transform 0.3s var(--ease); pointer-events: none; }
 
-        /* Heart pop animation */
         @keyframes heartPop {
             0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
             40%  { transform: translate(-50%,-50%) scale(1.4); opacity: 1; }
             70%  { transform: translate(-50%,-50%) scale(1.1); opacity: 0.9; }
             100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
         }
-        /* Album swipe animations */
         @keyframes slideOutLeft  { from { transform: translateX(0) scale(1.04); opacity:1; } to { transform: translateX(-70px) scale(0.92); opacity:0; } }
         @keyframes slideOutRight { from { transform: translateX(0) scale(1.04); opacity:1; } to { transform: translateX(70px)  scale(0.92); opacity:0; } }
         @keyframes slideInRight  { from { transform: translateX(70px)  scale(0.92); opacity:0; } to { transform: translateX(0) scale(1.04); opacity:1; } }
@@ -207,7 +313,6 @@
             .fs-content-wrap { max-width: 1000px !important; height: 100vh; padding: 40px 32px !important; }
             .fs-main { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 54px !important; flex: 1; }
             .fs-album-wrap { max-width: 440px !important; width: 440px !important; height: 440px !important; max-height: 440px !important; margin: 0 !important; flex-shrink: 0; border-radius: 36px !important; }
-            .fs-info-section { flex: 1; justify-content: center; gap: 24px; }
             .fs-title { font-size: 1.9rem; }
             .fs-artist { font-size: 1.15rem; margin-bottom: 12px; }
         }
@@ -288,6 +393,23 @@
     </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════════
+     SPLASH SCREEN — Jio Studios style
+     Logo slides left, "SWAR" text reveals right
+═══════════════════════════════════════════════ -->
+<div id="splash">
+    <div class="splash-inner">
+        <div class="splash-icon">
+            <img src="swar.png" alt="Swar">
+        </div>
+        <div class="splash-text">
+            <span class="splash-brand">SWAR</span>
+            <span class="splash-tagline">Premium Audio</span>
+        </div>
+        <div class="splash-shimmer"></div>
+    </div>
+</div>
 
 <div class="player-loading-overlay" id="playerLoadingOverlay">
     <div class="pulse-logo"><img src="swar.png" alt="Swar"></div>
@@ -491,6 +613,36 @@
 
 <script>
 'use strict';
+
+// ═══════════════════════════════════════════════════════
+// SPLASH SCREEN — dismiss after animation completes
+// Total animation duration: ~1.8s, then fade out
+// ═══════════════════════════════════════════════════════
+(function() {
+    const splash = document.getElementById('splash');
+    // Wait for all animations to finish (~1.8s), then fade out
+    setTimeout(() => {
+        splash.classList.add('fade-out');
+        splash.addEventListener('animationend', () => {
+            splash.style.display = 'none';
+        }, { once: true });
+        // Fallback: force hide after 600ms regardless
+        setTimeout(() => { splash.style.display = 'none'; }, 600);
+    }, 1850);
+})();
+
+// ═══════════════════════════════════════════════════════
+// SERVICE WORKER REGISTRATION
+// ═══════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('[Swar SW] Registered:', reg.scope);
+        }).catch(err => {
+            console.warn('[Swar SW] Registration failed:', err);
+        });
+    });
+}
 
 const Marquee = (() => {
     const instances = new Set();
@@ -750,12 +902,6 @@ function setupScrubbing() {
     window.addEventListener('touchend', onEnd, { passive: true });
 }
 
-// ═══════════════════════════════════════════════════════
-// ALBUM GESTURES
-// Double tap  → toggle like + heart animation
-// Swipe left  → next track (with slide animation)
-// Swipe right → prev track (with slide animation)
-// ═══════════════════════════════════════════════════════
 function setupAlbumGestures() {
     const albumWrap = $('fsAlbumWrap');
     let lastTap = 0;
@@ -777,7 +923,6 @@ function setupAlbumGestures() {
         const dx = e.changedTouches[0].clientX - swipeStartX;
         const dy = e.changedTouches[0].clientY - swipeStartY;
 
-        // Horizontal swipe — next / prev
         if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
             const art = $('fsAlbumArt');
             if (dx < 0) {
@@ -798,7 +943,6 @@ function setupAlbumGestures() {
             return;
         }
 
-        // Double tap — like
         if (!swipeMoved) {
             const now = Date.now();
             const diff = now - lastTap;
@@ -1050,10 +1194,6 @@ function renderDynamicKLGrid(arr) {
     `).join('');
 }
 
-// ═══════════════════════════════════════════════════════
-// REGIONAL MIX THUMBNAILS — Spotify "Top 50" SVG style
-// Black bg · white bold "TOP 50" · grey divider · grey label
-// ═══════════════════════════════════════════════════════
 function renderDynamicKLGrid2() {
     const mixes = [
         { name: 'Bollywood',  label: 'BOLLYWOOD'  },
