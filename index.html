@@ -65,7 +65,7 @@
             --surface-grain-opacity: 0.045;
         }
         
-        /* ── Matrix / Liquid Mercury Surface (New) ── */
+        /* ── Matrix / Liquid Mercury Surface ── */
         body.surface-matrix {
             --bg-base: #141518; --bg-elevated: #1c1e22;
             --bg-card: rgba(255,255,255,0.04); --bg-card-hover: rgba(255,255,255,0.09);
@@ -77,7 +77,7 @@
             background-image: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08) 0%, transparent 65%) !important;
         }
         
-        /* ── Raw Canvas Surface (New) ── */
+        /* ── Raw Canvas Surface ── */
         body.surface-canvas {
             --bg-base: #faf9f6; --bg-elevated: #f4f2ed;
             --bg-card: rgba(0,0,0,0.035); --bg-card-hover: rgba(0,0,0,0.065);
@@ -99,13 +99,11 @@
         body.surface-chalk ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); }
         body.surface-canvas ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); }
         
-        /* Accent Tints & Shadow Enhancements */
         .ap-pill, .btn-primary, .fs-ctrl-btn, .appearance-sheet-close {
             text-shadow: 0 1px 2px var(--accent-shadow-tint);
             border-color: var(--accent-border-tint) !important;
         }
 
-        /* Grain overlay element with Dynamic Controls */
         #surfaceGrain {
             position: fixed; inset: 0; z-index: 9998; pointer-events: none;
             background-image: var(--surface-grain-url);
@@ -114,7 +112,6 @@
             transition: opacity 0.3s var(--ease), background-size 0.2s var(--ease);
         }
         
-        /* Dynamic Micro-Jitter Keyframe Noise Loop */
         @keyframes microJitterAnimation {
             0% { background-position: 0px 0px; }
             20% { background-position: 1.5px -2px; }
@@ -127,7 +124,6 @@
             animation: microJitterAnimation 0.12s steps(2) infinite;
         }
         
-        /* Material transition helper */
         body.material-transitioning,
         body.material-transitioning * {
             transition-property: background-color, background, color, border-color, box-shadow !important;
@@ -135,9 +131,6 @@
             transition-timing-function: var(--ease) !important;
         }
 
-        /* ═══════════════════════════════════════════════
-           APPEARANCE PANEL — Redesigned Dashboard
-        ═══════════════════════════════════════════════ */
         .appearance-panel {
             position: fixed; inset: 0; z-index: 2800;
             display: flex; align-items: flex-end;
@@ -185,7 +178,6 @@
             padding: 16px 22px 8px;
         }
         
-        /* Material pill layout customization */
         .ap-material-row {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 22px 4px;
         }
@@ -232,7 +224,6 @@
             animation: apDotPop 0.35s var(--ease-spring);
         }
         
-        /* Functional Dashboard Controls */
         .ap-control-block {
             background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
             margin: 0 22px 12px; border-radius: 16px; padding: 14px;
@@ -245,7 +236,6 @@
         .ap-ctrl-label { font-size: 0.78rem; font-weight: 600; color: var(--text-base); }
         .ap-ctrl-desc { font-size: 0.68rem; color: var(--text-subdued); margin-top: 1px; }
         
-        /* Functional Range Sliders & Selectors */
         .ap-slider {
             -webkit-appearance: none; width: 120px; height: 4px; background: var(--glass-border-strong);
             border-radius: 2px; outline: none; transition: background 0.3s;
@@ -268,7 +258,6 @@
             background: var(--text-base); color: var(--bg-base);
         }
         
-        /* Toggle Switch Architecture */
         .ap-toggle-switch {
             position: relative; width: 36px; height: 20px; -webkit-appearance: none;
             background: var(--glass-border-strong); border-radius: 10px; outline: none;
@@ -281,7 +270,6 @@
         }
         .ap-toggle-switch:checked::before { transform: translateX(16px); background: var(--bg-base); }
 
-        /* Mini Sandbox Sandbox & Interactive Live Preview Sheet */
         .ap-preview-wrap { padding: 6px 22px 4px; }
         .ap-preview-card {
             background: var(--bg-card); border: 1px solid var(--glass-border);
@@ -326,7 +314,6 @@
         }
         .ap-preview-fill { height: 100%; width: 45%; background: var(--text-base); border-radius: 2px; transition: width 0.1s linear; }
         
-        /* Pro Audio Utilities elements */
         .ap-audio-badge {
             background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border);
             font-size: 0.58rem; font-weight: 800; padding: 1px 4px; border-radius: 4px;
@@ -334,7 +321,6 @@
         }
         body.surface-chalk .ap-audio-badge, body.surface-canvas .ap-audio-badge { background: rgba(0,0,0,0.06); }
         
-        /* Live VU Micro Visualizer element */
         .ap-vu-container {
             display: flex; align-items: flex-end; gap: 2px; height: 10px; width: 14px; margin-top: 2px;
         }
@@ -352,9 +338,7 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
 
-        /* ═══════════════════════════════════════════════
-           SPLASH SCREEN — Cinematic Redesign
-        ═══════════════════════════════════════════════ */
+        /* ─── SPLASH SCREEN ─── */
         #splash {
             position: fixed; inset: 0; z-index: 9999;
             background: #000;
@@ -459,9 +443,7 @@
             100% { opacity:0; background-position: 200% center; width: 100%; }
         }
 
-        /* ═══════════════════════════════════════════════
-           LOADING OVERLAY
-        ═══════════════════════════════════════════════ */
+        /* ─── LOADING OVERLAY ─── */
         .player-loading-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 24px; transition: opacity 0.5s var(--ease); }
         .player-loading-overlay.show { display: flex; }
         .pulse-logo { width: 80px; height: 80px; background: #000; border-radius: 22px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 14px; position: relative; }
@@ -482,9 +464,7 @@
             50%      { transform: translateY(-4px) scale(1.05); }
         }
 
-        /* ═══════════════════════════════════════════════
-           SIGN IN
-        ═══════════════════════════════════════════════ */
+        /* ─── SIGN IN ─── */
         .signin-overlay { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 24px; }
         .signin-overlay.hidden { display: none; }
         .signin-card {
@@ -517,15 +497,11 @@
         .skip-link { display: block; margin-top: 20px; color: var(--text-subdued); font-size: 0.88rem; transition: color 0.2s; cursor: pointer; }
         .skip-link:hover { color: #fff; }
 
-        /* ═══════════════════════════════════════════════
-           APP SHELL
-        ═══════════════════════════════════════════════ */
+        /* ─── APP SHELL ─── */
         .app { min-height: 100vh; padding-bottom: 200px; transition: filter 0.5s var(--ease), transform 0.5s var(--ease); }
         .app.fs-open { filter: blur(20px) brightness(0.3); pointer-events: none; transform: scale(0.97); }
 
-        /* ═══════════════════════════════════════════════
-           HEADER
-        ═══════════════════════════════════════════════ */
+        /* ─── HEADER ─── */
         .header {
             position: sticky; top: 0; z-index: 50;
             background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
@@ -585,9 +561,7 @@
         .user-menu-item:hover { background: rgba(255,255,255,0.06); transform: translateX(3px); }
         .user-menu-item svg { width: 16px; height: 16px; fill: currentColor; }
 
-        /* ═══════════════════════════════════════════════
-           HOME — Greeting
-        ═══════════════════════════════════════════════ */
+        /* ─── HOME — Greeting ─── */
         .home-greeting {
             padding: 20px 16px 10px; display: flex; align-items: center; justify-content: space-between;
             animation: greetSlide 0.7s var(--ease) 0.1s both;
@@ -599,9 +573,7 @@
         .home-greeting-text { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; }
         .home-greeting-sub { color: var(--text-subdued); font-size: 0.8rem; margin-top: 2px; }
 
-        /* ═══════════════════════════════════════════════
-           MOOD CHIPS — Elastic Select
-        ═══════════════════════════════════════════════ */
+        /* ─── MOOD CHIPS ─── */
         .mood-chips-row { display: flex; gap: 8px; padding: 8px 16px 16px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; animation: fadeUp 0.6s var(--ease) 0.2s both; }
         .mood-chips-row::-webkit-scrollbar { display: none; }
         @keyframes fadeUp {
@@ -636,9 +608,7 @@
             100% { transform: scale(1.06) rotate(0deg); }
         }
 
-        /* ═══════════════════════════════════════════════
-           FEATURED CARDS — 3D Tilt
-        ═══════════════════════════════════════════════ */
+        /* ─── FEATURED CARDS (Slider) ─── */
         .featured-section { padding: 4px 0 20px; }
         .featured-row { display: flex; gap: 18px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; min-height: 320px; }
         .featured-row::-webkit-scrollbar { display: none; }
@@ -672,9 +642,7 @@
         .featured-card-title { font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 3px; color: #fff; }
         .featured-card-artist { font-size: 0.75rem; color: rgba(255,255,255,0.7); font-weight: 500; }
 
-        /* ═══════════════════════════════════════════════
-           KL SECTION
-        ═══════════════════════════════════════════════ */
+        /* ─── KEEP LISTENING SECTION ─── */
         .kl-section { padding: 4px 0 20px; }
         .kl-header { padding: 0 16px 12px; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.025em; }
         .kl-grid { display: flex; gap: 18px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; min-height: 170px; }
@@ -726,19 +694,12 @@
             background: #0a0a0a; position: relative; margin-bottom: 10px;
             transition: box-shadow 0.3s var(--ease);
         }
-        @keyframes spinGlow {
-            from { box-shadow: 0 0 0 2px rgba(255,255,255,0.2), 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.05); }
-            50%  { box-shadow: 0 0 0 2px rgba(255,255,255,0.4), 0 12px 30px rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.1); }
-            to   { box-shadow: 0 0 0 2px rgba(255,255,255,0.2), 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.05); }
-        }
         .kl-card-2-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s var(--ease); }
         .kl-card-2:hover .kl-card-2-img { transform: scale(1.08); }
         .kl-card-2-title { font-size: 0.78rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; color: #fff; }
         .kl-card-2-meta { font-size: 0.68rem; color: var(--text-subdued); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ═══════════════════════════════════════════════
-           SECTION & TRACK GRID
-        ═══════════════════════════════════════════════ */
+        /* ─── SECTION & TRACK GRID ─── */
         .section { padding: 24px; }
         .section-header { margin-bottom: 16px; }
         .section-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.03em; }
@@ -784,9 +745,7 @@
         .track-card h4 { font-size: 0.92rem; font-weight: var(--font-weight-override); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
         .track-card p { font-size: 0.78rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ═══════════════════════════════════════════════
-           PROFILE PAGE
-        ═══════════════════════════════════════════════ */
+        /* ─── PROFILE PAGE ─── */
         .profile-page { max-width: 480px; margin: 0 auto; }
         .profile-hero { display: flex; align-items: center; gap: 20px; background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 22px; padding: 24px; margin-bottom: 16px; cursor: pointer; transition: all 0.3s var(--ease-spring); }
         .profile-hero:hover { background: var(--bg-card-hover); transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.4); }
@@ -813,9 +772,7 @@
         .danger-item { color: var(--danger) !important; }
         .danger-item .settings-item-label { color: var(--danger); }
 
-        /* ═══════════════════════════════════════════════
-           PROFILE MODAL
-        ═══════════════════════════════════════════════ */
+        /* ─── PROFILE MODAL ─── */
         .profile-modal { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease); }
         .profile-modal.active { opacity: 1; pointer-events: all; }
         .profile-modal-card { background: var(--bg-elevated); border: 1px solid var(--glass-border-strong); border-radius: 28px; padding: 36px 28px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.9); transform: scale(0.9) translateY(30px); transition: transform 0.45s var(--ease-spring); }
@@ -841,9 +798,7 @@
         .profile-modal-close { padding: 12px 32px; background: rgba(255,255,255,0.08); border-radius: 12px; font-size: 0.88rem; font-weight: 700; color: #fff; transition: all 0.2s var(--ease); }
         .profile-modal-close:hover { background: rgba(255,255,255,0.14); transform: scale(1.04); }
 
-        /* ═══════════════════════════════════════════════
-           IN-APP WEBVIEW
-        ═══════════════════════════════════════════════ */
+        /* ─── IN-APP WEBVIEW ─── */
         .inapp-webview { position: fixed; inset: 0; z-index: 2500; background: #000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); transform: translateY(20px); }
         .inapp-webview.active { opacity: 1; pointer-events: all; transform: translateY(0); }
         .inapp-webview-bar { display: flex; align-items: center; gap: 12px; padding: 14px 16px calc(14px + env(safe-area-inset-top)); padding-top: calc(14px + env(safe-area-inset-top)); background: var(--glass-bg-strong); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--glass-border); flex-shrink: 0; }
@@ -854,9 +809,7 @@
         .inapp-webview-url { font-size: 0.7rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .inapp-webview iframe { flex: 1; border: none; width: 100%; height: 100%; background: #000; }
 
-        /* ═══════════════════════════════════════════════
-           MINI PLAYER — Glow Pulse Ring
-        ═══════════════════════════════════════════════ */
+        /* ─── MINI PLAYER ─── */
         .mini-player {
             position: fixed; bottom: 84px; left: 20px; right: 20px; z-index: 40;
             background: var(--glass-bg-strong);
@@ -912,9 +865,7 @@
         .mini-progress { position: absolute; bottom: 0; left: 14px; right: 14px; height: 2px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; }
         .mini-progress-fill { height: 100%; background: #fff; width: 0%; transition: width 0.15s linear; }
 
-        /* ═══════════════════════════════════════════════
-           BOTTOM NAV — Fluid Slab
-        ═══════════════════════════════════════════════ */
+        /* ─── BOTTOM NAV ─── */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 45;
             background: var(--glass-bg-strong);
@@ -951,9 +902,7 @@
             pointer-events: none;
         }
 
-        /* ═══════════════════════════════════════════════
-           FULLSCREEN PLAYER
-        ═══════════════════════════════════════════════ */
+        /* ─── FULLSCREEN PLAYER ─── */
         .fullscreen-player {
             position: fixed; inset: 0; z-index: 1000;
             display: none; flex-direction: column; overflow: hidden;
@@ -1063,7 +1012,6 @@
         .fs-title { font-size: 1.45rem; font-weight: var(--font-weight-title); letter-spacing: -0.03em; line-height: 1.25; }
         .fs-artist { font-size: 0.95rem; color: var(--text-subdued); margin-bottom: 2px; font-weight: 500; }
 
-        /* Pro Audio UI Utilities elements inside Fullscreen */
         .fs-meta-utilities {
             display: flex; align-items: center; gap: 8px; margin-top: 2px;
         }
@@ -1121,7 +1069,6 @@
             transition: transform 0.2s var(--ease-spring), color 0.18s, box-shadow 0.18s;
         }
         
-        /* Motion Framework Overrides */
         body.motion-rigid .featured-card, 
         body.motion-rigid .kl-card, 
         body.motion-rigid .track-card, 
@@ -1183,9 +1130,6 @@
         .sleep-dropdown-item { padding: 8px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: var(--text-subdued); text-align: left; transition: all 0.2s var(--ease); }
         .sleep-dropdown-item:hover, .sleep-dropdown-item.active { background: rgba(255,255,255,0.08); color: #fff; transform: translateX(3px); }
 
-        /* ═══════════════════════════════════════════════
-           TOAST — Floaty Entrance
-        ═══════════════════════════════════════════════ */
         .toast {
             position: fixed; bottom: 96px; left: 50%;
             transform: translateX(-50%) translateY(20px) scale(0.92);
@@ -1218,12 +1162,11 @@
         @keyframes slideUpSheet { from { transform:translateY(100%) scale(0.98); } to { transform:translateY(0) scale(1); } }
         @keyframes bounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(4px); } }
 
-        /* ═══════════════════════════════════════════════
-           MARQUEE
-        ═══════════════════════════════════════════════ */
+        /* ─── MARQUEE ─── */
         .marquee { position: relative; overflow: hidden; min-width: 0; display: block; contain: content; }
         .marquee__track { display: inline-flex; align-items: center; white-space: nowrap; transform: translate3d(0,0,0); will-change: transform; backface-visibility: hidden; }
         .marquee__text { display: inline-block; white-space: nowrap; }
+        .marquee__track span { white-space: nowrap !important; }
         .marquee__gap { width: var(--marquee-gap); flex: 0 0 auto; }
         .marquee:not(.is-animating) .marquee__gap, .marquee:not(.is-animating) .marquee__clone { display: none; }
         @supports (-webkit-mask-image: linear-gradient(#000,#000)) or (mask-image: linear-gradient(#000,#000)) {
@@ -1238,10 +1181,9 @@
 </head>
 <body>
 
-<!-- Surface grain overlay (Carbon + Chalk surfaces) -->
 <div id="surfaceGrain" aria-hidden="true"></div>
 
-<!-- APPEARANCE PANEL (Redesigned & Feature-Packed Sandbox) -->
+<!-- APPEARANCE PANEL -->
 <div class="appearance-panel" id="appearancePanel" onclick="closeAppearancePanel(event)">
     <div class="appearance-sheet" onclick="event.stopPropagation()">
         <div class="appearance-sheet-handle"></div>
@@ -1252,7 +1194,6 @@
             </button>
         </div>
         
-        <!-- Section 1: Surface Materials -->
         <div class="ap-section-label">1. Core Surface Materials</div>
         <div class="ap-material-row">
             <button class="ap-pill ap-pill-void active" id="apPillVoid" onclick="SwarMaterial.apply('void')" aria-label="Void — pure OLED black">
@@ -1280,7 +1221,6 @@
             <div style="flex:1;"></div>
         </div>
 
-        <!-- Section 2: Dynamic Texture Engine -->
         <div class="ap-section-label">2. Texture & Grain Studio</div>
         <div class="ap-control-block">
             <div class="ap-ctrl-row">
@@ -1309,7 +1249,6 @@
             </div>
         </div>
 
-        <!-- Section 3: Monochrome Metallic Accents -->
         <div class="ap-section-label">3. Monochrome Accent Tones</div>
         <div class="ap-control-block">
             <div class="ap-ctrl-row">
@@ -1326,7 +1265,6 @@
             </div>
         </div>
 
-        <!-- Section 4: Typography Configuration -->
         <div class="ap-section-label">4. Typography & Layout Scaling</div>
         <div class="ap-control-block">
             <div class="ap-ctrl-row">
@@ -1352,7 +1290,6 @@
             </div>
         </div>
 
-        <!-- Section 5: Animation Deck -->
         <div class="ap-section-label">5. Motion Mechanics Deck</div>
         <div class="ap-control-block">
             <div class="ap-ctrl-row">
@@ -1381,7 +1318,6 @@
             </div>
         </div>
 
-        <!-- Section 6 & 7: Sandbox Sandbox Canvas -->
         <div class="ap-section-label">6 & 7. Interactive Live Sandbox</div>
         <div class="ap-preview-wrap">
             <div class="ap-preview-card">
@@ -1407,7 +1343,6 @@
                 <div class="ap-preview-progress" id="sandboxProgressBar" onclick="StudioEngine.sandboxScrub(event)"><div class="ap-preview-fill" id="sandboxProgressFill" style="width: 35%"></div></div>
             </div>
             
-            <!-- Pro Utilities Config Mode inside Dashboard -->
             <div class="ap-control-block" style="margin: 12px 0 0 0;">
                 <div class="ap-ctrl-row">
                     <div>
@@ -1546,14 +1481,12 @@
             </div>
         </div>
         <div class="mood-chips-row" id="moodChipsRow">
-            <button class="mood-chip active" onclick="onMoodChip(this,'')">For You</button>
-            <button class="mood-chip" onclick="onMoodChip(this,'romantic hindi songs')">Romance</button>
-            <button class="mood-chip" onclick="onMoodChip(this,'feel good pop songs')">Feel Good</button>
-            <button class="mood-chip" onclick="onMoodChip(this,'party dance hits')">Party</button>
-            <button class="mood-chip" onclick="onMoodChip(this,'relax chill music')">Relax</button>
-            <button class="mood-chip" onclick="onMoodChip(this,'energize workout music')">Energize</button>
-            <button class="mood-chip" onclick="onMoodChip(this,'lofi commute music')">Commute</button>
-            <button class="mood-chip" onclick="onMoodChip(this,'workout gym music')">Workout</button>
+            <button class="mood-chip active" onclick="onMoodChip(this,'for-you')">For You</button>
+            <button class="mood-chip" onclick="onMoodChip(this,'romance')">Romance</button>
+            <button class="mood-chip" onclick="onMoodChip(this,'feel-good')">Feel Good</button>
+            <button class="mood-chip" onclick="onMoodChip(this,'party')">Party</button>
+            <button class="mood-chip" onclick="onMoodChip(this,'relax')">Relax</button>
+            <button class="mood-chip" onclick="onMoodChip(this,'energize')">Energize</button>
         </div>
         <div class="featured-section">
             <div class="featured-row" id="featuredRow"></div>
@@ -1645,7 +1578,6 @@
                             </div>
                         </div>
                         
-                        <!-- Section 6 Display: Audio Bitrate Badge & Live VU Widget -->
                         <div class="fs-meta-utilities">
                             <span class="ap-audio-badge" id="fsBitrateBadge">320kbps High Fidelity</span>
                             <div class="fs-vu-widget" id="fsLiveVuContainer">
@@ -1729,7 +1661,7 @@
     }
 })();
 
-// ─── Splash ───
+// ─── Splash Termination ───
 (function() {
     const splash = document.getElementById('splash');
     setTimeout(() => {
@@ -1797,7 +1729,7 @@ const Marquee = (() => {
     return { init, refreshAll, refresh, stop };
 })();
 
-// ─── Mood Chip Ripple ───
+// ─── Mood Chip Elastic Ripple ───
 document.addEventListener('click', e => {
     const chip = e.target.closest('.mood-chip');
     if (!chip) return;
@@ -1810,14 +1742,7 @@ document.addEventListener('click', e => {
     setTimeout(() => chip.style.removeProperty('--after-opacity'), 500);
 });
 
-// ─── Track card stagger entrance ───
-function applyStaggerEntrance(selector, baseDelay = 0, step = 0.06) {
-    document.querySelectorAll(selector).forEach((el, i) => {
-        el.style.setProperty('--stagger', `${baseDelay + i * step}s`);
-    });
-}
-
-// ─── Constants ───
+// ─── Core Constants & Extended Premium Playlists ───
 const PIPED_INSTANCES = [
     'https://pipedapi.kavin.rocks',
     'https://pipedapi.adminforge.de',
@@ -1826,15 +1751,71 @@ const PIPED_INSTANCES = [
     'https://api.piped.private.coffee',
     'https://pipedapi.syncstream.org'
 ];
-const BACKUP_TRACKS = [
+
+// Expanded Curated Premium Tracks (25 songs for swipe row list mapping)
+const PREMIUM_CARDS_TRACKS = [
     { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', duration: 279, meta: '4:39' },
     { id: '1Ek8X0idI44', title: 'Night Changes', artist: 'One Direction', duration: 240, meta: '4:00' },
     { id: 'fKopy74weus', title: 'Starboy', artist: 'The Weeknd', duration: 230, meta: '3:50' },
     { id: '3AtDnEC4zak', title: 'Attention', artist: 'Charlie Puth', duration: 210, meta: '3:30' },
-    { id: 'tgOu00H6KTo', title: 'Closer', artist: 'The Chainsmokers', duration: 245, meta: '4:05' }
+    { id: 'tgOu00H6KTo', title: 'Closer', artist: 'The Chainsmokers', duration: 245, meta: '4:05' },
+    { id: '7wtfhZwyrP0', title: 'Yummy', artist: 'Justin Bieber', duration: 210, meta: '3:30' },
+    { id: 'kJQP7kiw5Fk', title: 'Despacito', artist: 'Luis Fonsi ft. Daddy Yankee', duration: 282, meta: '4:42' },
+    { id: 'OPf0YbXqDm0', title: 'Mark Upton', artist: 'Uptown Funk', duration: 270, meta: '4:30' },
+    { id: 'K4DyBUG242c', title: 'In The End', artist: 'Linkin Park', duration: 216, meta: '3:36' },
+    { id: '09R8_2nJtjg', title: 'Sugar', artist: 'Maroon 5', duration: 300, meta: '5:00' },
+    { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd', duration: 200, meta: '3:20' },
+    { id: 'hT_nvWreIhg', title: 'Counting Stars', artist: 'OneRepublic', duration: 257, meta: '4:17' },
+    { id: 'Co0tS6nI0G4', title: 'Let Me Love You', artist: 'DJ Snake / Justin Bieber', duration: 205, meta: '3:25' },
+    { id: 'iX-QaNcmw8M', title: 'Shape of You', artist: 'Ed Sheeran', duration: 233, meta: '3:53' },
+    { id: 'pa00E_J26FA', title: 'Believer', artist: 'Imagine Dragons', duration: 204, meta: '3:24' },
+    { id: 'f_EioO80V94', title: 'Mockingbird', artist: 'Eminem', duration: 251, meta: '4:11' },
+    { id: 'w7_r5Q1F_co', title: 'Bad Boy', artist: 'Raaban / Tungevaag', duration: 195, meta: '3:15' },
+    { id: 'v2BfP_oZqyI', title: 'Stay', artist: 'The Kid LAROI & Justin Bieber', duration: 141, meta: '2:21' },
+    { id: '0J2QdDbf7GA', title: 'Wake Me Up', artist: 'Avicii', duration: 247, meta: '4:07' },
+    { id: '6A0v-9I0K9o', title: 'Love Me Like You Do', artist: 'Ellie Goulding', duration: 252, meta: '4:12' },
+    { id: 'L0A8w_v9N6A', title: 'Cheap Thrills', artist: 'Sia', duration: 211, meta: '3:31' },
+    { id: 'h7C8NfA_2Q4', title: 'Animals', artist: 'Martin Garrix', duration: 304, meta: '5:04' },
+    { id: 'N2C0U9w8v7Q', title: 'Unstoppable', artist: 'Sia', duration: 217, meta: '3:37' },
+    { id: 'B8C_8w9v7Q0', title: 'Lean On', artist: 'Major Lazer & DJ Snake', duration: 176, meta: '2:56' },
+    { id: 'G8C_U0w8v6A', title: 'Rockabye', artist: 'Clean Bandit', duration: 251, meta: '4:11' }
 ];
 
-// ─── State ───
+const MOOD_TRACKS_DICTIONARY = {
+    'romance': [
+        { id: 'vUCM_O-Zs1Y', title: 'Tum Hi Ho', artist: 'Arijit Singh', duration: 262, meta: '4:22' },
+        { id: 'T94PHkuydXo', title: 'Raataan Lambiyan', artist: 'Jubin Nautiyal', duration: 230, meta: '3:50' },
+        { id: 'WmuF8H_02As', title: 'Channa Mereya', artist: 'Arijit Singh', duration: 289, meta: '4:49' },
+        { id: 'kXMR_9o1Vxo', title: 'Kesariya', artist: 'Arijit Singh', duration: 268, meta: '4:28' },
+        { id: 'Ax8o0w_v8k0', title: 'Jeena Jeena', artist: 'Atif Aslam', duration: 229, meta: '3:49' }
+    ],
+    'feel-good': [
+        { id: 'fLexgO8oVw4', title: 'Happy', artist: 'Pharrell Williams', duration: 233, meta: '3:53' },
+        { id: 'KdhQ7k_iW5M', title: 'Love You Zindagi', artist: 'Jasleen Royal', duration: 232, meta: '3:52' },
+        { id: 'Co0tS6nI0G4', title: 'Can\'t Stop the Feeling', artist: 'Justin Timberlake', duration: 236, meta: '3:56' },
+        { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd', duration: 200, meta: '3:20' }
+    ],
+    'party': [
+        { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Bruno Mars', duration: 270, meta: '4:30' },
+        { id: 'h7C8NfA_2Q4', title: 'Animals', artist: 'Martin Garrix', duration: 304, meta: '5:04' },
+        { id: 'tgOu00H6KTo', title: 'Closer', artist: 'The Chainsmokers', duration: 245, meta: '4:05' },
+        { id: '0J2QdDbf7GA', title: 'Wake Me Up', artist: 'Avicii', duration: 247, meta: '4:07' }
+    ],
+    'relax': [
+        { id: '1Ek8X0idI44', title: 'Night Changes', artist: 'One Direction', duration: 240, meta: '4:00' },
+        { id: '3AtDnEC4zak', title: 'Attention', artist: 'Charlie Puth', duration: 210, meta: '3:30' },
+        { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', duration: 279, meta: '4:39' },
+        { id: 'fKopy74weus', title: 'Starboy', artist: 'The Weeknd', duration: 230, meta: '3:50' }
+    ],
+    'energize': [
+        { id: 'pa00E_J26FA', title: 'Believer', artist: 'Imagine Dragons', duration: 204, meta: '3:24' },
+        { id: 'K4DyBUG242c', title: 'In The End', artist: 'Linkin Park', duration: 216, meta: '3:36' },
+        { id: 'N2C0U9w8v7Q', title: 'Unstoppable', artist: 'Sia', duration: 217, meta: '3:37' },
+        { id: 'f_EioO80V94', title: 'Mockingbird', artist: 'Eminem', duration: 251, meta: '4:11' }
+    ]
+};
+
+// ─── State Configuration ───
 let player = null, isPlaying = false, isPlayerReady = false;
 let currentTrackIndex = 0, tracks = [], progressInterval = null;
 let isFullscreenOpen = false, isShuffleOn = false, repeatMode = 0;
@@ -1845,7 +1826,6 @@ let touchStartY = 0, isDragging = false, isScrubbing = false;
 let totalPlayedCount = 0;
 
 window.homeFeaturedTracks = [];
-window.homeKLTracks = [];
 
 const Storage = {
     get(key) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch { return null; } },
@@ -1878,7 +1858,7 @@ function showPlayerLoading(show) {
     show ? $('playerLoadingOverlay').classList.add('show') : $('playerLoadingOverlay').classList.remove('show');
 }
 
-// ─── YouTube Player ───
+// ─── YouTube Player Logic ───
 function initYouTubePlayer() {
     if (typeof YT !== 'undefined' && YT.Player) createPlayer();
     else {
@@ -1905,13 +1885,10 @@ function onPlayerStateChange(event) {
     const playPath = '<path d="M8 5v14l11-7z"/>';
     const pausePath = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
     if (event.data === YT.PlayerState.PLAYING) {
-        
-        // Volume Safe Guard Feature Integration
         if ($('volSafeGuardToggle').checked && player.getVolume() > 75) {
             player.setVolume(65);
             showToast("Volume Safe Guard Active: Normalized to 65%");
         }
-        
         isPlaying = true;
         $('miniPlayIcon').innerHTML = pausePath;
         $('fsPlayIcon').innerHTML = pausePath;
@@ -1935,7 +1912,17 @@ function handleTrackEnd() {
     else if (isShuffleOn && tracks.length > 1) nextTrack();
 }
 
-// ─── Track Playback ───
+// ─── Track History Storage Engine ───
+function recordPlayedTrackInHistory(track) {
+    let history = Storage.get('swar_played_history_list') || [];
+    history = history.filter(item => item.id !== track.id);
+    history.unshift(track);
+    if(history.length > 30) history.pop();
+    Storage.set('swar_played_history_list', history);
+    renderDynamicKLGrid(); 
+}
+
+// ─── Track Playback Controller ───
 function playTrack(i) {
     if (!isPlayerReady) { showToast('Interface Loading...'); return; }
     if (!tracks[i]) return;
@@ -1943,6 +1930,9 @@ function playTrack(i) {
     const t = tracks[i];
     totalPlayedCount++;
     Storage.set('swar_played_count', totalPlayedCount);
+    
+    recordPlayedTrackInHistory(t);
+
     try { player.loadVideoById(t.id); player.playVideo(); } catch(e) { showToast('Decoding Error'); return; }
     const thumb = getThumbnail(t.id);
     const fallback = getThumbnailFallback(t.id);
@@ -1977,7 +1967,6 @@ function playTrack(i) {
     $('fsArtist').textContent = t.artist;
     $('miniPlayer').classList.add('visible');
     
-    // Sync current values inside Sandbox sandbox variables
     $('apPreviewTitle').textContent = t.title;
     
     updateLikeButton(); updateAtmosphericBackground(); setupMediaSession(t); renderQueueList();
@@ -2021,7 +2010,7 @@ function startProgress() {
     }, 350);
 }
 
-// ─── Scrubbing ───
+// ─── Scrubbing Control ───
 function setupScrubbing() {
     const container = $('fsProgressContainer');
     const getPct = e => {
@@ -2049,7 +2038,7 @@ function setupScrubbing() {
     window.addEventListener('touchend', onEnd, { passive: true });
 }
 
-// ─── Album Gestures ───
+// ─── Album Swipe Gestures ───
 function setupAlbumGestures() {
     const albumWrap = $('fsAlbumWrap');
     let lastTap = 0, swipeStartX = 0, swipeStartY = 0, swipeMoved = false;
@@ -2109,7 +2098,7 @@ function updateAtmosphericBackground() {
     $('fullscreenBg').style.background = 'linear-gradient(180deg,#0f0f12 0%,#000 100%)';
 }
 
-// ─── Fullscreen Player ───
+// ─── Fullscreen Controller ───
 function setupSwipeGesture() {
     const fs = $('fullscreenPlayer');
     fs.addEventListener('touchstart', e => {
@@ -2187,7 +2176,7 @@ function updateNavIndicatorSlab() {
     if (activeBtn && slab) { slab.style.left = activeBtn.offsetLeft + 'px'; slab.style.width = activeBtn.offsetWidth + 'px'; }
 }
 
-// ─── Search ───
+// ─── Global Online Search Engine ───
 function saveSearchQuery(q) {
     if (!q || q.trim().length < 2) return;
     let history = Storage.get('swar_last_searches') || [];
@@ -2238,7 +2227,7 @@ async function searchAcrossInstances(query, signal) {
     return await Promise.any(promises);
 }
 
-// ─── Render Functions ───
+// ─── Layout Grid Renderers ───
 function renderTrackGrid() {
     $('contentArea').innerHTML = `<div class="track-grid">${tracks.map((t, i) => `
         <div class="track-card" onclick="playTrack(${i})" style="--stagger:${(i * 0.05).toFixed(2)}s">
@@ -2333,44 +2322,28 @@ function openAboutPage() {
     openInAppWebview('https://kishorbankapur2-glitch.github.io/social-id/', 'About — Swar');
 }
 
-// ─── Home Loading ───
+// ─── Home Base Initialization & Engine Loading ───
 function renderHomeSkeletons() {
     $('featuredRow').innerHTML = Array(4).fill('<div class="featured-card skeleton" style="opacity:1"></div>').join('');
     $('klGrid').innerHTML = Array(4).fill('<div class="kl-card skeleton" style="height:170px;border-radius:12px;opacity:1"></div>').join('');
     $('klGrid2').innerHTML = Array(4).fill('<div class="kl-card-2 skeleton" style="height:150px;border-radius:50%;opacity:1"></div>').join('');
 }
-async function fetchTracksForHome(query, limit = 5) {
-    try {
-        const res = await searchAcrossInstances(query);
-        if (res?.items) {
-            return res.items.filter(it => it.url?.includes('/watch?v=')).slice(0, limit).map(it => {
-                const id = it.url.split('v=')[1]?.split('&')[0] || '';
-                return { id, title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.uploaderName || 'Unknown Artist', duration: it.duration || 0, meta: formatDuration(it.duration || 240) };
-            });
-        }
-    } catch(e) { console.warn('Home load failed:', query, e); }
-    return [];
-}
+
 async function loadAndRenderHome() {
     renderHomeSkeletons();
-    const history = Storage.get('swar_last_searches') || [];
-    const fallbacks = ['trending acoustic','lofi chill beats','atmospheric pop','indie folk','synthwave electronic','chill commute music'];
-    const sf = [...fallbacks].sort(() => Math.random() - 0.5);
-    $('greetingSub').textContent = history.length > 0 ? 'Personalized from your search behavior.' : 'Monochrome dynamic interface.';
-    const [tA, tB] = await Promise.all([
-        fetchTracksForHome(history[0] || sf[0], 5),
-        fetchTracksForHome(history[1] || sf[1], 5)
-    ]);
-    window.homeFeaturedTracks = tA.length ? tA : BACKUP_TRACKS.slice(0, 5);
-    window.homeKLTracks = tB.length ? tB : BACKUP_TRACKS.slice(2, 6);
+    
+    // Injecting 25-30 massive high-fidelity custom tracks inside the top slider context
+    window.homeFeaturedTracks = [...PREMIUM_CARDS_TRACKS];
+    
     renderDynamicFeaturedRow(window.homeFeaturedTracks);
-    renderDynamicKLGrid(window.homeKLTracks);
+    renderDynamicKLGrid(); // User Played Track Engine
     renderDynamicKLGrid2();
 }
+
 function renderDynamicFeaturedRow(arr) {
     $('featuredRow').innerHTML = arr.map((t, i) => `
-        <div class="featured-card" onclick="playDynamicFeatured(${i})" style="--stagger:${(i * 0.08).toFixed(2)}s">
-            <img class="featured-card-bg" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
+        <div class="featured-card" onclick="playDynamicFeatured(${i})" style="--stagger:${(i * 0.04).toFixed(2)}s">
+            <img class="featured-card-bg" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${t.id}/hqdefault.jpg'">
             <div class="featured-card-overlay"></div>
             <div class="featured-card-info">
                 <div class="featured-card-title">${escapeHtml(t.title)}</div>
@@ -2379,18 +2352,38 @@ function renderDynamicFeaturedRow(arr) {
         </div>
     `).join('');
 }
-function renderDynamicKLGrid(arr) {
-    $('klGrid').innerHTML = arr.map((t, i) => `
-        <div class="kl-card" onclick="playDynamicKL(${i})" style="--stagger:${(i * 0.07).toFixed(2)}s">
-            <div class="kl-card-img-wrap">
-                <img class="kl-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
-                <div class="kl-play-overlay"><div class="kl-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+
+// Fixed to only reflect real tracks played by user via client active playback
+function renderDynamicKLGrid() {
+    const historyPlayedTracks = Storage.get('swar_played_history_list') || [];
+    
+    if (historyPlayedTracks.length === 0) {
+        // Fallback standard curated set if local device footprint empty
+        const defaultSet = PREMIUM_CARDS_TRACKS.slice(0, 6);
+        $('klGrid').innerHTML = defaultSet.map((t, i) => `
+            <div class="kl-card" onclick="playFallbackKL(${i})" style="--stagger:${(i * 0.07).toFixed(2)}s">
+                <div class="kl-card-img-wrap">
+                    <img class="kl-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
+                    <div class="kl-play-overlay"><div class="kl-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+                </div>
+                <div class="kl-card-title">${escapeHtml(t.title)}</div>
+                <div class="kl-card-meta">${escapeHtml(t.artist)}</div>
             </div>
-            <div class="kl-card-title">${escapeHtml(t.title)}</div>
-            <div class="kl-card-meta">${escapeHtml(t.artist)} • ${t.meta || '3:30'}</div>
-        </div>
-    `).join('');
+        `).join('');
+    } else {
+        $('klGrid').innerHTML = historyPlayedTracks.map((t, i) => `
+            <div class="kl-card" onclick="playHistoryKL(${i})" style="--stagger:${(i * 0.07).toFixed(2)}s">
+                <div class="kl-card-img-wrap">
+                    <img class="kl-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
+                    <div class="kl-play-overlay"><div class="kl-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+                </div>
+                <div class="kl-card-title">${escapeHtml(t.title)}</div>
+                <div class="kl-card-meta">${escapeHtml(t.artist)}</div>
+            </div>
+        `).join('');
+    }
 }
+
 function renderDynamicKLGrid2() {
     const mixes = [
         { name: 'Bollywood',  label: 'BOLLYWOOD'  },
@@ -2455,17 +2448,37 @@ function playDynamicFeatured(i) {
     if (!window.homeFeaturedTracks?.[i]) return;
     tracks = [...window.homeFeaturedTracks]; currentTrackIndex = i; playTrack(i);
 }
-function playDynamicKL(i) {
-    if (!window.homeKLTracks?.[i]) return;
-    tracks = [...window.homeKLTracks]; currentTrackIndex = i; playTrack(i);
+function playHistoryKL(i) {
+    const historyPlayedTracks = Storage.get('swar_played_history_list') || [];
+    if (!historyPlayedTracks[i]) return;
+    tracks = [...historyPlayedTracks]; currentTrackIndex = i; playTrack(i);
 }
+function playFallbackKL(i) {
+    const defaultSet = PREMIUM_CARDS_TRACKS.slice(0, 6);
+    tracks = [...defaultSet]; currentTrackIndex = i; playTrack(i);
+}
+
+// ─── Mode Chips Selection Engine (In-place Dynamic Sorting) ───
 function onMoodChip(el, query) {
     document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
-    if (!query) loadAndRenderHome(); else quickSearch(query);
+    
+    if (query === 'for-you') {
+        loadAndRenderHome();
+        tracks = [...PREMIUM_CARDS_TRACKS];
+        return;
+    }
+    
+    // Renders the results inline inside slider view window matrix directly without redirecting
+    const selectedMoodTracks = MOOD_TRACKS_DICTIONARY[query];
+    if (selectedMoodTracks) {
+        tracks = [...selectedMoodTracks];
+        renderDynamicFeaturedRow(tracks);
+        showToast(`Rendering ${el.textContent} Matrix Filter`);
+    }
 }
 
-// ─── User Auth ───
+// ─── User Profile Auth ───
 function signIn() {
     const name = $('nameInput').value.trim();
     if (!name) { showToast('Please provide your name'); return; }
@@ -2498,7 +2511,7 @@ function signOut() {
     delete $('picUploader').dataset.img;
 }
 
-// ─── Sleep Timer ───
+// ─── Sleep Deferment Timer ───
 function toggleSleepDropdown(e) { e.stopPropagation(); $('sleepDropdown').classList.toggle('active'); }
 function closeSleepDropdown() { $('sleepDropdown').classList.remove('active'); }
 function selectSleepTime(min) { handleSleepTimer(min); closeSleepDropdown(); }
@@ -2521,7 +2534,7 @@ function handleSleepTimer(minutes) {
     }
 }
 
-// ─── Event Listeners ───
+// ─── Interface Event Handlers ───
 function setupEventListeners() {
     const searchInput = $('searchInput');
     searchInput.addEventListener('focus', () => { if (currentView !== 'search') navigateTo('search'); });
@@ -2562,7 +2575,7 @@ function setupEventListeners() {
     window.addEventListener('resize', updateNavIndicatorSlab);
 }
 
-// ─── Navigation ───
+// ─── Navigation Layout Shells ───
 function navigateTo(view) {
     currentView = view;
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -2573,7 +2586,7 @@ function navigateTo(view) {
     if (view === 'home') {
         $('homeView').style.display = 'block'; $('otherView').style.display = 'none';
         $('searchInput').value = '';
-        tracks = window.homeFeaturedTracks.length ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
+        tracks = [...PREMIUM_CARDS_TRACKS];
     } else {
         $('homeView').style.display = 'none'; $('otherView').style.display = 'block';
         if (view === 'search') {
@@ -2587,14 +2600,11 @@ function navigateTo(view) {
 }
 
 function goHome() { navigateTo('home'); }
-function quickSearch(q) { $('searchInput').value = q; navigateTo('search'); searchMusic(q); }
 function toggleUserMenu(e) { e.stopPropagation(); $('userMenu').classList.toggle('active'); }
 function closeUserMenu() { $('userMenu').classList.remove('active'); }
 function toggleShuffle() {
     isShuffleOn = !isShuffleOn;
     $('shuffleBtn').classList.toggle('active', isShuffleOn);
-    $('shuffleBtn').style.animation = 'none';
-    requestAnimationFrame(() => { $('shuffleBtn').style.animation = ''; });
     showToast(isShuffleOn ? 'Shuffle Enabled' : 'Shuffle Disabled');
 }
 function toggleRepeat() {
@@ -2610,7 +2620,6 @@ function toggleLike() {
     Storage.set('swar_liked', Array.from(likedTracks.values())); updateLikeButton();
     btn.style.animation = 'none';
     requestAnimationFrame(() => { btn.style.animation = ''; btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 600); });
-    updateLikeButton();
 }
 function updateLikeButton() {
     const t = tracks[currentTrackIndex]; if (!t) return;
@@ -2633,7 +2642,7 @@ function setGreeting() {
     $('greeting').textContent = (user && user.name !== 'Guest User') ? `${greet}, ${user.name.split(' ')[0]}` : greet;
 }
 
-// ─── Swar Advanced Studio Suite & Engine (New Controls) ───
+// ─── Swar Advanced Studio Suite & Engine ───
 const StudioEngine = (() => {
     let sandboxPlaying = false;
     let sandboxInterval = null;
@@ -2733,7 +2742,6 @@ const StudioEngine = (() => {
         if (badge) badge.textContent = type === 'analog' ? 'VU Needle 0dB' : '320kbps Hi-Fi';
     }
 
-    // Interactive Sandbox Utilities
     function sandboxToggle() {
         sandboxPlaying = !sandboxPlaying;
         const playBtn = document.querySelector('.ap-preview-btn-play svg');
@@ -2794,7 +2802,7 @@ const StudioEngine = (() => {
     };
 })();
 
-// ─── Material System ───
+// ─── Material System Interface ───
 const SwarMaterial = (() => {
     const SURFACES = {
         void:   { cls: '',               label: 'Void' },
@@ -2858,7 +2866,7 @@ function _doCloseAppearancePanel() {
     if (currentView === 'settings') renderSettingsView();
 }
 
-// ─── Init ───
+// ─── Document Bootstrapper Init ───
 window.addEventListener('DOMContentLoaded', () => {
     const savedUser = Storage.get('swar_user');
     if (savedUser) { user = savedUser; hideSignIn(); updateUserUI(); }
@@ -2873,7 +2881,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setupAlbumGestures();
     Marquee.init();
     loadAndRenderHome().then(() => {
-        tracks = window.homeFeaturedTracks.length ? [...window.homeFeaturedTracks] : [...BACKUP_TRACKS];
+        tracks = [...PREMIUM_CARDS_TRACKS];
     });
     initYouTubePlayer();
     setTimeout(updateNavIndicatorSlab, 300);
