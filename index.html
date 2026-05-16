@@ -1815,6 +1815,136 @@ const MOOD_TRACKS_DICTIONARY = {
     ]
 };
 
+// ─── Vibe Taxonomy Engine ───
+const VIBE_MAP = {
+    // Romantic / Love
+    'vUCM_O-Zs1Y': 'romantic', 'T94PHkuydXo': 'romantic', 'WmuF8H_02As': 'romantic',
+    'kXMR_9o1Vxo': 'romantic', 'Ax8o0w_v8k0': 'romantic', '2Vv-BfVoq4g': 'romantic',
+    '1Ek8X0idI44': 'romantic', '6A0v-9I0K9o': 'romantic',
+    // Energetic / Hype
+    'pa00E_J26FA': 'energetic', 'K4DyBUG242c': 'energetic', 'N2C0U9w8v7Q': 'energetic',
+    'h7C8NfA_2Q4': 'energetic', 'OPf0YbXqDm0': 'energetic',
+    // Party / EDM
+    '0J2QdDbf7GA': 'party', 'tgOu00H6KTo': 'party', 'B8C_8w9v7Q0': 'party',
+    'L0A8w_v9N6A': 'party', 'G8C_U0w8v6A': 'party',
+    // Chill / Vibes
+    'fKopy74weus': 'chill', '3AtDnEC4zak': 'chill', 'v2BfP_oZqyI': 'chill',
+    'hT_nvWreIhg': 'chill', '09R8_2nJtjg': 'chill', 'Co0tS6nI0G4': 'chill',
+    // Pop / Feel Good
+    'fLexgO8oVw4': 'pop', 'KdhQ7k_iW5M': 'pop', '7wtfhZwyrP0': 'pop',
+    'kJQP7kiw5Fk': 'pop', 'iX-QaNcmw8M': 'pop',
+    // Sad / Emotional
+    '4NRXx6U8ABQ': 'sad', 'w7_r5Q1F_co': 'sad',
+    // Hip-Hop / Rap
+    'f_EioO80V94': 'hiphop'
+};
+
+const VIBE_SEARCH_QUERIES = {
+    romantic:  ['romantic hindi songs 2025','love songs arijit singh','bollywood romantic hits','ed sheeran love','taylor swift love songs'],
+    energetic: ['imagine dragons hits','linkin park best songs','high energy workout songs','motivational songs 2025','eminem hits'],
+    party:     ['best party songs 2025','edm party hits','avicii best songs','martin garrix top songs','chainsmokers hits'],
+    chill:     ['chill vibes playlist 2025','lo-fi chill songs','the weeknd best songs','midnight chill music','indie chill hits'],
+    pop:       ['pop hits 2025','billboard pop songs','popular english songs','top pop playlist','feel good pop songs'],
+    sad:       ['sad songs playlist 2025','emotional hindi songs','heartbreak songs','adele best songs','soft emotional english'],
+    hiphop:    ['hip hop hits 2025','rap songs trending','drake hits','eminem best','hip hop classics'],
+    phonk:     ['phonk music 2025','drift phonk songs','tiktok phonk hits','aggressive phonk','dark phonk playlist'],
+    indie:     ['indie pop 2025','indie songs trending','alternative indie hits','bedroom pop playlist','indie rock hits'],
+    default:   ['top songs 2025','trending music worldwide','best hits playlist','music mix 2025','popular songs today']
+};
+
+// Infer vibe from track title/artist heuristically
+function inferVibeFromTrack(track) {
+    if (VIBE_MAP[track.id]) return VIBE_MAP[track.id];
+    const text = (track.title + ' ' + track.artist).toLowerCase();
+    if (/phonk|drift|sigma|aggressive|skibidi/.test(text)) return 'phonk';
+    if (/love|pyaar|romance|dil|heart|tum|tere|teri|ishq|mohabbat|mere|sajna/.test(text)) return 'romantic';
+    if (/sad|emotional|breakup|cry|tears|dard|alone|miss/.test(text)) return 'sad';
+    if (/party|dance|club|edm|remix|bass|drop|banger/.test(text)) return 'party';
+    if (/rap|hip.?hop|freestyle|bars|cypher|flow/.test(text)) return 'hiphop';
+    if (/chill|relax|vibes|night|midnight|calm|slow|lofi|lo.fi/.test(text)) return 'chill';
+    if (/workout|run|power|energy|fire|beast|strong|pump/.test(text)) return 'energetic';
+    if (/indie|alternative|acoustic|folk|bedroom/.test(text)) return 'indie';
+    return 'pop';
+}
+
+// ─── For You Feed Builder — Intelligent Vibe-Based Engine ───
+async function buildForYouFeed() {
+    // Step 1: Analyze play history
+    const history = Storage.get('swar_played_history_list') || [];
+
+    // Step 2: Count vibes from history
+    const vibeCounts = {};
+    history.forEach(track => {
+        const vibe = inferVibeFromTrack(track);
+        vibeCounts[vibe] = (vibeCounts[vibe] || 0) + 1;
+    });
+
+    // Step 3: Sort vibes by frequency, take top 3 (or default if no history)
+    let topVibes = Object.entries(vibeCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(e => e[0]);
+
+    const hasHistory = topVibes.length > 0;
+    if (!hasHistory) topVibes = ['default'];
+
+    // Step 4: ~10 tracks per vibe so total ~30
+    const tracksPerVibe = Math.max(1, Math.floor(30 / topVibes.length));
+
+    showToast(hasHistory
+        ? `Building For You: ${topVibes.join(' + ')} vibes…`
+        : 'Curating your personal feed…');
+
+    const allResults = [];
+
+    // Run all vibe queries in parallel
+    await Promise.allSettled(topVibes.map(async (vibe) => {
+        const queries = VIBE_SEARCH_QUERIES[vibe] || VIBE_SEARCH_QUERIES['default'];
+        // Pick 2 random queries per vibe for variety
+        const picked = [...queries].sort(() => Math.random() - 0.5).slice(0, 2);
+
+        await Promise.allSettled(picked.map(async (q) => {
+            try {
+                const res = await searchAcrossInstances(q);
+                if (res?.items) {
+                    const parsed = res.items
+                        .filter(it => it.url?.includes('/watch?v='))
+                        .slice(0, tracksPerVibe)
+                        .map(it => {
+                            const id = it.url.split('v=')[1]?.split('&')[0] || '';
+                            return {
+                                id,
+                                title: (it.title || 'Unknown').replace(/&quot;/g, '"'),
+                                artist: it.uploaderName || 'Unknown Artist',
+                                duration: it.duration || 0,
+                                _vibe: vibe
+                            };
+                        });
+                    allResults.push(...parsed);
+                }
+            } catch {}
+        }));
+    }));
+
+    // Step 5: Deduplicate & shuffle
+    const seen = new Set();
+    const unique = allResults.filter(t => t.id && !seen.has(t.id) && seen.add(t.id));
+    const shuffled = unique.sort(() => Math.random() - 0.5);
+
+    // Step 6: Fallback to premium defaults if API returned nothing
+    const finalTracks = shuffled.length >= 6 ? shuffled : PREMIUM_CARDS_TRACKS;
+
+    window.homeFeaturedTracks = finalTracks;
+    renderDynamicFeaturedRow(finalTracks);
+    tracks = [...finalTracks];
+
+    const vibeLabel = hasHistory
+        ? topVibes.map(v => v.charAt(0).toUpperCase() + v.slice(1)).join(' + ')
+        : 'Curated Mix';
+
+    showToast(`For You: ${vibeLabel} · ${finalTracks.length} tracks`);
+}
+
 // ─── State Configuration ───
 let player = null, isPlaying = false, isPlayerReady = false;
 let currentTrackIndex = 0, tracks = [], progressInterval = null;
@@ -2331,13 +2461,15 @@ function renderHomeSkeletons() {
 
 async function loadAndRenderHome() {
     renderHomeSkeletons();
-    
-    // Injecting 25-30 massive high-fidelity custom tracks inside the top slider context
+    // Show premium defaults instantly
     window.homeFeaturedTracks = [...PREMIUM_CARDS_TRACKS];
-    
     renderDynamicFeaturedRow(window.homeFeaturedTracks);
-    renderDynamicKLGrid(); // User Played Track Engine
+    renderDynamicKLGrid();
     renderDynamicKLGrid2();
+    // Then build intelligent For You feed in background
+    buildForYouFeed().catch(() => {
+        renderDynamicFeaturedRow(PREMIUM_CARDS_TRACKS);
+    });
 }
 
 function renderDynamicFeaturedRow(arr) {
@@ -2458,14 +2590,17 @@ function playFallbackKL(i) {
     tracks = [...defaultSet]; currentTrackIndex = i; playTrack(i);
 }
 
-// ─── Mode Chips Selection Engine (In-place Dynamic Sorting) ───
+// ─── Mode Chips Selection Engine ───
 function onMoodChip(el, query) {
     document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     
     if (query === 'for-you') {
-        loadAndRenderHome();
-        tracks = [...PREMIUM_CARDS_TRACKS];
+        // Intelligent vibe-based personalized feed
+        buildForYouFeed().catch(() => {
+            renderDynamicFeaturedRow(PREMIUM_CARDS_TRACKS);
+        });
+        renderDynamicKLGrid();
         return;
     }
     
@@ -2866,6 +3001,623 @@ function _doCloseAppearancePanel() {
     if (currentView === 'settings') renderSettingsView();
 }
 
+// ═══════════════════════════════════════════════════════════
+// ─── FEATURE PACK — FREE / NO BACKEND / NO API KEY ────────
+// ═══════════════════════════════════════════════════════════
+
+// ─── 1. ALBUM ART COLOR EXTRACTION ───
+const ColorExtractor = (() => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.height = 8;
+
+    function extract(imgSrc, cb) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            try {
+                ctx.drawImage(img, 0, 0, 8, 8);
+                const d = ctx.getImageData(0, 0, 8, 8).data;
+                let r = 0, g = 0, b = 0, count = 0;
+                for (let i = 0; i < d.length; i += 4) {
+                    const brightness = (d[i] + d[i+1] + d[i+2]) / 3;
+                    if (brightness > 20 && brightness < 220) {
+                        r += d[i]; g += d[i+1]; b += d[i+2]; count++;
+                    }
+                }
+                if (count > 0) { r = Math.round(r/count); g = Math.round(g/count); b = Math.round(b/count); }
+                cb(`${r},${g},${b}`);
+            } catch { cb('255,255,255'); }
+        };
+        img.onerror = () => cb('255,255,255');
+        img.src = imgSrc;
+    }
+
+    function applyToFullscreen(trackId) {
+        const src = `https://i.ytimg.com/vi/${trackId}/hqdefault.jpg`;
+        extract(src, (rgb) => {
+            const bg = $('fullscreenBg');
+            if (bg) {
+                bg.style.background = `linear-gradient(180deg, rgba(${rgb},0.55) 0%, rgba(0,0,0,0.92) 100%)`;
+                bg.style.transition = 'background 1.4s ease';
+            }
+            ['fsOrbElement1','fsOrbElement2','fsOrbElement3'].forEach((id, i) => {
+                const el = $(id);
+                if (el) el.style.background = `radial-gradient(circle, rgba(${rgb},${0.5 - i*0.12}), transparent 70%)`;
+            });
+        });
+    }
+    return { applyToFullscreen };
+})();
+
+// ─── 2. SPEED CONTROL ───
+let currentPlaybackRate = 1.0;
+function setPlaybackSpeed(rate) {
+    currentPlaybackRate = rate;
+    if (player && player.getIframe) {
+        try {
+            const iframe = player.getIframe();
+            player.setPlaybackRate(rate);
+        } catch {}
+    }
+    document.querySelectorAll('.speed-btn').forEach(b => {
+        b.classList.toggle('active', parseFloat(b.dataset.speed) === rate);
+    });
+    showToast(`Speed: ${rate}x`);
+    Storage.set('swar_speed', rate);
+}
+
+// ─── 3. CUSTOM PLAYLISTS ───
+let playlists = Storage.get('swar_playlists') || {};
+let playlistPanelOpen = false;
+
+function savePlaylists() { Storage.set('swar_playlists', playlists); }
+
+function createPlaylist(name) {
+    if (!name?.trim()) return;
+    const id = 'pl_' + Date.now();
+    playlists[id] = { id, name: name.trim(), tracks: [], created: Date.now() };
+    savePlaylists();
+    showToast(`Playlist "${name}" created`);
+    renderPlaylistPanel();
+}
+
+function addToPlaylist(plId, track) {
+    if (!playlists[plId]) return;
+    if (playlists[plId].tracks.find(t => t.id === track.id)) { showToast('Already in playlist'); return; }
+    playlists[plId].tracks.push(track);
+    savePlaylists();
+    showToast(`Added to "${playlists[plId].name}"`);
+}
+
+function deletePlaylist(plId) {
+    delete playlists[plId];
+    savePlaylists();
+    renderPlaylistPanel();
+}
+
+function playPlaylist(plId) {
+    const pl = playlists[plId];
+    if (!pl?.tracks?.length) { showToast('Playlist is empty'); return; }
+    tracks = [...pl.tracks];
+    currentTrackIndex = 0;
+    playTrack(0);
+    $('fsPlayingContext').textContent = pl.name + ' — SWAR';
+    closePlaylistPanel();
+    showToast(`Playing "${pl.name}"`);
+}
+
+function renderPlaylistPanel() {
+    const panel = $('playlistPanel');
+    if (!panel) return;
+    const pls = Object.values(playlists);
+    const currentTrack = tracks[currentTrackIndex];
+    panel.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;border-bottom:1px solid var(--glass-border);padding-bottom:14px">
+            <span style="font-size:1.05rem;font-weight:800;letter-spacing:-0.02em">My Playlists</span>
+            <button onclick="closePlaylistPanel()" style="color:var(--text-subdued);font-size:0.85rem;font-weight:600">Close</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+            <input id="newPlName" placeholder="New playlist name..." style="flex:1;padding:10px 14px;background:var(--bg-card);border:1px solid var(--glass-border);border-radius:10px;color:var(--text-base);font-size:0.85rem;font-family:inherit">
+            <button onclick="createPlaylist($('newPlName').value);$('newPlName').value=''" style="padding:10px 16px;background:var(--text-base);color:var(--bg-base);border-radius:10px;font-weight:700;font-size:0.82rem">Create</button>
+        </div>
+        ${currentTrack ? `
+        <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:0.78rem;color:var(--text-subdued)">
+            Add <strong style="color:var(--text-base)">"${escapeHtml(currentTrack.title)}"</strong> to:
+            ${pls.map(pl => `<button onclick="addToPlaylist('${pl.id}',tracks[currentTrackIndex])" style="display:inline-block;margin:4px 4px 0 0;padding:4px 10px;background:var(--bg-card-hover);border:1px solid var(--glass-border);border-radius:6px;font-size:0.72rem;font-weight:600;color:var(--text-base)">${escapeHtml(pl.name)}</button>`).join('') || '<span style="margin-left:6px">Create a playlist first</span>'}
+        </div>` : ''}
+        ${pls.length === 0 ? `<div style="text-align:center;padding:40px 20px;color:var(--text-subdued);font-size:0.85rem">No playlists yet. Create one above!</div>` :
+        pls.map(pl => `
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 10px;border-radius:10px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.2s" onmouseover="this.style.background='var(--bg-card)'" onmouseout="this.style.background=''">
+                <div style="width:42px;height:42px;border-radius:10px;background:var(--bg-card-hover);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--text-subdued)"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>
+                </div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:0.85rem;color:var(--text-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(pl.name)}</div>
+                    <div style="font-size:0.72rem;color:var(--text-subdued);margin-top:2px">${pl.tracks.length} track${pl.tracks.length !== 1 ? 's' : ''}</div>
+                </div>
+                <button onclick="playPlaylist('${pl.id}')" style="width:32px;height:32px;border-radius:8px;background:var(--text-base);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="var(--bg-base)"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button onclick="deletePlaylist('${pl.id}')" style="width:32px;height:32px;border-radius:8px;background:rgba(255,69,58,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="#ff453a"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+            </div>
+        `).join('')}
+    `;
+}
+
+function openPlaylistPanel() {
+    playlistPanelOpen = true;
+    const panel = $('playlistPanel');
+    if (panel) { panel.classList.add('show'); renderPlaylistPanel(); }
+}
+function closePlaylistPanel() {
+    playlistPanelOpen = false;
+    const panel = $('playlistPanel');
+    if (panel) panel.classList.remove('show');
+}
+
+// ─── 4. LISTENING STATS ───
+function renderStatsView() {
+    $('sectionTitle').textContent = 'Your Stats';
+    const history = Storage.get('swar_played_history_list') || [];
+    const liked = Array.from(likedTracks.values());
+
+    // Artist frequency
+    const artistCount = {};
+    history.forEach(t => { artistCount[t.artist] = (artistCount[t.artist] || 0) + 1; });
+    const topArtists = Object.entries(artistCount).sort((a,b) => b[1]-a[1]).slice(0, 5);
+
+    // Vibe frequency
+    const vibeCount = {};
+    history.forEach(t => { const v = inferVibeFromTrack(t); vibeCount[v] = (vibeCount[v] || 0) + 1; });
+    const topVibes = Object.entries(vibeCount).sort((a,b) => b[1]-a[1]).slice(0, 4);
+    const totalVibes = topVibes.reduce((s, v) => s + v[1], 0) || 1;
+
+    // Estimated time
+    const totalSecs = history.reduce((s, t) => s + (t.duration || 180), 0);
+    const hrs = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+
+    const vibeEmoji = { romantic:'💕', energetic:'⚡', party:'🎉', chill:'🌙', pop:'✨', sad:'🥺', hiphop:'🎤', phonk:'🔥', indie:'🎸', default:'🎵' };
+
+    $('contentArea').innerHTML = `
+        <div style="max-width:480px;margin:0 auto">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+                ${[
+                    ['🎵', totalPlayedCount, 'Total Played'],
+                    ['❤️', liked.length, 'Liked'],
+                    ['⏱️', hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`, 'Listened']
+                ].map(([ico, val, lbl]) => `
+                    <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;padding:16px 12px;text-align:center">
+                        <div style="font-size:1.4rem;margin-bottom:6px">${ico}</div>
+                        <div style="font-size:1.3rem;font-weight:800;color:var(--text-base)">${val}</div>
+                        <div style="font-size:0.65rem;color:var(--text-subdued);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">${lbl}</div>
+                    </div>`).join('')}
+            </div>
+
+            ${topVibes.length ? `
+            <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;padding:16px;margin-bottom:12px">
+                <div style="font-size:0.65rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-subdued);margin-bottom:12px">Your Vibe DNA</div>
+                ${topVibes.map(([vibe, count]) => `
+                    <div style="margin-bottom:10px">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                            <span style="font-size:0.8rem;font-weight:600;color:var(--text-base)">${vibeEmoji[vibe]||'🎵'} ${vibe.charAt(0).toUpperCase()+vibe.slice(1)}</span>
+                            <span style="font-size:0.75rem;color:var(--text-subdued)">${count} plays</span>
+                        </div>
+                        <div style="height:4px;background:var(--glass-border);border-radius:4px;overflow:hidden">
+                            <div style="height:100%;width:${Math.round(count/totalVibes*100)}%;background:var(--text-base);border-radius:4px;transition:width 1s ease"></div>
+                        </div>
+                    </div>`).join('')}
+            </div>` : ''}
+
+            ${topArtists.length ? `
+            <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;padding:16px;margin-bottom:12px">
+                <div style="font-size:0.65rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-subdued);margin-bottom:12px">Top Artists</div>
+                ${topArtists.map(([artist, count], i) => `
+                    <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+                        <span style="font-size:0.75rem;font-weight:800;color:var(--text-muted);width:16px">#${i+1}</span>
+                        <span style="flex:1;font-size:0.85rem;font-weight:600;color:var(--text-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(artist)}</span>
+                        <span style="font-size:0.72rem;color:var(--text-subdued)">${count} plays</span>
+                    </div>`).join('')}
+            </div>` : ''}
+
+            ${history.length === 0 ? `<div style="text-align:center;padding:60px 20px;color:var(--text-subdued)"><div style="font-size:2.5rem;margin-bottom:12px">🎧</div><p style="font-size:0.9rem">Play some tracks to see your stats!</p></div>` : ''}
+        </div>`;
+}
+
+// ─── 5. RECENTLY PLAYED TIMELINE ───
+function renderRecentView() {
+    $('sectionTitle').textContent = 'Recently Played';
+    const history = Storage.get('swar_played_history_list') || [];
+    if (!history.length) {
+        $('contentArea').innerHTML = '<div style="text-align:center;padding:80px 24px;color:var(--text-subdued)"><div style="font-size:2.5rem;margin-bottom:12px">🕐</div><p>Nothing played yet. Start listening!</p></div>';
+        return;
+    }
+    tracks = [...history];
+    $('contentArea').innerHTML = `<div>${history.map((t, i) => `
+        <div onclick="playTrack(${i})" style="display:flex;align-items:center;gap:14px;padding:12px 8px;border-radius:12px;cursor:pointer;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.04)"
+             onmouseover="this.style.background='var(--bg-card)'" onmouseout="this.style.background=''">
+            <span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);width:20px;text-align:right;flex-shrink:0">${i+1}</span>
+            <img src="${getThumbnail(t.id)}" style="width:46px;height:46px;border-radius:10px;object-fit:cover;flex-shrink:0" onerror="this.src='${getThumbnailFallback(t.id)}'">
+            <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-base)">${escapeHtml(t.title)}</div>
+                <div style="font-size:0.74rem;color:var(--text-subdued);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(t.artist)}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                ${likedTracks.has(t.id) ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="var(--text-subdued)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' : ''}
+                <span style="font-size:0.7rem;color:var(--text-muted)">${formatDuration(t.duration)}</span>
+            </div>
+        </div>`).join('')}</div>`;
+}
+
+// ─── 6. SHARE CARD (Canvas) ───
+function generateShareCard() {
+    const t = tracks[currentTrackIndex];
+    if (!t) { showToast('No track playing'); return; }
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080; canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+        // Background
+        ctx.drawImage(img, 0, 0, 1080, 1080);
+        // Dark overlay
+        const grad = ctx.createLinearGradient(0, 0, 0, 1080);
+        grad.addColorStop(0, 'rgba(0,0,0,0.2)');
+        grad.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+        grad.addColorStop(1, 'rgba(0,0,0,0.88)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1080, 1080);
+        // Album art box
+        const artSize = 340;
+        const artX = (1080 - artSize) / 2;
+        const artY = 260;
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(artX, artY, artSize, artSize, 32);
+        ctx.clip();
+        ctx.drawImage(img, artX, artY, artSize, artSize);
+        ctx.restore();
+        // White border on art
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(artX, artY, artSize, artSize, 32);
+        ctx.stroke();
+        // Title
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 62px Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        const title = t.title.length > 22 ? t.title.slice(0, 22) + '…' : t.title;
+        ctx.fillText(title, 540, 680);
+        // Artist
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '38px Inter, Arial, sans-serif';
+        ctx.fillText(t.artist, 540, 740);
+        // SWAR badge
+        ctx.fillStyle = 'rgba(255,255,255,0.12)';
+        ctx.beginPath();
+        ctx.roundRect(400, 800, 280, 60, 30);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 26px Inter, Arial, sans-serif';
+        ctx.letterSpacing = '4px';
+        ctx.fillText('SWAR MUSIC', 540, 838);
+        // Download
+        canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `swar-${t.title.replace(/[^a-z0-9]/gi,'_')}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Share card downloaded!');
+        }, 'image/png');
+    };
+    img.onerror = () => {
+        // Fallback: plain dark card
+        ctx.fillStyle = '#0a0a0c';
+        ctx.fillRect(0, 0, 1080, 1080);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 72px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(t.title.slice(0,20), 540, 500);
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font = '42px Arial';
+        ctx.fillText(t.artist, 540, 580);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 32px Arial';
+        ctx.fillText('SWAR MUSIC', 540, 900);
+        canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'swar-share.png';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Share card downloaded!');
+        });
+    };
+    img.src = getThumbnailFallback(t.id);
+}
+
+// ─── 7. AUDIO VISUALIZER (Canvas — Web Audio API) ───
+const Visualizer = (() => {
+    let audioCtx = null, analyser = null, source = null, animId = null;
+    let canvas = null, ctx = null, active = false;
+
+    function init() {
+        canvas = $('vizCanvas');
+        if (!canvas) return;
+        ctx = canvas.getContext('2d');
+        resize();
+        window.addEventListener('resize', resize);
+    }
+
+    function resize() {
+        if (!canvas) return;
+        canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1);
+        canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1);
+        ctx && ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    }
+
+    function start() {
+        if (active || !canvas) return;
+        active = true;
+        // Simulated visualizer (real Web Audio needs iframe src workaround)
+        const W = canvas.offsetWidth, H = canvas.offsetHeight;
+        const bars = 48;
+        let phase = 0;
+        function draw() {
+            if (!active) return;
+            ctx.clearRect(0, 0, W, H);
+            const bw = W / bars - 2;
+            for (let i = 0; i < bars; i++) {
+                const t = Date.now() / 600;
+                const h = Math.max(4, (
+                    Math.sin(i * 0.4 + t) * 0.4 +
+                    Math.sin(i * 0.7 + t * 1.3) * 0.3 +
+                    Math.sin(i * 0.15 + t * 0.7) * 0.3
+                ) * 0.5 + 0.5) * H * 0.75;
+                const x = i * (bw + 2);
+                const opacity = 0.5 + 0.5 * Math.sin(i * 0.3 + t);
+                ctx.fillStyle = `rgba(255,255,255,${opacity.toFixed(2)})`;
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(x, H - h, bw, h, 3);
+                else ctx.rect(x, H - h, bw, h);
+                ctx.fill();
+            }
+            animId = requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    function stop() {
+        active = false;
+        if (animId) { cancelAnimationFrame(animId); animId = null; }
+        if (canvas && ctx) ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+    }
+
+    return { init, start, stop };
+})();
+
+// ─── 8. KEYBOARD SHORTCUTS ───
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', e => {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        switch(e.key) {
+            case ' ':        e.preventDefault(); togglePlay(); break;
+            case 'ArrowRight': e.preventDefault(); nextTrack(); break;
+            case 'ArrowLeft':  e.preventDefault(); prevTrack(); break;
+            case 'l': case 'L': toggleLike(); break;
+            case 's': case 'S': toggleShuffle(); break;
+            case 'r': case 'R': toggleRepeat(); break;
+            case 'f': case 'F':
+                if (!isFullscreenOpen && tracks[currentTrackIndex]) openFullscreen();
+                else if (isFullscreenOpen) closeFullscreen();
+                break;
+            case 'm': case 'M':
+                if (player) { player.isMuted() ? player.unMute() : player.mute(); showToast(player.isMuted() ? 'Muted' : 'Unmuted'); }
+                break;
+            case '?':
+                showKeyboardHelp();
+                break;
+        }
+    });
+}
+
+function showKeyboardHelp() {
+    const existing = $('kbHelp');
+    if (existing) { existing.remove(); return; }
+    const div = document.createElement('div');
+    div.id = 'kbHelp';
+    div.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+        background:var(--glass-bg-strong);backdrop-filter:blur(40px);
+        border:1px solid var(--glass-border-strong);border-radius:24px;padding:28px;
+        z-index:9990;min-width:280px;box-shadow:0 30px 80px rgba(0,0,0,0.8);
+        animation:menuPop 0.3s var(--ease-spring)`;
+    div.innerHTML = `
+        <div style="font-weight:800;font-size:1rem;margin-bottom:16px;letter-spacing:-0.02em">Keyboard Shortcuts</div>
+        ${[
+            ['Space','Play / Pause'],['→','Next Track'],['←','Prev Track'],
+            ['L','Like / Unlike'],['S','Toggle Shuffle'],['R','Toggle Repeat'],
+            ['F','Open / Close Player'],['M','Mute / Unmute'],['?','This help']
+        ].map(([k,d]) => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                <span style="font-size:0.8rem;color:var(--text-subdued)">${d}</span>
+                <kbd style="background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);border-radius:6px;padding:3px 8px;font-size:0.72rem;font-weight:700;color:var(--text-base);font-family:monospace">${k}</kbd>
+            </div>`).join('')}
+        <button onclick="document.getElementById('kbHelp').remove()" style="margin-top:16px;width:100%;padding:10px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:10px;font-size:0.82rem;font-weight:600;color:var(--text-base)">Close</button>`;
+    document.body.appendChild(div);
+    setTimeout(() => { document.addEventListener('click', function rm(e) { if (!div.contains(e.target)) { div.remove(); document.removeEventListener('click', rm); } }); }, 100);
+}
+
+// ─── 9. AUTO MOOD BY TIME OF DAY ───
+function getAutoMoodByTime() {
+    const h = new Date().getHours();
+    if (h >= 5  && h < 9)  return { query: 'energize', label: 'Morning Energy' };
+    if (h >= 9  && h < 12) return { query: 'feel-good', label: 'Morning Vibes' };
+    if (h >= 12 && h < 15) return { query: 'pop', label: 'Afternoon Pop' };
+    if (h >= 15 && h < 18) return { query: 'party', label: 'Evening Party' };
+    if (h >= 18 && h < 21) return { query: 'chill', label: 'Night Chill' };
+    return { query: 'relax', label: 'Late Night Relax' };
+}
+
+// ─── 10. PATCH: playTrack — color extraction + visualizer ───
+const _origPlayTrack = playTrack;
+// Override done inline below via monkey-patch on DOMContentLoaded
+
+// ─── UI INJECTION — add new panels & controls to DOM ───
+function injectNewUI() {
+    // Speed Control Panel (injected into fullscreen options)
+    const fsOpts = document.querySelector('.fs-options-panel');
+    if (fsOpts) {
+        const speedBtn = document.createElement('button');
+        speedBtn.className = 'fs-opt-btn';
+        speedBtn.id = 'speedToggleBtn';
+        speedBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 0 0 3.35 19a2 2 0 0 0 1.72 1h13.85a2 2 0 0 0 1.74-1 10 10 0 0 0-.27-10.44zm-9.79 6.84a2 2 0 0 0 2.83 0l5.66-8.49-8.49 5.66a2 2 0 0 0 0 2.83z"/></svg>Speed`;
+        speedBtn.onclick = () => toggleSpeedPanel();
+        fsOpts.appendChild(speedBtn);
+
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'fs-opt-btn';
+        shareBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Share Card`;
+        shareBtn.onclick = generateShareCard;
+        fsOpts.appendChild(shareBtn);
+
+        const plBtn = document.createElement('button');
+        plBtn.className = 'fs-opt-btn';
+        plBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>Playlists`;
+        plBtn.onclick = openPlaylistPanel;
+        fsOpts.appendChild(plBtn);
+    }
+
+    // Speed Panel (inside fullscreen player)
+    const fsPlayer = $('fullscreenPlayer');
+    if (fsPlayer) {
+        const speedPanel = document.createElement('div');
+        speedPanel.id = 'speedPanel';
+        speedPanel.style.cssText = `position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
+            background:var(--glass-bg-strong);backdrop-filter:blur(30px);
+            border:1px solid var(--glass-border-strong);border-radius:18px;
+            padding:14px 18px;z-index:120;display:none;gap:8px;flex-wrap:wrap;
+            box-shadow:0 10px 40px rgba(0,0,0,0.7);align-items:center;justify-content:center;min-width:280px`;
+        speedPanel.innerHTML = `
+            <div style="width:100%;text-align:center;font-size:0.65rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-subdued);margin-bottom:4px">Playback Speed</div>
+            ${[0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map(s => `
+                <button class="speed-btn${s===1?' active':''}" data-speed="${s}" onclick="setPlaybackSpeed(${s})"
+                    style="padding:8px 14px;border-radius:10px;font-size:0.78rem;font-weight:700;
+                    background:${s===1?'var(--text-base)':'var(--bg-card)'};
+                    color:${s===1?'var(--bg-base)':'var(--text-base)'};
+                    border:1px solid var(--glass-border);transition:all 0.2s">${s}x</button>`).join('')}`;
+        fsPlayer.appendChild(speedPanel);
+
+        // Visualizer Canvas
+        const vizWrap = document.createElement('div');
+        vizWrap.style.cssText = `position:absolute;bottom:0;left:0;right:0;height:60px;z-index:5;pointer-events:none;opacity:0.35`;
+        vizWrap.innerHTML = `<canvas id="vizCanvas" style="width:100%;height:100%;display:block"></canvas>`;
+        fsPlayer.appendChild(vizWrap);
+
+        // Playlist Panel (inside fullscreen)
+        const plPanel = document.createElement('div');
+        plPanel.id = 'playlistPanel';
+        plPanel.style.cssText = `position:absolute;inset:0;background:rgba(10,10,12,0.98);
+            backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);z-index:115;
+            display:none;flex-direction:column;padding:28px 24px calc(24px + env(safe-area-inset-bottom));
+            overflow-y:auto;animation:slideUpSheet 0.4s var(--ease-spring)`;
+        plPanel.classList.add('queue-panel'); // reuse queue-panel show/hide class handling
+        plPanel.id = 'playlistPanel';
+        fsPlayer.appendChild(plPanel);
+    }
+
+    // Add Stats & Recent to nav — inject into settings view extra items
+    // Also add keyboard hint in header
+    const headerRight = document.querySelector('.header-right');
+    if (headerRight) {
+        const kbBtn = document.createElement('button');
+        kbBtn.style.cssText = `width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;margin-right:8px;transition:all 0.2s`;
+        kbBtn.title = 'Keyboard Shortcuts (?)';
+        kbBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="var(--text-subdued)"><path d="M20 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 5H5v-2h2v2zm10 0H7v-2h10v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2zm3 6h-2v-2h2v2z"/></svg>`;
+        kbBtn.onclick = showKeyboardHelp;
+        headerRight.insertBefore(kbBtn, headerRight.firstChild);
+    }
+}
+
+function toggleSpeedPanel() {
+    const panel = $('speedPanel');
+    if (!panel) return;
+    const isShowing = panel.style.display === 'flex';
+    panel.style.display = isShowing ? 'none' : 'flex';
+}
+
+// Update speed btn styles dynamically
+const _origSetPlaybackSpeed = setPlaybackSpeed;
+function setPlaybackSpeed(rate) {
+    currentPlaybackRate = rate;
+    if (player) { try { player.setPlaybackRate(rate); } catch {} }
+    document.querySelectorAll('.speed-btn').forEach(b => {
+        const isActive = parseFloat(b.dataset.speed) === rate;
+        b.style.background = isActive ? 'var(--text-base)' : 'var(--bg-card)';
+        b.style.color = isActive ? 'var(--bg-base)' : 'var(--text-base)';
+    });
+    const panel = $('speedPanel');
+    if (panel) panel.style.display = 'none';
+    showToast(`Speed: ${rate}x`);
+    Storage.set('swar_speed', rate);
+}
+
+// ─── Patch navigateTo to support new views ───
+const _origNavigateTo = navigateTo;
+function navigateTo(view) {
+    if (view === 'stats') {
+        currentView = 'stats';
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        updateNavIndicatorSlab();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        $('homeView').style.display = 'none';
+        $('otherView').style.display = 'block';
+        renderStatsView();
+        return;
+    }
+    if (view === 'recent') {
+        currentView = 'recent';
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        updateNavIndicatorSlab();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        $('homeView').style.display = 'none';
+        $('otherView').style.display = 'block';
+        renderRecentView();
+        return;
+    }
+    _origNavigateTo(view);
+}
+
+// ─── Patch renderSettingsView to include new items ───
+const _origRenderSettingsView = renderSettingsView;
+function renderSettingsView() {
+    _origRenderSettingsView();
+    // Append extra items
+    const section = $('contentArea')?.querySelector('.settings-section');
+    if (!section) return;
+    const extras = [
+        { icon: `<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/>`, label: 'Listening Stats', sub: 'Your top artists, vibes & playtime', action: `navigateTo('stats')` },
+        { icon: `<path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>`, label: 'Recently Played', sub: 'Your full play history', action: `navigateTo('recent')` },
+        { icon: `<path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/>`, label: 'My Playlists', sub: 'Create & manage your playlists', action: `openPlaylistPanel()` },
+    ];
+    extras.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'settings-item';
+        div.setAttribute('onclick', item.action);
+        div.innerHTML = `
+            <div class="settings-item-icon"><svg viewBox="0 0 24 24">${item.icon}</svg></div>
+            <div style="flex:1"><div class="settings-item-label">${item.label}</div><div class="settings-item-sub">${item.sub}</div></div>
+            <div class="settings-item-arrow"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg></div>`;
+        section.appendChild(div);
+    });
+}
+
 // ─── Document Bootstrapper Init ───
 window.addEventListener('DOMContentLoaded', () => {
     const savedUser = Storage.get('swar_user');
@@ -2873,13 +3625,56 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedLiked = Storage.get('swar_liked') || [];
     likedTracks = new Map(savedLiked.map(t => [t.id, t]));
     totalPlayedCount = Storage.get('swar_played_count') || 0;
+    currentPlaybackRate = Storage.get('swar_speed') || 1.0;
     setGreeting();
     SwarMaterial.init();
     setupEventListeners();
+    setupKeyboardShortcuts();
     setupSwipeGesture();
     setupScrubbing();
     setupAlbumGestures();
     Marquee.init();
+    injectNewUI();
+    Visualizer.init();
+
+    // Monkey-patch playTrack for color extraction + visualizer + speed restore
+    const __origPlayTrack = playTrack;
+    window.playTrack = function(i) {
+        __origPlayTrack(i);
+        const t = tracks[i];
+        if (t) {
+            ColorExtractor.applyToFullscreen(t.id);
+            if (isFullscreenOpen) { Visualizer.stop(); setTimeout(() => Visualizer.start(), 300); }
+        }
+        // Restore speed after track load
+        setTimeout(() => {
+            if (player && currentPlaybackRate !== 1.0) {
+                try { player.setPlaybackRate(currentPlaybackRate); } catch {}
+            }
+        }, 1500);
+    };
+
+    // Patch openFullscreen for visualizer
+    const __origOpenFullscreen = openFullscreen;
+    window.openFullscreen = function() {
+        __origOpenFullscreen();
+        setTimeout(() => { Visualizer.init(); if (isPlaying) Visualizer.start(); }, 200);
+    };
+
+    // Patch closeFullscreen
+    const __origCloseFullscreen = closeFullscreen;
+    window.closeFullscreen = function() {
+        Visualizer.stop();
+        closePlaylistPanel();
+        __origCloseFullscreen();
+    };
+
+    // Auto mood on first load
+    const autoMood = getAutoMoodByTime();
+    setTimeout(() => {
+        showToast(`Auto Mood: ${autoMood.label} ✨`);
+    }, 3000);
+
     loadAndRenderHome().then(() => {
         tracks = [...PREMIUM_CARDS_TRACKS];
     });
