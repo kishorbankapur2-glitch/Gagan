@@ -223,22 +223,38 @@ body:has(.rotate-wrapper.rotated-90) {
   position: relative;
 }
 
+/* 16:9 aspect ratio container — video fills this exactly */
 .video-panel.open {
-  max-height: 320px; /* enough for 16:9 video */
+  max-height: 600px;
 }
 
-.video-close-bar {
+.video-aspect-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  background: #000;
+}
+
+.live-video-frame {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 32px;
-  background: rgba(0,0,0,0.7);
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Close strip below video */
+.video-close-bar {
+  width: 100%;
+  height: 30px;
+  background: rgba(0,0,0,0.85);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 14px;
-  z-index: 10;
-  border-bottom: 1px solid rgba(255,215,0,0.2);
+  border-bottom: 1px solid rgba(255,215,0,0.15);
 }
 
 .video-close-label {
@@ -251,25 +267,18 @@ body:has(.rotate-wrapper.rotated-90) {
 }
 
 .video-close-btn {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px 6px;
+  padding: 4px 8px;
   border-radius: 6px;
   transition: color 0.2s;
   background: none;
   border: none;
   line-height: 1;
+  font-family: 'Inter', sans-serif;
 }
 .video-close-btn:active { color: var(--accent); }
-
-.live-video-frame {
-  width: 100%;
-  height: 280px;
-  border: none;
-  display: block;
-  margin-top: 32px; /* below the close bar */
-}
 
 /* ===== CREX IFRAME SECTION ===== */
 .iframe-box {
@@ -468,8 +477,7 @@ body:has(.rotate-wrapper.rotated-90) {
   .footer-info { padding: 10px 16px; }
   .menu-trigger { width: 32px; height: 32px; }
   .modal-card { width: 280px; padding: 20px 16px; }
-  .video-panel.open { max-height: 240px; }
-  .live-video-frame { height: 208px; }
+  .video-panel.open { max-height: 400px; }
 }
 
 .mode-option:hover, .theme-toggle-option:hover, .rotate-card-option:hover { background: rgba(255,215,0,0.15); border-color: var(--accent); }
@@ -491,18 +499,20 @@ body:has(.rotate-wrapper.rotated-90) {
 
       <!-- VIDEO PANEL - slides open above crex iframe when LIVE STREAM clicked -->
       <div class="video-panel" id="videoPanel">
+        <div class="video-aspect-wrap">
+          <iframe
+            id="liveVideoFrame"
+            class="live-video-frame"
+            src=""
+            allowfullscreen
+            allow="autoplay; encrypted-media; fullscreen"
+            scrolling="no"
+          ></iframe>
+        </div>
         <div class="video-close-bar">
           <span class="video-close-label">📺 Live Stream</span>
           <button class="video-close-btn" onclick="closeVideoPanel()">✕ Close</button>
         </div>
-        <iframe
-          id="liveVideoFrame"
-          class="live-video-frame"
-          src=""
-          allowfullscreen
-          allow="autoplay; encrypted-media; fullscreen"
-          scrolling="no"
-        ></iframe>
       </div>
 
       <!-- CREX SCORE IFRAME - same as before, pushed down when video opens -->
