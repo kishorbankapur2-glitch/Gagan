@@ -146,11 +146,10 @@ body {
   }
 
   .crex-card.split-active .live-video-frame {
-    width: 100% !important;
-    height: 100% !important;
-    transform: none !important; /* reset JS scale — fill naturally */
     position: absolute;
     top: 0; left: 0;
+    transform-origin: top left !important;
+    /* transform set dynamically by JS based on panel width */
   }
 
   /* RIGHT PANEL — Crex score */
@@ -163,14 +162,17 @@ body {
     position: relative;
   }
 
-  /* Mini header for right panel - "CARELESS · LIVE SCORE" */
+  /* Right panel mini header */
   .crex-card.split-active .top-overlay {
     position: relative !important;
     height: 38px !important;
     font-size: 10px;
     flex-shrink: 0;
     pointer-events: none;
+    letter-spacing: 1px;
   }
+
+  /* Override overlay text content in split mode via attr trick — done in JS */
 
   .crex-card.split-active .score-frame {
     flex: 1;
@@ -607,7 +609,7 @@ body:has(.rotate-wrapper.rotated-90) {
 
       <!-- CREX SCORE IFRAME - same as before, pushed down when video opens -->
       <div class="iframe-box" id="iframeBox">
-        <div class="top-overlay">⚡ CARELESS · LIVE SCORE 🏏</div>
+        <div class="top-overlay" id="topOverlay">⚡ YOU BORED WITH LOW SPEED? TRY OUR 🗿</div>
         <iframe id="crexFrame" class="score-frame" src="https://crex.com/series/indian-premier-league-2026-1PW" allowfullscreen></iframe>
       </div>
 
@@ -678,13 +680,30 @@ function isLandscapeNow() {
 
 function applySplitOrStack() {
   const card = document.querySelector('.crex-card');
+  const overlay = document.getElementById('topOverlay');
   if (!card) return;
   if (isVideoOpen && isLandscapeNow()) {
     card.classList.add('split-active');
+    if (overlay) overlay.innerText = '⚡ CARELESS · LIVE SCORE 🏏';
+    // Dynamically set scale for left video panel based on panel width
+    setTimeout(() => {
+      const wrap = document.querySelector('.video-aspect-wrap');
+      const frame = document.getElementById('liveVideoFrame');
+      if (!wrap || !frame) return;
+      const panelW = wrap.offsetWidth;
+      // Scale so 890px video fills panel width, offset to crop header/margins
+      const scale = panelW / 890;
+      const tx = -(250 * scale);
+      const ty = -(130 * scale);
+      frame.style.width = '1390px';
+      frame.style.height = '900px';
+      frame.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      frame.style.transformOrigin = 'top left';
+    }, 80);
   } else {
     card.classList.remove('split-active');
+    if (overlay) overlay.innerText = '⚡ YOU BORED WITH LOW SPEED? TRY OUR 🗿';
   }
-  setTimeout(scaleVideoFrame, 50);
   setTimeout(applyIframeHeight, 50);
 }
 
