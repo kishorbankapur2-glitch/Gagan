@@ -236,6 +236,14 @@ body:has(.rotate-wrapper.rotated-90) {
   overflow: hidden;
 }
 
+/* Tablet mode - bigger video area */
+.app-container.mode-tablet .video-panel.open { max-height: 35vh; }
+.app-container.mode-tablet .video-aspect-wrap { height: 35vh; }
+
+/* PC mode - bigger video area */
+.app-container.mode-pc .video-panel.open { max-height: 40vh; }
+.app-container.mode-pc .video-aspect-wrap { height: 40vh; }
+
 /* 
   crichd page renders at ~1390px wide
   Video player starts at ~18% from left = ~250px
