@@ -101,10 +101,83 @@ body {
 
 /* Landscape adjustments for modes */
 @media (orientation: landscape) {
-  .app-container.mode-phone .crex-card { max-width: 90vw; border-radius: 32px; }
-  .app-container.mode-tablet .crex-card { max-width: 94vw; border-radius: 28px; }
-  .app-container.mode-pc .crex-card { max-width: 96vw; border-radius: 24px; }
+  .app-container.mode-phone .crex-card { max-width: 98vw; border-radius: 24px; }
+  .app-container.mode-tablet .crex-card { max-width: 98vw; border-radius: 24px; }
+  .app-container.mode-pc .crex-card { max-width: 99vw; border-radius: 20px; }
   .top-overlay { font-size: 10px; height: 36px; }
+
+  /* ── SPLIT LAYOUT: two side-by-side panels, each with own mini-header ── */
+  .crex-card.split-active {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 24px);
+    overflow: hidden;
+  }
+
+  /* Hide the shared header & footer in split mode */
+  .crex-card.split-active .header      { display: none; }
+  .crex-card.split-active .footer-info { display: none; }
+
+  /* LEFT PANEL — Live Stream */
+  .crex-card.split-active .video-panel {
+    flex: 1;
+    display: flex !important;
+    flex-direction: column;
+    max-height: none !important;
+    height: 100% !important;
+    border-right: 1px solid rgba(255,215,0,0.2);
+    overflow: hidden;
+  }
+
+  /* Mini header for left panel */
+  .crex-card.split-active .video-close-bar {
+    display: flex !important;
+    height: 38px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    border-top: none;
+  }
+
+  .crex-card.split-active .video-aspect-wrap {
+    flex: 1;
+    height: 0 !important;   /* flex will stretch it */
+    min-height: 0;
+    padding-top: 0 !important;
+  }
+
+  .crex-card.split-active .live-video-frame {
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important; /* reset JS scale — fill naturally */
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  /* RIGHT PANEL — Crex score */
+  .crex-card.split-active .iframe-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100% !important;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Mini header for right panel - "CARELESS · LIVE SCORE" */
+  .crex-card.split-active .top-overlay {
+    position: relative !important;
+    height: 38px !important;
+    font-size: 10px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  .crex-card.split-active .score-frame {
+    flex: 1;
+    height: 0 !important;
+    min-height: 0;
+    margin-top: 0 !important;
+  }
 }
 
 /* Rotate wrapper */
@@ -527,14 +600,14 @@ body:has(.rotate-wrapper.rotated-90) {
           ></iframe>
         </div>
         <div class="video-close-bar">
-          <span class="video-close-label">📺 Live Stream</span>
+          <span class="video-close-label">📺 LIVE STREAM</span>
           <button class="video-close-btn" onclick="closeVideoPanel()">✕ Close</button>
         </div>
       </div>
 
       <!-- CREX SCORE IFRAME - same as before, pushed down when video opens -->
       <div class="iframe-box" id="iframeBox">
-        <div class="top-overlay">⚡ YOU BORED WITH LOW SPEED? TRY OUR 🗿</div>
+        <div class="top-overlay">⚡ CARELESS · LIVE SCORE 🏏</div>
         <iframe id="crexFrame" class="score-frame" src="https://crex.com/series/indian-premier-league-2026-1PW" allowfullscreen></iframe>
       </div>
 
@@ -599,12 +672,27 @@ function toggleVideoPanel() {
   isVideoOpen ? closeVideoPanel() : openVideoPanel();
 }
 
+function isLandscapeNow() {
+  return window.innerWidth > window.innerHeight;
+}
+
+function applySplitOrStack() {
+  const card = document.querySelector('.crex-card');
+  if (!card) return;
+  if (isVideoOpen && isLandscapeNow()) {
+    card.classList.add('split-active');
+  } else {
+    card.classList.remove('split-active');
+  }
+  setTimeout(scaleVideoFrame, 50);
+  setTimeout(applyIframeHeight, 50);
+}
+
 function openVideoPanel() {
   const panel = document.getElementById('videoPanel');
   const frame = document.getElementById('liveVideoFrame');
   const btn = document.getElementById('watchLiveBtn');
 
-  // Load src only when opening (lazy load)
   if (!frame.src || frame.src === window.location.href || frame.src === '') {
     frame.src = LIVE_STREAM_URL;
   }
@@ -612,19 +700,17 @@ function openVideoPanel() {
   panel.classList.add('open');
   isVideoOpen = true;
 
-  // Scale at multiple intervals - iframe takes time to load/render
+  applySplitOrStack();
   setTimeout(scaleVideoFrame, 50);
   setTimeout(scaleVideoFrame, 450);
   setTimeout(scaleVideoFrame, 1000);
   setTimeout(scaleVideoFrame, 2500);
 
-  // Button feedback
   btn.innerHTML = '📺 CLOSE VIDEO';
   btn.style.background = 'rgba(255,215,0,0.15)';
   btn.style.borderColor = 'var(--accent)';
   btn.style.color = 'var(--accent)';
 
-  // Adjust crex iframe height after video opens
   setTimeout(applyIframeHeight, 420);
 }
 
@@ -632,14 +718,14 @@ function closeVideoPanel() {
   const panel = document.getElementById('videoPanel');
   const frame = document.getElementById('liveVideoFrame');
   const btn = document.getElementById('watchLiveBtn');
+  const card = document.querySelector('.crex-card');
 
   panel.classList.remove('open');
+  card.classList.remove('split-active');
   isVideoOpen = false;
 
-  // Clear iframe src to stop video/audio
   setTimeout(() => { frame.src = ''; }, 400);
 
-  // Reset button
   btn.innerHTML = '📺 LIVE STREAM';
   btn.style.background = '';
   btn.style.borderColor = '';
@@ -754,32 +840,30 @@ function scaleVideoFrame() {
   const frame = document.getElementById('liveVideoFrame');
   if (!wrap || !frame) return;
 
-  const containerW = wrap.offsetWidth;
+  // In landscape split mode, CSS handles sizing — skip JS transform
+  if (isLandscapeNow() && isVideoOpen) return;
 
-  // crichd page ~1390px wide
-  // Video box: left margin ~18% = ~250px, video width ~64% = ~890px
-  // Top header: ~130px
-  // We always zoom so video fills full container width regardless of mode
+  const containerW = wrap.offsetWidth;
   const scale = containerW / 890;
   const translateX = -(250 * scale);
   const translateY = -(130 * scale);
 
   frame.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
   frame.style.transformOrigin = 'top left';
-
-  // Force iframe scrolled to top so Telegram popup / other content doesn't show
   try { frame.contentWindow.scrollTo(0, 0); } catch(e) {}
 }
 
-window.addEventListener('resize', () => { if (isVideoOpen) scaleVideoFrame(); });
+window.addEventListener('resize', () => { 
+  if (isVideoOpen) { applySplitOrStack(); scaleVideoFrame(); }
+});
 
 window.addEventListener('orientationchange', () => {
-  setTimeout(handleLayoutChange, 150);
-  setTimeout(handleLayoutChange, 400);
+  setTimeout(() => { handleLayoutChange(); if (isVideoOpen) applySplitOrStack(); }, 150);
+  setTimeout(() => { handleLayoutChange(); if (isVideoOpen) applySplitOrStack(); }, 400);
 });
 if (screen.orientation) {
   screen.orientation.addEventListener('change', () => {
-    setTimeout(handleLayoutChange, 150);
+    setTimeout(() => { handleLayoutChange(); if (isVideoOpen) applySplitOrStack(); }, 150);
   });
 }
 
