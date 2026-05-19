@@ -237,12 +237,12 @@ body:has(.rotate-wrapper.rotated-90) {
 }
 
 /* Tablet mode - bigger video area */
-.app-container.mode-tablet .video-panel.open { max-height: 35vh; }
-.app-container.mode-tablet .video-aspect-wrap { height: 35vh; }
+.app-container.mode-tablet .video-panel.open { max-height: 30vh; }
+.app-container.mode-tablet .video-aspect-wrap { height: 30vh; }
 
 /* PC mode - bigger video area */
-.app-container.mode-pc .video-panel.open { max-height: 40vh; }
-.app-container.mode-pc .video-aspect-wrap { height: 40vh; }
+.app-container.mode-pc .video-panel.open { max-height: 35vh; }
+.app-container.mode-pc .video-aspect-wrap { height: 35vh; }
 
 /* 
   crichd page renders at ~1390px wide
@@ -612,9 +612,11 @@ function openVideoPanel() {
   panel.classList.add('open');
   isVideoOpen = true;
 
-  // Scale the iframe to fill container after transition
+  // Scale at multiple intervals - iframe takes time to load/render
   setTimeout(scaleVideoFrame, 50);
-  setTimeout(scaleVideoFrame, 450); // after open animation
+  setTimeout(scaleVideoFrame, 450);
+  setTimeout(scaleVideoFrame, 1000);
+  setTimeout(scaleVideoFrame, 2500);
 
   // Button feedback
   btn.innerHTML = '📺 CLOSE VIDEO';
@@ -754,19 +756,19 @@ function scaleVideoFrame() {
 
   const containerW = wrap.offsetWidth;
 
-  // Phone: zoom in tight on video (890px base)
-  // Tablet: zoom out more (1150px base = more of page visible)
-  // PC: even more zoomed out
-  let videoWidth = 890;
-  if (currentMode === 'tablet') videoWidth = 1150;
-  if (currentMode === 'pc') videoWidth = 1300;
-
-  const scale = containerW / videoWidth;
+  // crichd page ~1390px wide
+  // Video box: left margin ~18% = ~250px, video width ~64% = ~890px
+  // Top header: ~130px
+  // We always zoom so video fills full container width regardless of mode
+  const scale = containerW / 890;
   const translateX = -(250 * scale);
   const translateY = -(130 * scale);
 
   frame.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
   frame.style.transformOrigin = 'top left';
+
+  // Force iframe scrolled to top so Telegram popup / other content doesn't show
+  try { frame.contentWindow.scrollTo(0, 0); } catch(e) {}
 }
 
 window.addEventListener('resize', () => { if (isVideoOpen) scaleVideoFrame(); });
