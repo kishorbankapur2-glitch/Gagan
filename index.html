@@ -66,9 +66,10 @@ body {
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100px;
+  align-items: flex-start;
+  min-height: 100vh;
   padding: 12px;
+  overflow-y: auto;
   transition: background 0.3s ease, color 0.2s ease;
 }
 
@@ -223,20 +224,20 @@ body:has(.rotate-wrapper.rotated-90) {
   position: relative;
 }
 
-/* 16:9 aspect ratio container */
 .video-panel.open {
   max-height: 600px;
 }
 
+/* Pure CSS 16:9 — no JS height needed */
 .video-aspect-wrap {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 */
+  padding-top: 56.25%;
   background: #000;
   overflow: hidden;
 }
 
-/* iframe loads at 1280x720 internally, then we scale it down to fill container */
+/* iframe at 1280x720, scaled down via JS transform */
 .live-video-frame {
   position: absolute;
   top: 0; left: 0;
@@ -245,7 +246,6 @@ body:has(.rotate-wrapper.rotated-90) {
   border: none;
   display: block;
   transform-origin: top left;
-  /* JS will set the scale dynamically */
 }
 
 /* Close strip below video */
@@ -561,10 +561,10 @@ body:has(.rotate-wrapper.rotated-90) {
 </div>
 
 <script>
-// ========== DAILY YOUTUBE AUDIO COMMENTARY LINK ==========
+// ========== 🟥🟥🟥DAILY YOUTUBE AUDIO COMMENTARY LINK🟥🟥🟥 ==========
 const COMMENTARY_URL = "https://www.youtube.com/live/W42OdjZaHB4?si=WTN3Bx_iJSE83uRX";
 
-// ========== LIVE STREAM VIDEO LINK ==========
+// ========== 🟥🟥🟥LIVE STREAM VIDEO LINK🟥🟥🟥 ==========
 const LIVE_STREAM_URL = "https://crichd-livee.pages.dev/?id=eng";
 
 let audioIframe = null;
@@ -731,17 +731,13 @@ function debouncedLayoutChange() {
 }
 
 // ===================== VIDEO FRAME SCALING =====================
-// crichd renders at 1280x720 — we scale it down to fill the container
 function scaleVideoFrame() {
   const wrap = document.querySelector('.video-aspect-wrap');
   const frame = document.getElementById('liveVideoFrame');
   if (!wrap || !frame) return;
-  const containerW = wrap.offsetWidth;
-  const scale = containerW / 1280;
+  const scale = wrap.offsetWidth / 1280;
   frame.style.transform = `scale(${scale})`;
-  // Set wrap height to match scaled height
-  wrap.style.paddingTop = '0';
-  wrap.style.height = Math.round(720 * scale) + 'px';
+  // Keep padding-top for 16:9 ratio — do NOT set height manually
 }
 
 window.addEventListener('resize', () => { if (isVideoOpen) scaleVideoFrame(); });
