@@ -223,7 +223,7 @@ body:has(.rotate-wrapper.rotated-90) {
   position: relative;
 }
 
-/* 16:9 aspect ratio container — video fills this exactly */
+/* 16:9 aspect ratio container */
 .video-panel.open {
   max-height: 600px;
 }
@@ -233,15 +233,19 @@ body:has(.rotate-wrapper.rotated-90) {
   width: 100%;
   padding-top: 56.25%; /* 16:9 */
   background: #000;
+  overflow: hidden;
 }
 
+/* iframe loads at 1280x720 internally, then we scale it down to fill container */
 .live-video-frame {
   position: absolute;
   top: 0; left: 0;
-  width: 100%;
-  height: 100%;
+  width: 1280px;
+  height: 720px;
   border: none;
   display: block;
+  transform-origin: top left;
+  /* JS will set the scale dynamically */
 }
 
 /* Close strip below video */
@@ -595,6 +599,10 @@ function openVideoPanel() {
   panel.classList.add('open');
   isVideoOpen = true;
 
+  // Scale the iframe to fill container after transition
+  setTimeout(scaleVideoFrame, 50);
+  setTimeout(scaleVideoFrame, 450); // after open animation
+
   // Button feedback
   btn.innerHTML = '📺 CLOSE VIDEO';
   btn.style.background = 'rgba(255,215,0,0.15)';
@@ -722,7 +730,22 @@ function debouncedLayoutChange() {
   resizeDebounceTimer = setTimeout(handleLayoutChange, 80);
 }
 
-window.addEventListener('resize', debouncedLayoutChange);
+// ===================== VIDEO FRAME SCALING =====================
+// crichd renders at 1280x720 — we scale it down to fill the container
+function scaleVideoFrame() {
+  const wrap = document.querySelector('.video-aspect-wrap');
+  const frame = document.getElementById('liveVideoFrame');
+  if (!wrap || !frame) return;
+  const containerW = wrap.offsetWidth;
+  const scale = containerW / 1280;
+  frame.style.transform = `scale(${scale})`;
+  // Set wrap height to match scaled height
+  wrap.style.paddingTop = '0';
+  wrap.style.height = Math.round(720 * scale) + 'px';
+}
+
+window.addEventListener('resize', () => { if (isVideoOpen) scaleVideoFrame(); });
+
 window.addEventListener('orientationchange', () => {
   setTimeout(handleLayoutChange, 150);
   setTimeout(handleLayoutChange, 400);
