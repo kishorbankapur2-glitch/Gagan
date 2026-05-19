@@ -214,7 +214,7 @@ body:has(.rotate-wrapper.rotated-90) {
   box-shadow: 0 0 14px var(--accent-glow);
 }
 
-/* ===== VIDEO PLAYER SECTION (shown/hidden) ===== */
+/* ===== VIDEO PLAYER SECTION - 1/4 screen height ===== */
 .video-panel {
   width: 100%;
   background: #000;
@@ -225,19 +225,18 @@ body:has(.rotate-wrapper.rotated-90) {
 }
 
 .video-panel.open {
-  max-height: 600px;
+  max-height: 25vh;
 }
 
-/* Pure CSS 16:9 — no JS height needed */
+/* iframe fills the 25vh area completely */
 .video-aspect-wrap {
   position: relative;
   width: 100%;
-  padding-top: 56.25%;
+  height: 25vh;
   background: #000;
   overflow: hidden;
 }
 
-/* iframe at 1280x720, scaled down via JS transform */
 .live-video-frame {
   position: absolute;
   top: 0; left: 0;
@@ -481,7 +480,6 @@ body:has(.rotate-wrapper.rotated-90) {
   .footer-info { padding: 10px 16px; }
   .menu-trigger { width: 32px; height: 32px; }
   .modal-card { width: 280px; padding: 20px 16px; }
-  .video-panel.open { max-height: 400px; }
 }
 
 .mode-option:hover, .theme-toggle-option:hover, .rotate-card-option:hover { background: rgba(255,215,0,0.15); border-color: var(--accent); }
@@ -561,10 +559,10 @@ body:has(.rotate-wrapper.rotated-90) {
 </div>
 
 <script>
-// ========== 🟥🟥🟥DAILY YOUTUBE AUDIO COMMENTARY LINK🟥🟥🟥 ==========
+// ========== DAILY YOUTUBE AUDIO COMMENTARY LINK ==========
 const COMMENTARY_URL = "https://www.youtube.com/live/W42OdjZaHB4?si=WTN3Bx_iJSE83uRX";
 
-// ========== 🟥🟥🟥LIVE STREAM VIDEO LINK🟥🟥🟥 ==========
+// ========== LIVE STREAM VIDEO LINK ==========
 const LIVE_STREAM_URL = "https://crichd-livee.pages.dev/?id=eng";
 
 let audioIframe = null;
@@ -735,9 +733,9 @@ function scaleVideoFrame() {
   const wrap = document.querySelector('.video-aspect-wrap');
   const frame = document.getElementById('liveVideoFrame');
   if (!wrap || !frame) return;
+  // Scale based on width (fills full width, crops height to 25vh)
   const scale = wrap.offsetWidth / 1280;
   frame.style.transform = `scale(${scale})`;
-  // Keep padding-top for 16:9 ratio — do NOT set height manually
 }
 
 window.addEventListener('resize', () => { if (isVideoOpen) scaleVideoFrame(); });
