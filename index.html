@@ -48,17 +48,8 @@ body.light-mode {
   --hamburger-color: #d4a000;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-html, body {
-  height: 100%;
-  width: 100%;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; width: 100%; }
 
 body {
   background: radial-gradient(ellipse at 30% 20%, var(--bg-gradient-start), var(--bg-gradient-end));
@@ -73,7 +64,6 @@ body {
   transition: background 0.3s ease, color 0.2s ease;
 }
 
-/* MODE CLASSES on .app-container - these control card sizing */
 .app-container {
   width: 100%;
   display: flex;
@@ -81,44 +71,26 @@ body {
   transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 
-/* Phone mode */
-.app-container.mode-phone .crex-card { 
-  max-width: 420px; 
-  border-radius: 48px; 
-}
+.app-container.mode-phone .crex-card  { max-width: 420px;  border-radius: 48px; }
+.app-container.mode-tablet .crex-card { max-width: 720px;  border-radius: 36px; }
+.app-container.mode-pc .crex-card     { max-width: 1100px; border-radius: 28px; }
 
-/* Tablet mode */
-.app-container.mode-tablet .crex-card { 
-  max-width: 720px; 
-  border-radius: 36px; 
-}
-
-/* PC mode */
-.app-container.mode-pc .crex-card { 
-  max-width: 1100px; 
-  border-radius: 28px; 
-}
-
-/* Landscape adjustments for modes */
 @media (orientation: landscape) {
-  .app-container.mode-phone .crex-card { max-width: 98vw; border-radius: 24px; }
+  .app-container.mode-phone .crex-card  { max-width: 98vw; border-radius: 24px; }
   .app-container.mode-tablet .crex-card { max-width: 98vw; border-radius: 24px; }
-  .app-container.mode-pc .crex-card { max-width: 99vw; border-radius: 20px; }
+  .app-container.mode-pc .crex-card     { max-width: 99vw; border-radius: 20px; }
   .top-overlay { font-size: 10px; height: 36px; }
 
-  /* ── SPLIT LAYOUT: two side-by-side panels, each with own mini-header ── */
   .crex-card.split-active {
     display: flex;
     flex-direction: row;
     height: calc(100vh - 24px);
     overflow: hidden;
   }
-
-  /* Hide the shared header & footer in split mode */
   .crex-card.split-active .header      { display: none; }
   .crex-card.split-active .footer-info { display: none; }
 
-  /* LEFT PANEL — Live Stream */
+  /* LEFT — video panel */
   .crex-card.split-active .video-panel {
     flex: 1;
     display: flex !important;
@@ -128,8 +100,6 @@ body {
     border-right: 1px solid rgba(255,215,0,0.2);
     overflow: hidden;
   }
-
-  /* Mini header for left panel */
   .crex-card.split-active .video-close-bar {
     display: flex !important;
     height: 38px;
@@ -137,52 +107,44 @@ body {
     border-bottom: 1px solid rgba(255,215,0,0.2);
     border-top: none;
   }
-
   .crex-card.split-active .video-aspect-wrap {
     flex: 1;
-    height: 0 !important;   /* flex will stretch it */
+    height: 0 !important;
     min-height: 0;
     padding-top: 0 !important;
   }
-
   .crex-card.split-active .live-video-frame {
     position: absolute;
     top: 0; left: 0;
     transform-origin: top left !important;
-    /* transform set dynamically by JS based on panel width */
   }
 
-  /* RIGHT PANEL — Crex score */
+  /* RIGHT — crex panel */
   .crex-card.split-active .iframe-box {
     flex: 1;
-    display: flex;
-    flex-direction: column;
     height: 100% !important;
     overflow: hidden;
     position: relative;
   }
-
-  /* Right panel mini header */
+  /* overlay covers crex navbar */
   .crex-card.split-active .top-overlay {
-    position: relative !important;
-    height: 38px !important;
-    font-size: 10px;
-    flex-shrink: 0;
+    position: absolute !important;
+    top: 0; left: 0;
+    width: 100%;
+    height: 52px !important;
+    z-index: 30;
     pointer-events: none;
+    font-size: 10px;
     letter-spacing: 1px;
+    background: rgba(0,0,0,0.92) !important;
   }
-
-  /* Override overlay text content in split mode via attr trick — done in JS */
-
   .crex-card.split-active .score-frame {
-    flex: 1;
-    height: 0 !important;
-    min-height: 0;
+    width: 100%;
+    height: 100% !important;
     margin-top: 0 !important;
   }
 }
 
-/* Rotate wrapper */
 .rotate-wrapper {
   display: flex;
   justify-content: center;
@@ -190,15 +152,8 @@ body {
   transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
   width: 100%;
 }
-
-.rotate-wrapper.rotated-90 {
-  transform: rotate(90deg);
-}
-
-body:has(.rotate-wrapper.rotated-90) {
-  overflow-x: visible;
-  overflow-y: visible;
-}
+.rotate-wrapper.rotated-90 { transform: rotate(90deg); }
+body:has(.rotate-wrapper.rotated-90) { overflow-x: visible; overflow-y: visible; }
 
 .crex-card {
   width: 100%;
@@ -232,335 +187,162 @@ body:has(.rotate-wrapper.rotated-90) {
   color: transparent;
   line-height: 1.2;
 }
-
 .sub-live {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.9px;
-  color: var(--accent);
-  display: block;
-  text-transform: uppercase;
-  font-family: 'Inter', monospace;
-  opacity: 0.95;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.9px;
+  color: var(--accent); display: block; text-transform: uppercase;
+  font-family: 'Inter', monospace; opacity: 0.95;
 }
 
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 1;
-}
+.header-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 1; }
 
-.commentary-btn-header,
-.watch-live-btn {
+.commentary-btn-header, .watch-live-btn {
   height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 11px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; font-size: 11px;
   transition: all 0.2s cubic-bezier(0.2,0.9,0.4,1.1);
-  cursor: pointer;
-  background: var(--btn-bg);
-  backdrop-filter: blur(4px);
-  border: 1px solid var(--btn-border);
-  white-space: nowrap;
-  text-decoration: none;
-  padding: 0 16px;
-  font-family: 'Inter', sans-serif;
+  cursor: pointer; background: var(--btn-bg); backdrop-filter: blur(4px);
+  border: 1px solid var(--btn-border); white-space: nowrap;
+  text-decoration: none; padding: 0 16px; font-family: 'Inter', sans-serif;
 }
-
 .watch-live-btn {
   background: rgba(255,59,48,0.12);
   border: 1px solid rgba(255,59,48,0.4);
-  color: #ff5e55;
-  font-weight: 700;
+  color: #ff5e55; font-weight: 700;
 }
-
 .watch-live-btn:active { transform: scale(0.97); }
 .commentary-btn-header { color: var(--accent); }
 .commentary-btn-header.playing {
-  background: var(--accent);
-  color: #0a0a0a;
-  border-color: var(--accent);
-  box-shadow: 0 0 14px var(--accent-glow);
+  background: var(--accent); color: #0a0a0a;
+  border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow);
 }
 
-/* ===== VIDEO PLAYER SECTION - 1/4 screen height ===== */
+/* ===== VIDEO PANEL ===== */
 .video-panel {
-  width: 100%;
-  background: #000;
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  width: 100%; background: #000; overflow: hidden;
+  max-height: 0; transition: max-height 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
   position: relative;
 }
-
-.video-panel.open {
-  max-height: 25vh;
-}
+.video-panel.open { max-height: 25vh; }
 
 .video-aspect-wrap {
-  position: relative;
-  width: 100%;
-  height: 25vh;
-  background: #000;
-  overflow: hidden;
+  position: relative; width: 100%; height: 25vh;
+  background: #000; overflow: hidden;
 }
 
-/* Tablet mode - bigger video area */
-.app-container.mode-tablet .video-panel.open { max-height: 30vh; }
+.app-container.mode-tablet .video-panel.open  { max-height: 30vh; }
 .app-container.mode-tablet .video-aspect-wrap { height: 30vh; }
+.app-container.mode-pc .video-panel.open      { max-height: 35vh; }
+.app-container.mode-pc .video-aspect-wrap     { height: 35vh; }
 
-/* PC mode - bigger video area */
-.app-container.mode-pc .video-panel.open { max-height: 35vh; }
-.app-container.mode-pc .video-aspect-wrap { height: 35vh; }
-
-/* 
-  crichd page renders at ~1390px wide
-  Video player starts at ~18% from left = ~250px
-  Video player width = ~64% = ~890px
-  Top header (Star Sports bar) = ~130px
-  We scale up so video fills full width, then translate to cut top header
-*/
 .live-video-frame {
-  position: absolute;
-  top: 0; left: 0;
-  width: 1390px;
-  height: 900px;
-  border: none;
-  display: block;
-  transform-origin: top left;
-  /* JS sets transform: scale + translateX to crop to video only */
+  position: absolute; top: 0; left: 0;
+  width: 1390px; height: 900px;
+  border: none; display: block; transform-origin: top left;
 }
 
-/* Close strip below video */
 .video-close-bar {
-  width: 100%;
-  height: 30px;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 14px;
-  border-bottom: 1px solid rgba(255,215,0,0.15);
+  width: 100%; height: 30px;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 14px; border-bottom: 1px solid rgba(255,215,0,0.15);
 }
-
 .video-close-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--accent);
-  text-transform: uppercase;
-  font-family: 'Inter', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  color: var(--accent); text-transform: uppercase; font-family: 'Inter', monospace;
 }
-
 .video-close-btn {
-  font-size: 12px;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: color 0.2s;
-  background: none;
-  border: none;
-  line-height: 1;
-  font-family: 'Inter', sans-serif;
+  font-size: 12px; color: var(--text-muted); cursor: pointer;
+  padding: 4px 8px; border-radius: 6px; transition: color 0.2s;
+  background: none; border: none; line-height: 1; font-family: 'Inter', sans-serif;
 }
 .video-close-btn:active { color: var(--accent); }
 
-/* ===== CREX IFRAME SECTION ===== */
+/* ===== CREX ===== */
 .iframe-box {
-  width: 100%;
-  background: #000;
-  position: relative;
-  overflow: hidden;
-  transition: height 0.25s ease;
+  width: 100%; background: #000; position: relative;
+  overflow: hidden; transition: height 0.25s ease;
 }
-
 .top-overlay {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 44px;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(12px);
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent);
-  font-weight: 600;
-  font-size: 10px;
-  letter-spacing: 0.9px;
-  text-transform: uppercase;
-  pointer-events: none;
-  border-bottom: 1px solid rgba(255,215,0,0.25);
-  font-family: 'Inter', monospace;
+  position: absolute; top: 0; left: 0; width: 100%; height: 44px;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+  z-index: 20; display: flex; align-items: center; justify-content: center;
+  color: var(--accent); font-weight: 600; font-size: 10px;
+  letter-spacing: 0.9px; text-transform: uppercase; pointer-events: none;
+  border-bottom: 1px solid rgba(255,215,0,0.25); font-family: 'Inter', monospace;
 }
-
 .score-frame {
-  width: 100%;
-  height: 145%;
-  border: none;
-  display: block;
-  margin-top: -15px;
+  width: 100%; height: 145%; border: none; display: block; margin-top: -15px;
 }
 
+/* ===== FOOTER ===== */
 .footer-info {
-  padding: 12px 20px;
-  background: var(--footer-bg);
-  backdrop-filter: blur(12px);
+  padding: 12px 20px; background: var(--footer-bg); backdrop-filter: blur(12px);
   border-top: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: background 0.2s;
+  display: flex; justify-content: space-between; align-items: center; transition: background 0.2s;
 }
-
 .footer-left { display: flex; align-items: center; gap: 12px; }
-
 .menu-trigger {
-  width: 36px; height: 36px;
-  border-radius: 999px;
-  background: var(--btn-bg);
-  border: 1px solid var(--btn-border);
-  display: grid; place-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  width: 36px; height: 36px; border-radius: 999px;
+  background: var(--btn-bg); border: 1px solid var(--btn-border);
+  display: grid; place-items: center; cursor: pointer; transition: all 0.2s ease;
 }
 .menu-trigger:active { transform: scale(0.94); }
-
-.hamburger-icon {
-  width: 18px; height: 14px;
-  display: flex; flex-direction: column;
-  justify-content: space-between;
-}
-.hamburger-icon span {
-  display: block; height: 2px; width: 100%;
-  background: var(--hamburger-color);
-  border-radius: 2px;
-  transition: background 0.2s;
-}
-
-.footer-text {
-  font-size: 10px; font-weight: 500;
-  letter-spacing: 0.3px;
-  color: var(--text-muted);
-  font-family: 'Inter', monospace;
-}
-
+.hamburger-icon { width: 18px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+.hamburger-icon span { display: block; height: 2px; width: 100%; background: var(--hamburger-color); border-radius: 2px; transition: background 0.2s; }
+.footer-text { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; color: var(--text-muted); font-family: 'Inter', monospace; }
 .reload-btn {
-  width: 38px; height: 38px;
-  background: var(--btn-bg);
-  border-radius: 999px;
-  border: 1px solid var(--btn-border);
-  display: grid; place-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 20px;
-  color: var(--accent);
-  backdrop-filter: blur(4px);
+  width: 38px; height: 38px; background: var(--btn-bg); border-radius: 999px;
+  border: 1px solid var(--btn-border); display: grid; place-items: center;
+  cursor: pointer; transition: all 0.2s ease; font-size: 20px; color: var(--accent); backdrop-filter: blur(4px);
 }
 .reload-btn:active { transform: scale(0.95); }
 
+/* ===== MODAL ===== */
 .modal-overlay {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(8px);
-  z-index: 1000;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 1000;
   display: flex; align-items: center; justify-content: center;
-  opacity: 0; visibility: hidden;
-  transition: all 0.25s ease;
+  opacity: 0; visibility: hidden; transition: all 0.25s ease;
 }
 .modal-overlay.active { opacity: 1; visibility: visible; }
-
 .modal-card {
-  background: var(--modal-bg);
-  backdrop-filter: blur(20px);
-  border-radius: 48px;
-  border: 1px solid var(--accent);
-  width: 300px;
-  padding: 24px 20px;
-  text-align: center;
-  box-shadow: 0 25px 45px rgba(0,0,0,0.3);
-  transform: scale(0.95);
-  transition: transform 0.2s ease, background 0.2s;
+  background: var(--modal-bg); backdrop-filter: blur(20px);
+  border-radius: 48px; border: 1px solid var(--accent); width: 300px;
+  padding: 24px 20px; text-align: center; box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+  transform: scale(0.95); transition: transform 0.2s ease, background 0.2s;
 }
 .modal-overlay.active .modal-card { transform: scale(1); }
-
-.modal-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700; font-size: 18px;
-  color: var(--accent);
-  margin-bottom: 16px;
-  letter-spacing: -0.3px;
-}
+.modal-card h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; color: var(--accent); margin-bottom: 16px; letter-spacing: -0.3px; }
 .modal-divider { height: 1px; background: var(--btn-border); margin: 16px 0; }
-.mode-section-title {
-  font-size: 11px; text-transform: uppercase;
-  letter-spacing: 1px; color: var(--text-muted);
-  margin-bottom: 10px; font-weight: 600;
-}
+.mode-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; font-weight: 600; }
 .mode-option {
-  background: var(--btn-bg);
-  border: 1px solid var(--btn-border);
-  border-radius: 999px;
-  padding: 10px 16px; margin: 8px 0;
-  cursor: pointer; transition: all 0.2s;
+  background: var(--btn-bg); border: 1px solid var(--btn-border); border-radius: 999px;
+  padding: 10px 16px; margin: 8px 0; cursor: pointer; transition: all 0.2s;
   display: flex; align-items: center; justify-content: center;
-  gap: 10px; font-weight: 600; font-size: 14px;
-  color: var(--text-primary);
+  gap: 10px; font-weight: 600; font-size: 14px; color: var(--text-primary);
 }
 .mode-option:active { transform: scale(0.97); background: rgba(255,215,0,0.15); border-color: var(--accent); }
-
 .theme-toggle-option {
-  background: var(--btn-bg);
-  border: 1px solid var(--btn-border);
-  border-radius: 999px;
-  padding: 10px 16px; margin: 8px 0;
-  cursor: pointer; transition: all 0.2s;
+  background: var(--btn-bg); border: 1px solid var(--btn-border); border-radius: 999px;
+  padding: 10px 16px; margin: 8px 0; cursor: pointer; transition: all 0.2s;
   display: flex; align-items: center; justify-content: space-between;
-  font-weight: 600; font-size: 14px;
-  color: var(--text-primary);
+  font-weight: 600; font-size: 14px; color: var(--text-primary);
 }
 .theme-toggle-option:active { transform: scale(0.97); }
 .theme-toggle-option span:first-child { display: flex; align-items: center; gap: 10px; }
-.theme-badge {
-  font-size: 11px; background: var(--accent); color: #000;
-  padding: 4px 10px; border-radius: 999px; font-weight: 700;
-}
-
+.theme-badge { font-size: 11px; background: var(--accent); color: #000; padding: 4px 10px; border-radius: 999px; font-weight: 700; }
 .rotate-card-option {
-  background: var(--btn-bg);
-  border: 1px solid var(--btn-border);
-  border-radius: 999px;
-  padding: 10px 16px; margin: 8px 0;
-  cursor: pointer; transition: all 0.2s;
+  background: var(--btn-bg); border: 1px solid var(--btn-border); border-radius: 999px;
+  padding: 10px 16px; margin: 8px 0; cursor: pointer; transition: all 0.2s;
   display: flex; align-items: center; justify-content: space-between;
-  font-weight: 600; font-size: 14px;
-  color: var(--text-primary);
+  font-weight: 600; font-size: 14px; color: var(--text-primary);
 }
 .rotate-card-option:active { transform: scale(0.97); }
 .rotate-card-option span:first-child { display: flex; align-items: center; gap: 10px; }
-.rotate-badge {
-  font-size: 11px; background: var(--accent); color: #000;
-  padding: 4px 10px; border-radius: 999px; font-weight: 700;
-}
-.rotate-badge.active {
-  background: var(--accent);
-  box-shadow: 0 0 6px var(--accent-glow);
-}
-
-.close-modal {
-  margin-top: 16px; background: transparent; border: none;
-  color: var(--text-muted); font-size: 12px; cursor: pointer; padding: 8px;
-}
+.rotate-badge { font-size: 11px; background: var(--accent); color: #000; padding: 4px 10px; border-radius: 999px; font-weight: 700; }
+.rotate-badge.active { background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+.close-modal { margin-top: 16px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; padding: 8px; }
 
 @media (max-width: 520px) {
   .header { padding: 10px 14px; }
@@ -583,23 +365,15 @@ body:has(.rotate-wrapper.rotated-90) {
       <div class="header">
         <div class="brand">CARELESS <br><span class="sub-live">LIVE SCORE</span></div>
         <div class="header-controls">
-          <!-- LIVE STREAM button now opens video panel inside card -->
           <div class="watch-live-btn" id="watchLiveBtn" onclick="toggleVideoPanel()">📺 LIVE STREAM</div>
           <div class="commentary-btn-header" id="commentaryBtn" onclick="toggleCommentary()">🎧 AUDIO</div>
         </div>
       </div>
 
-      <!-- VIDEO PANEL - slides open above crex iframe when LIVE STREAM clicked -->
       <div class="video-panel" id="videoPanel">
         <div class="video-aspect-wrap">
-          <iframe
-            id="liveVideoFrame"
-            class="live-video-frame"
-            src=""
-            allowfullscreen
-            allow="autoplay; encrypted-media; fullscreen"
-            scrolling="no"
-          ></iframe>
+          <iframe id="liveVideoFrame" class="live-video-frame" src=""
+            allowfullscreen allow="autoplay; encrypted-media; fullscreen" scrolling="no"></iframe>
         </div>
         <div class="video-close-bar">
           <span class="video-close-label">📺 LIVE STREAM</span>
@@ -607,7 +381,6 @@ body:has(.rotate-wrapper.rotated-90) {
         </div>
       </div>
 
-      <!-- CREX SCORE IFRAME - same as before, pushed down when video opens -->
       <div class="iframe-box" id="iframeBox">
         <div class="top-overlay" id="topOverlay">⚡ YOU BORED WITH LOW SPEED? TRY OUR 🗿</div>
         <iframe id="crexFrame" class="score-frame" src="https://crex.com/series/indian-premier-league-2026-1PW" allowfullscreen></iframe>
@@ -626,7 +399,6 @@ body:has(.rotate-wrapper.rotated-90) {
   </div>
 </div>
 
-<!-- MODAL MENU -->
 <div class="modal-overlay" id="modeModal">
   <div class="modal-card">
     <h3>⚙️ CARELESS MENU</h3>
@@ -649,34 +421,18 @@ body:has(.rotate-wrapper.rotated-90) {
 </div>
 
 <script>
-// ========== DAILY YOUTUBE AUDIO COMMENTARY LINK ==========
 const COMMENTARY_URL = "https://www.youtube.com/live/W42OdjZaHB4?si=WTN3Bx_iJSE83uRX";
-
-// ========== LIVE STREAM VIDEO LINK ==========
 const LIVE_STREAM_URL = "https://crichd-livee.pages.dev/?id=eng";
 
-let audioIframe = null;
-let isPlaying = false;
-let currentMode = 'phone';
-let resizeDebounceTimer = null;
-let isVideoOpen = false;
-let isCardRotated = false;
+let audioIframe = null, isPlaying = false, currentMode = 'phone';
+let resizeDebounceTimer = null, isVideoOpen = false, isCardRotated = false;
 
-// PWA Registration
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 }
 
-// ===================== VIDEO PANEL TOGGLE =====================
-function toggleVideoPanel() {
-  isVideoOpen ? closeVideoPanel() : openVideoPanel();
-}
-
-function isLandscapeNow() {
-  return window.innerWidth > window.innerHeight;
-}
+function toggleVideoPanel() { isVideoOpen ? closeVideoPanel() : openVideoPanel(); }
+function isLandscapeNow() { return window.innerWidth > window.innerHeight; }
 
 function applySplitOrStack() {
   const card = document.querySelector('.crex-card');
@@ -685,13 +441,11 @@ function applySplitOrStack() {
   if (isVideoOpen && isLandscapeNow()) {
     card.classList.add('split-active');
     if (overlay) overlay.innerText = '⚡ CARELESS · LIVE SCORE 🏏';
-    // Dynamically set scale for left video panel based on panel width
     setTimeout(() => {
       const wrap = document.querySelector('.video-aspect-wrap');
       const frame = document.getElementById('liveVideoFrame');
       if (!wrap || !frame) return;
       const panelW = wrap.offsetWidth;
-      // Scale so 890px video fills panel width, offset to crop header/margins
       const scale = panelW / 890;
       const tx = -(250 * scale);
       const ty = -(130 * scale);
@@ -711,25 +465,20 @@ function openVideoPanel() {
   const panel = document.getElementById('videoPanel');
   const frame = document.getElementById('liveVideoFrame');
   const btn = document.getElementById('watchLiveBtn');
-
   if (!frame.src || frame.src === window.location.href || frame.src === '') {
     frame.src = LIVE_STREAM_URL;
   }
-
   panel.classList.add('open');
   isVideoOpen = true;
-
   applySplitOrStack();
   setTimeout(scaleVideoFrame, 50);
   setTimeout(scaleVideoFrame, 450);
   setTimeout(scaleVideoFrame, 1000);
   setTimeout(scaleVideoFrame, 2500);
-
   btn.innerHTML = '📺 CLOSE VIDEO';
   btn.style.background = 'rgba(255,215,0,0.15)';
   btn.style.borderColor = 'var(--accent)';
   btn.style.color = 'var(--accent)';
-
   setTimeout(applyIframeHeight, 420);
 }
 
@@ -738,27 +487,23 @@ function closeVideoPanel() {
   const frame = document.getElementById('liveVideoFrame');
   const btn = document.getElementById('watchLiveBtn');
   const card = document.querySelector('.crex-card');
-
+  const overlay = document.getElementById('topOverlay');
   panel.classList.remove('open');
   card.classList.remove('split-active');
   isVideoOpen = false;
-
+  if (overlay) overlay.innerText = '⚡ YOU BORED WITH LOW SPEED? TRY OUR 🗿';
   setTimeout(() => { frame.src = ''; }, 400);
-
   btn.innerHTML = '📺 LIVE STREAM';
   btn.style.background = '';
   btn.style.borderColor = '';
   btn.style.color = '';
-
   setTimeout(applyIframeHeight, 420);
 }
 
-// ===================== FULL CARD 90° ROTATION =====================
 function applyFullCardRotation(rotateState) {
   const wrapper = document.getElementById('rotateWrapper');
   const badge = document.getElementById('rotateBadge');
   if (!wrapper) return;
-  
   if (rotateState) {
     wrapper.classList.add('rotated-90');
     if (badge) { badge.innerText = '90° ✓'; badge.classList.add('active'); }
@@ -770,57 +515,37 @@ function applyFullCardRotation(rotateState) {
     document.body.style.overflowX = '';
     document.body.style.overflowY = '';
   }
-  
   setTimeout(() => {
     applyIframeHeight();
     const iframe = document.getElementById('crexFrame');
-    if (iframe) {
-      iframe.style.opacity = '0.99';
-      setTimeout(() => { if(iframe) iframe.style.opacity = '1'; }, 60);
-    }
+    if (iframe) { iframe.style.opacity = '0.99'; setTimeout(() => { if(iframe) iframe.style.opacity = '1'; }, 60); }
   }, 50);
 }
-
 function setCardRotationState(rotated) {
   isCardRotated = rotated;
   localStorage.setItem('carelessFullCardRotated', rotated ? '1' : '0');
   applyFullCardRotation(isCardRotated);
 }
-
-window.toggleFullCardRotation = function() {
-  setCardRotationState(!isCardRotated);
-};
-
+window.toggleFullCardRotation = function() { setCardRotationState(!isCardRotated); };
 function loadCardRotationFromStorage() {
-  const savedRotate = localStorage.getItem('carelessFullCardRotated');
-  setCardRotationState(savedRotate === '1');
+  setCardRotationState(localStorage.getItem('carelessFullCardRotated') === '1');
 }
 
-// ===================== IFRAME HEIGHT MANAGEMENT =====================
 function getIframeHeight() {
-  const W = window.innerWidth;
-  const H = window.innerHeight;
+  const W = window.innerWidth, H = window.innerHeight;
   const isLandscape = W > H;
-  
   const ratios = { phone: 0.78, tablet: 0.70, pc: 0.75 };
-  let ratio = ratios[currentMode] || 0.78;
-  
+  const ratio = ratios[currentMode] || 0.78;
   if (isLandscape) {
-    const reserved = isVideoOpen ? 150 : 110;
-    let h = Math.max(180, H - reserved);
-    return h + 'px';
+    return Math.max(180, H - (isVideoOpen ? 150 : 110)) + 'px';
   } else {
-    // Reduce crex height a bit if video is open
-    let heightPx = Math.floor(H * (isVideoOpen ? ratio * 0.72 : ratio));
-    return heightPx + 'px';
+    return Math.floor(H * (isVideoOpen ? ratio * 0.72 : ratio)) + 'px';
   }
 }
-
 function applyIframeHeight() {
   const box = document.getElementById('iframeBox');
   if (box) box.style.height = getIframeHeight();
 }
-
 function applyMode(mode) {
   const container = document.getElementById('appContainer');
   container.classList.remove('mode-phone', 'mode-tablet', 'mode-pc');
@@ -828,54 +553,36 @@ function applyMode(mode) {
   currentMode = mode;
   localStorage.setItem('displayMode', mode);
   applyIframeHeight();
-  
   const card = document.querySelector('.crex-card');
-  if (card) {
-    card.style.transform = 'scale(0.99)';
-    setTimeout(() => { if(card) card.style.transform = ''; }, 150);
-  }
+  if (card) { card.style.transform = 'scale(0.99)'; setTimeout(() => { if(card) card.style.transform = ''; }, 150); }
 }
-
 function handleLayoutChange() {
   applyIframeHeight();
   const iframe = document.getElementById('crexFrame');
-  if (iframe) {
-    iframe.style.opacity = '0.99';
-    setTimeout(() => { if(iframe) iframe.style.opacity = '1'; }, 80);
-  }
+  if (iframe) { iframe.style.opacity = '0.99'; setTimeout(() => { if(iframe) iframe.style.opacity = '1'; }, 80); }
 }
-
 function debouncedLayoutChange() {
   clearTimeout(resizeDebounceTimer);
   resizeDebounceTimer = setTimeout(handleLayoutChange, 80);
 }
 
-// ===================== VIDEO FRAME SCALING =====================
-// crichd page: 1390px wide, video player starts at ~18% left (≈250px), width ~64% (≈890px)
-// Top "Star Sports" header bar ≈ 130px tall
-// We scale iframe so the 890px video = container width, then shift left/top to crop
 function scaleVideoFrame() {
   const wrap = document.querySelector('.video-aspect-wrap');
   const frame = document.getElementById('liveVideoFrame');
   if (!wrap || !frame) return;
-
-  // In landscape split mode, CSS handles sizing — skip JS transform
   if (isLandscapeNow() && isVideoOpen) return;
-
   const containerW = wrap.offsetWidth;
   const scale = containerW / 890;
   const translateX = -(250 * scale);
   const translateY = -(130 * scale);
-
   frame.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
   frame.style.transformOrigin = 'top left';
   try { frame.contentWindow.scrollTo(0, 0); } catch(e) {}
 }
 
-window.addEventListener('resize', () => { 
+window.addEventListener('resize', () => {
   if (isVideoOpen) { applySplitOrStack(); scaleVideoFrame(); }
 });
-
 window.addEventListener('orientationchange', () => {
   setTimeout(() => { handleLayoutChange(); if (isVideoOpen) applySplitOrStack(); }, 150);
   setTimeout(() => { handleLayoutChange(); if (isVideoOpen) applySplitOrStack(); }, 400);
@@ -886,7 +593,6 @@ if (screen.orientation) {
   });
 }
 
-// ========== THEME MANAGEMENT ==========
 function setTheme(theme) {
   if (theme === 'light') {
     document.body.classList.add('light-mode');
@@ -901,48 +607,34 @@ function setTheme(theme) {
   }
   updateButtonStyle(isPlaying);
 }
+function toggleTheme() { setTheme(document.body.classList.contains('light-mode') ? 'dark' : 'light'); }
 
-function toggleTheme() {
-  setTheme(document.body.classList.contains('light-mode') ? 'dark' : 'light');
-}
-
-// ========== MODAL & MENU ==========
 const menuBtn = document.getElementById('menuTrigger');
 const modal = document.getElementById('modeModal');
 const closeModalBtn = document.getElementById('closeModal');
-
 function openModal()  { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
 function closeModal() { modal.classList.remove('active'); document.body.style.overflow = ''; }
-
 menuBtn.addEventListener('click', openModal);
 closeModalBtn.addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-
 document.querySelectorAll('.mode-option').forEach(option => {
   option.addEventListener('click', () => {
     const mode = option.getAttribute('data-mode');
     if (mode) { applyMode(mode); closeModal(); }
   });
 });
-
 document.getElementById('themeToggleModal').addEventListener('click', toggleTheme);
-
 const rotateCardOpt = document.getElementById('rotateCardOption');
 if (rotateCardOpt) {
-  rotateCardOpt.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleFullCardRotation();
-  });
+  rotateCardOpt.addEventListener('click', (e) => { e.stopPropagation(); toggleFullCardRotation(); });
 }
 
-// ========== AUDIO COMMENTARY ==========
 function getYouTubeId(url) {
   if (!url) return null;
   const cleanUrl = url.replace('m.youtube.com', 'youtube.com');
   const match = cleanUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/live\/)([^&?#]+)/);
   return match ? match[1] : null;
 }
-
 function startCommentary() {
   const videoId = getYouTubeId(COMMENTARY_URL);
   if (!videoId) { alert('⚠️ Please update daily YouTube commentary link.'); return; }
@@ -950,8 +642,7 @@ function startCommentary() {
   audioIframe = document.createElement('iframe');
   Object.assign(audioIframe.style, {
     position: 'fixed', bottom: '-100px', left: '-100px',
-    width: '1px', height: '1px', opacity: '0',
-    pointerEvents: 'none', border: 'none'
+    width: '1px', height: '1px', opacity: '0', pointerEvents: 'none', border: 'none'
   });
   audioIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&disablekb=1&modestbranding=1&rel=0&playsinline=1`;
   audioIframe.allow = 'autoplay; encrypted-media';
@@ -959,15 +650,12 @@ function startCommentary() {
   isPlaying = true;
   updateButtonStyle(true);
 }
-
 function stopCommentary() {
   if (audioIframe) { audioIframe.remove(); audioIframe = null; }
   isPlaying = false;
   updateButtonStyle(false);
 }
-
 function toggleCommentary() { isPlaying ? stopCommentary() : startCommentary(); }
-
 function updateButtonStyle(playing) {
   const btn = document.getElementById('commentaryBtn');
   if (!btn) return;
@@ -984,23 +672,16 @@ function updateButtonStyle(playing) {
   }
 }
 
-// ========== INITIALIZATION ==========
 window.onload = () => {
   const savedMode = localStorage.getItem('displayMode');
   const validModes = ['phone', 'tablet', 'pc'];
-  const startMode = validModes.includes(savedMode) ? savedMode : 'phone';
-  applyMode(startMode);
-  
-  const savedTheme = localStorage.getItem('carelessTheme');
-  setTheme(savedTheme === 'light' ? 'light' : 'dark');
-  
+  applyMode(validModes.includes(savedMode) ? savedMode : 'phone');
+  setTheme(localStorage.getItem('carelessTheme') === 'light' ? 'light' : 'dark');
   loadCardRotationFromStorage();
-  
   document.querySelectorAll('.commentary-btn-header, .watch-live-btn, .reload-btn, .menu-trigger, .rotate-card-option').forEach(btn => {
     ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, () => btn.style.transform = 'scale(0.97)', {passive:true}));
     ['touchend','mouseup','touchcancel','mouseleave'].forEach(ev => btn.addEventListener(ev, () => btn.style.transform = ''));
   });
-  
   handleLayoutChange();
 };
 
