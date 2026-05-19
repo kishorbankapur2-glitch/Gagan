@@ -228,7 +228,6 @@ body:has(.rotate-wrapper.rotated-90) {
   max-height: 25vh;
 }
 
-/* iframe fills the 25vh area completely */
 .video-aspect-wrap {
   position: relative;
   width: 100%;
@@ -237,14 +236,22 @@ body:has(.rotate-wrapper.rotated-90) {
   overflow: hidden;
 }
 
+/* 
+  crichd page renders at ~1390px wide
+  Video player starts at ~18% from left = ~250px
+  Video player width = ~64% = ~890px
+  Top header (Star Sports bar) = ~130px
+  We scale up so video fills full width, then translate to cut top header
+*/
 .live-video-frame {
   position: absolute;
   top: 0; left: 0;
-  width: 1280px;
-  height: 720px;
+  width: 1390px;
+  height: 900px;
   border: none;
   display: block;
   transform-origin: top left;
+  /* JS sets transform: scale + translateX to crop to video only */
 }
 
 /* Close strip below video */
@@ -729,13 +736,28 @@ function debouncedLayoutChange() {
 }
 
 // ===================== VIDEO FRAME SCALING =====================
+// crichd page: 1390px wide, video player starts at ~18% left (≈250px), width ~64% (≈890px)
+// Top "Star Sports" header bar ≈ 130px tall
+// We scale iframe so the 890px video = container width, then shift left/top to crop
 function scaleVideoFrame() {
   const wrap = document.querySelector('.video-aspect-wrap');
   const frame = document.getElementById('liveVideoFrame');
   if (!wrap || !frame) return;
-  // Scale based on width (fills full width, crops height to 25vh)
-  const scale = wrap.offsetWidth / 1280;
-  frame.style.transform = `scale(${scale})`;
+
+  const containerW = wrap.offsetWidth;
+
+  // Scale so video player (890px wide) fills full container width
+  const scale = containerW / 890;
+
+  // After scaling, video left edge is at: 250 * scale px from left
+  // Shift left by that amount to align video to left edge
+  const translateX = -(250 * scale);
+
+  // Shift up to hide top header (130px in page coords = 130*scale px after scale)
+  const translateY = -(130 * scale);
+
+  frame.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  frame.style.transformOrigin = 'top left';
 }
 
 window.addEventListener('resize', () => { if (isVideoOpen) scaleVideoFrame(); });
