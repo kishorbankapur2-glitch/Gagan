@@ -840,20 +840,7 @@
         .mini-player-img.sway-active {
             animation: albumIdle 6s ease-in-out infinite;
         }
-    // ─── Profile Modal ───
-function openProfileModal() {
-    const u = user || { name: 'Guest User', pic: null };
-    const av = $('profileModalAvatar');
-    av.innerHTML = u.pic ? `<img src="${u.pic}">` : u.name[0].toUpperCase();
-    $('profileModalName').textContent = u.name;
-    $('profileStatLiked').textContent = likedTracks.size;
-    $('profileStatPlayed').textContent = totalPlayedCount;
-    $('profileModal').classList.add('active');
-    
-    history.pushState({ swarProfileModal: true }, ''); // Ye add kiya hai
-}
-      
-      .mini-player.visible .mini-player-img { animation: imgPop 0.5s var(--ease-spring); }
+        .mini-player.visible .mini-player-img { animation: imgPop 0.5s var(--ease-spring); }
         @keyframes imgPop {
             from { transform: scale(0.7) rotate(-5deg); opacity: 0; }
             to   { transform: scale(1) rotate(0deg); opacity: 1; }
@@ -977,18 +964,7 @@ function openProfileModal() {
             50%       { transform: translate(-20px,25px) scale(1.2); opacity: 0.09; }
         }
 
-        window.addEventListener('popstate', e => {
-        if ($('appearancePanel').classList.contains('active')) { _doCloseAppearancePanel(); return; }
-        if ($('inappWebview').classList.contains('active')) { closeInAppWebview(); return; }
-        if ($('profileModal').classList.contains('active')) { closeProfileModal(); return; }
-        if (isFullscreenOpen) { closeFullscreen(); return; }
-
-        // Agar koi popup nahi khula hai, toh previous view pe jao
-        const previousView = e.state && e.state.view ? e.state.view : 'home';
-        navigateTo(previousView, true);
-    });
-      
-      .fs-content-wrap { flex: 1; display: flex; flex-direction: column; padding: 24px 24px calc(20px + env(safe-area-inset-bottom)); max-width: 520px; margin: 0 auto; width: 100%; position: relative; z-index: 10; justify-content: space-between; overflow: hidden; }
+        .fs-content-wrap { flex: 1; display: flex; flex-direction: column; padding: 24px 24px calc(20px + env(safe-area-inset-bottom)); max-width: 520px; margin: 0 auto; width: 100%; position: relative; z-index: 10; justify-content: space-between; overflow: hidden; }
         .fs-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 14px; }
         .fs-top-info { display: flex; flex-direction: column; gap: 3px; }
         .fs-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--text-subdued); font-weight: 800; }
@@ -1007,33 +983,7 @@ function openProfileModal() {
             box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
             flex-shrink: 0; cursor: pointer; user-select: none;
         }
-     function navigateTo(view, isBack = false) {
-    if (!isBack && currentView !== view) {
-        history.pushState({ view: view }, '');
-    }
-    currentView = view;
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    const btn = $(`nav-${view}`);
-    if (btn) btn.classList.add('active');
-    updateNavIndicatorSlab();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (view === 'home') {
-        $('homeView').style.display = 'block'; $('otherView').style.display = 'none';
-        $('searchInput').value = '';
-        tracks = [...PREMIUM_CARDS_TRACKS];
-    } else {
-        $('homeView').style.display = 'none'; $('otherView').style.display = 'block';
-        if (view === 'search') {
-            $('sectionTitle').textContent = 'Discover Music';
-            $('contentArea').innerHTML = '<div style="text-align:center;padding:80px 24px;color:var(--text-subdued)"><svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor" style="margin-bottom:16px;opacity:0.5"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg><h3 style="color:#fff;font-size:1.1rem;margin-bottom:4px">Dynamic Stream Input</h3><p style="font-size:0.85rem">Input search keywords or paste raw stream URL.</p></div>';
-            $('searchInput').focus();
-        } else if (view === 'library') renderLibraryView();
-        else if (view === 'profile') renderProfileView();
-        else if (view === 'settings') renderSettingsView();
-    }
-    }
-       
-      .fs-album-wrap.sway-active {
+        .fs-album-wrap.sway-active {
             animation: albumIdle 6s ease-in-out infinite;
         }
         @keyframes albumIdle {
@@ -1179,12 +1129,7 @@ function openProfileModal() {
         .sleep-dropdown.active { display: flex; }
         .sleep-dropdown-item { padding: 8px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: var(--text-subdued); text-align: left; transition: all 0.2s var(--ease); }
         .sleep-dropdown-item:hover, .sleep-dropdown-item.active { background: rgba(255,255,255,0.08); color: #fff; transform: translateX(3px); }
-window.addEventListener('DOMContentLoaded', () => {
-    history.replaceState({ view: 'home' }, ''); // Ye nayi line add karni hai
-    
-    const savedUser = Storage.get('swar_user');
-    // ... baaki ka existing code
-  
+
         .toast {
             position: fixed; bottom: 96px; left: 50%;
             transform: translateX(-50%) translateY(20px) scale(0.92);
@@ -2323,6 +2268,7 @@ function closeFullscreen() {
         fs.style.transform = '';
         fs.style.opacity = '';
         $('app').classList.remove('fs-open');
+        if (history.state?.swarFullscreen) history.back();
     }, 380);
     isFullscreenOpen = false;
     document.body.style.overflow = '';
@@ -2340,6 +2286,7 @@ function openInAppWebview(url, title) {
 function closeInAppWebview() {
     $('inappWebview').classList.remove('active');
     setTimeout(() => { $('inappWebviewFrame').src = ''; }, 300);
+    if (history.state?.swarWebview) history.back();
 }
 
 // ─── Profile Modal ───
@@ -2351,8 +2298,12 @@ function openProfileModal() {
     $('profileStatLiked').textContent = likedTracks.size;
     $('profileStatPlayed').textContent = totalPlayedCount;
     $('profileModal').classList.add('active');
+    history.pushState({ swarProfileModal: true }, '');
 }
-function closeProfileModal() { $('profileModal').classList.remove('active'); }
+function closeProfileModal() {
+    $('profileModal').classList.remove('active');
+    if (history.state?.swarProfileModal) history.back();
+}
 
 // ─── Navigation Indicator ───
 function updateNavIndicatorSlab() {
@@ -3054,6 +3005,7 @@ function _doCloseAppearancePanel() {
     $('appearancePanel').classList.remove('active');
     document.body.style.overflow = '';
     if (currentView === 'settings') renderSettingsView();
+    if (history.state?.swarAppearance) history.back();
 }
 
 // ─── Document Bootstrapper Init ───
