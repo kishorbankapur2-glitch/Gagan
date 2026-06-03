@@ -1207,7 +1207,246 @@
             transform: scale(1.06);
             box-shadow: 0 0 30px rgba(255,255,255,0.1);
         }
-    </style>
+    
+        /* ─── Artist Page Styles ─── */
+        .artist-page-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        .artist-page-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--glass-border-strong);
+            background: var(--bg-elevated);
+            flex-shrink: 0;
+        }
+        .artist-page-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .artist-page-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-base);
+            margin-bottom: 4px;
+        }
+        .artist-page-subs {
+            font-size: 0.8rem;
+            color: var(--text-subdued);
+            font-weight: 500;
+        }
+        .artist-page-shuffle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--text-base);
+            color: var(--bg-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            flex-shrink: 0;
+            border: none;
+        }
+        .artist-page-shuffle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 20px rgba(255,255,255,0.2);
+        }
+        .artist-page-shuffle:active {
+            transform: scale(0.95);
+        }
+        .artist-page-shuffle.active {
+            background: var(--accent);
+            box-shadow: 0 0 20px rgba(255,255,255,0.15);
+        }
+        .artist-page-shuffle svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* ─── Library Section Styles ─── */
+        .library-section {
+            margin-bottom: 28px;
+        }
+        .library-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px 12px;
+        }
+        .library-section-title {
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-base);
+        }
+        .library-section-count {
+            font-size: 0.75rem;
+            color: var(--text-subdued);
+            font-weight: 500;
+        }
+
+        /* ─── Liked Songs Folder Card ─── */
+        .liked-songs-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            margin-bottom: 20px;
+        }
+        .liked-songs-card:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%);
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .liked-songs-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff453a 0%, #ff6b61 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .liked-songs-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+        }
+        .liked-songs-info {
+            flex: 1;
+        }
+        .liked-songs-info h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .liked-songs-info p {
+            font-size: 0.78rem;
+            color: var(--text-subdued);
+        }
+
+        /* ─── Artist Card in Library (circular logo) ─── */
+        .artist-card-logo {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--bg-elevated);
+            border: 1px solid var(--glass-border);
+        }
+        .artist-card-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ─── Tablet Portrait Fix: Force phone-like layout ─── */
+        @media (min-width: 601px) and (max-width: 1024px) and (orientation: portrait) {
+            .track-grid {
+                display: flex !important;
+                gap: 16px;
+                overflow-x: auto;
+                padding-bottom: 12px;
+                margin: 0 -24px;
+                padding-left: 24px;
+                padding-right: 24px;
+                scroll-snap-type: x mandatory;
+            }
+            .track-grid::-webkit-scrollbar { display: none; }
+            .track-card {
+                flex: 0 0 180px;
+                scroll-snap-align: start;
+            }
+            .featured-row {
+                min-height: 280px;
+            }
+            .featured-card {
+                width: 200px;
+                height: 280px;
+            }
+            .kl-grid, .kl-grid-2 {
+                min-height: 150px;
+            }
+            .kl-card {
+                width: 150px;
+            }
+            .kl-card-img-wrap {
+                width: 150px;
+                height: 150px;
+            }
+            .kl-card-2 {
+                width: 140px;
+            }
+            .kl-card-2-img-wrap {
+                width: 140px;
+                height: 140px;
+            }
+            .fs-album-wrap {
+                width: 70vw !important;
+                height: 70vw !important;
+                max-width: 280px !important;
+                max-height: 280px !important;
+            }
+            .fs-content-wrap {
+                padding: 16px 20px calc(12px + env(safe-area-inset-bottom)) !important;
+            }
+            .fs-main {
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 12px !important;
+            }
+            .fs-controls .fs-ctrl-btn {
+                width: 44px;
+                height: 44px;
+                border-radius: 14px;
+            }
+            .fs-controls .fs-play-btn {
+                width: 64px !important;
+                height: 64px !important;
+                border-radius: 20px !important;
+            }
+            .fs-title {
+                font-size: 1.2rem;
+            }
+            .fs-artist {
+                font-size: 0.85rem;
+            }
+            .header {
+                padding: 14px 16px;
+            }
+            .brand-name {
+                font-size: 1.1rem;
+            }
+            .search-wrap {
+                max-width: 300px;
+            }
+            .home-greeting-text {
+                font-size: 1.4rem;
+            }
+        }
+</style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
@@ -2083,7 +2322,8 @@ function playTrack(i) {
 
     $('miniPlayerTitle').textContent = t.title;
     $('miniPlayerArtist').textContent = t.artist;
-    if (currentView === 'home') $('greetingSub').textContent = `Now Playing: ${t.title} — ${t.artist}`;
+    // Only update greeting on home view, don't switch views
+    if (currentView === 'home' && $('greetingSub')) $('greetingSub').textContent = `Now Playing: ${t.title} — ${t.artist}`;
 
     const fsArt = $('fsAlbumArt');
     fsArt.style.opacity = '0';
@@ -2329,7 +2569,7 @@ async function searchMusic(query) {
         const res = await searchAcrossInstances(query, searchAbortController.signal);
         if (!res?.items?.length) throw new Error();
         tracks = res.items.filter(it => it.type === 'video').map(it => {
-            return { id: it.videoId || '', title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.author || 'Unknown Artist', duration: it.lengthSeconds || 0 };
+            return { id: it.videoId || '', title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.author || 'Unknown Artist', duration: it.lengthSeconds || 0, authorId: it.authorId || '' };
         });
         renderTrackGrid(); saveSearchQuery(query);
     } catch(err) {
@@ -2369,7 +2609,7 @@ function renderTrackGrid() {
 }
 
 function renderLibraryView() {
-    $('sectionTitle').textContent = 'Saved Vault';
+    $('sectionTitle').textContent = 'Library';
     const collection = Array.from(likedTracks.values());
     const savedArtists = Storage.get('swar_saved_artists') || [];
 
@@ -2378,39 +2618,48 @@ function renderLibraryView() {
         return;
     }
 
-    let html = '';
-
-    // Saved Artists Section
-    if (savedArtists.length > 0) {
-        html += `<div style="margin-bottom:24px;"><h3 style="font-size:1rem;font-weight:700;margin-bottom:12px;color:var(--text-subdued);letter-spacing:0.05em;text-transform:uppercase;">Saved Artists</h3>`;
-        html += `<div class="track-grid">${savedArtists.map((a, i) => `
-            <div class="track-card" onclick="loadSavedArtist('${a.name.replace(/'/g, "\'")}')" style="--stagger:${(i * 0.05).toFixed(2)}s">
-                <div class="track-card-img-wrap" style="aspect-ratio:1;border-radius:50%;">
-                    <img class="track-card-img" src="${a.pic || ''}" loading="lazy" style="border-radius:50%;" onerror="this.onerror=null;this.style.display='none';this.parentElement.style.background='var(--bg-card-hover)';this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;font-weight:800;color:var(--text-base);\'>'+'${a.name[0].toUpperCase()}'+'</div>'">
-                </div>
-                <h4>${escapeHtml(a.name)}</h4>
-                <p style="color:var(--text-subdued);">Saved Artist</p>
-            </div>
-        `).join('')}</div></div>`;
-    }
-
-    // Liked Songs Section
+    let h = '';
     if (collection.length > 0) {
-        html += `<div><h3 style="font-size:1rem;font-weight:700;margin-bottom:12px;color:var(--text-subdued);letter-spacing:0.05em;text-transform:uppercase;">Liked Songs</h3>`;
-        tracks = collection;
-        html += `<div class="track-grid">${tracks.map((t, i) => `
-            <div class="track-card" onclick="playTrack(${i})" style="--stagger:${(i * 0.05).toFixed(2)}s">
-                <div class="track-card-img-wrap">
-                    <img class="track-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
-                    <div class="play-overlay"><div class="play-overlay-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
-                </div>
-                <h4>${escapeHtml(t.title)}</h4>
-                <p>${escapeHtml(t.artist)}</p>
-            </div>
-        `).join('')}</div></div>`;
+        h += `<div class="liked-songs-card" onclick="openLikedSongs()">`;
+        h += `<div class="liked-songs-icon"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>`;
+        h += `<div class="liked-songs-info"><h4>Liked Songs</h4><p>${collection.length} song${collection.length!==1?'s':''}</p></div>`;
+        h += `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="opacity:0.5;flex-shrink:0;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>`;
+        h += `</div>`;
     }
+    if (savedArtists.length > 0) {
+        h += `<div class="library-section">`;
+        h += `<div class="library-section-header">`;
+        h += `<span class="library-section-title">Saved Artists</span>`;
+        h += `<span class="library-section-count">${savedArtists.length} artist${savedArtists.length!==1?'s':''}</span>`;
+        h += `</div>`;
+        h += `<div class="track-grid">${savedArtists.map((a,i)=>`<div class="track-card" onclick="loadSavedArtist('${a.name.replace(/'/g,"\'")}','${a.authorId||''}')" style="--stagger:${(i*0.05).toFixed(2)}s"><div class="track-card-img-wrap" style="aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--bg-elevated);"><img class="artist-card-logo" src="${a.pic||''}" loading="lazy" onerror="this.onerror=null;this.style.display='none';this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;font-size:2.5rem;font-weight:800;color:var(--text-base);\'>'+'${a.name[0].toUpperCase()}'+'</div>'"></div><div class="artist-card-name">${escapeHtml(a.name)}</div></div>`).join('')}</div></div>`;
+    }
+    $('contentArea').innerHTML = h;
+}
 
-    $('contentArea').innerHTML = html;
+function openLikedSongs() {
+    currentView = 'liked';
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    $('homeView').style.display = 'none';
+    $('otherView').style.display = 'block';
+    $('sectionTitle').textContent = 'Liked Songs';
+    const collection = Array.from(likedTracks.values());
+    tracks = collection;
+    if (!collection.length) {
+        $('contentArea').innerHTML = '<div style="text-align:center;padding:80px 24px;color:var(--text-subdued)"><h3 style="color:#fff;font-size:1.1rem;margin-bottom:4px">No liked songs yet</h3><p style="font-size:0.85rem">Tap the heart icon while playing to add songs here.</p></div>';
+        return;
+    }
+    $('contentArea').innerHTML = `<div class="track-grid">${collection.map((t,i)=>`<div class="track-card" onclick="playTrack(${i})" style="--stagger:${(i*0.05).toFixed(2)}s"><div class="track-card-img-wrap"><img class="track-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'"><div class="play-overlay"><div class="play-overlay-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><h4>${escapeHtml(t.title)}</h4><p>${escapeHtml(t.artist)}</p></div>`).join('')}</div>`;
+}
+
+function loadSavedArtist(artistName, authorId) {
+    currentView = 'artist';
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    $('homeView').style.display = 'none';
+    $('otherView').style.display = 'block';
+    $('sectionTitle').textContent = artistName;
+    $('contentArea').innerHTML = `<div class="track-grid">${Array(6).fill('<div class="track-card skeleton" style="height:190px;border-radius:16px"></div>').join('')}</div>`;
+    searchMusicByArtist(artistName, authorId);
 }
 
 function loadSavedArtist(artistName) {
@@ -2650,20 +2899,30 @@ function showArtistVideos() {
     $('otherView').style.display = 'block';
     $('sectionTitle').textContent = artistName;
     $('contentArea').innerHTML = `<div class="track-grid">${Array(6).fill('<div class="track-card skeleton" style="height:190px;border-radius:16px"></div>').join('')}</div>`;
-    searchMusicByArtist(artistName);
+    searchMusicByArtist(artistName, t.authorId);
 }
 
-async function searchMusicByArtist(artistName) {
+async function searchMusicByArtist(artistName, authorId) {
     if (searchAbortController) searchAbortController.abort();
     searchAbortController = new AbortController();
+
+    // Fetch channel info for logo and subscribers
+    let channelInfo = null;
+    if (authorId) {
+        try {
+            const channelRes = await fetchChannelInfo(authorId);
+            if (channelRes) channelInfo = channelRes;
+        } catch(e) { console.warn('Channel info fetch failed', e); }
+    }
+
     try {
         const res = await searchAcrossInstances(artistName, searchAbortController.signal);
         if (!res?.items?.length) throw new Error();
         const artistTracks = res.items.filter(it => it.type === 'video').map(it => {
-            return { id: it.videoId || '', title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.author || artistName, duration: it.lengthSeconds || 0 };
+            return { id: it.videoId || '', title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.author || artistName, duration: it.lengthSeconds || 0, authorId: it.authorId || authorId || '' };
         });
         tracks = artistTracks;
-        renderArtistPage(artistName);
+        renderArtistPage(artistName, channelInfo);
     } catch(err) {
         if (err.name !== 'AbortError') {
             $('contentArea').innerHTML = '<div style="text-align:center;padding:60px 20px"><h3 style="margin-bottom:8px">No videos found</h3><p style="color:var(--text-subdued);font-size:0.85rem">Try searching manually.</p></div>';
@@ -2671,28 +2930,84 @@ async function searchMusicByArtist(artistName) {
     }
 }
 
-function renderArtistPage(artistName) {
+// Fetch channel info from Invidious API
+async function fetchChannelInfo(authorId) {
+    const promises = INVIDIOUS_INSTANCES.map(async ins => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 6000);
+        try {
+            const res = await fetch(`${ins}/api/v1/channels/${authorId}`, { signal: controller.signal });
+            clearTimeout(timeout);
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            return {
+                authorId: data.authorId,
+                author: data.author,
+                subCount: data.subCount,
+                subCountText: formatSubCount(data.subCount),
+                logo: data.authorThumbnails?.[data.authorThumbnails.length - 1]?.url || data.authorThumbnails?.[0]?.url || ''
+            };
+        } catch(e) { clearTimeout(timeout); throw e; }
+    });
+    try {
+        return await Promise.any(promises);
+    } catch { return null; }
+}
+
+function formatSubCount(num) {
+    if (!num) return '0 subscribers';
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M subscribers';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K subscribers';
+    return num + ' subscribers';
+}
+
+function renderArtistPage(artistName, channelInfo) {
     const savedArtists = Storage.get('swar_saved_artists') || [];
     const isSaved = savedArtists.some(a => a.name === artistName);
 
-    let html = `<div style="margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">`;
-    html += `<button class="btn-primary" onclick="toggleSaveArtist('${artistName.replace(/'/g, "\'")}')" id="saveArtistBtn" style="width:auto;padding:10px 20px;font-size:0.85rem;display:flex;align-items:center;gap:8px;">`;
-    html += isSaved ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Saved to Library` : `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg> Add to Library`;
-    html += `</button></div>`;
-    html += `<div class="track-grid">${tracks.map((t, i) => `
-        <div class="track-card" onclick="playTrack(${i})" style="--stagger:${(i * 0.05).toFixed(2)}s">
-            <div class="track-card-img-wrap">
-                <img class="track-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'">
-                <div class="play-overlay"><div class="play-overlay-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
-            </div>
-            <h4>${escapeHtml(t.title)}</h4>
-            <p>${escapeHtml(t.artist)}</p>
-        </div>
-    `).join('')}</div>`;
-    $('contentArea').innerHTML = html;
+    const logo = channelInfo?.logo || (tracks[0] ? getThumbnail(tracks[0].id) : '');
+    const subs = channelInfo?.subCountText || '';
+    const authorId = channelInfo?.authorId || tracks[0]?.authorId || '';
+
+    if (channelInfo) {
+        let channelCache = Storage.get('swar_channel_cache') || {};
+        channelCache[artistName] = channelInfo;
+        Storage.set('swar_channel_cache', channelCache);
+    }
+
+    let h = '';
+    h += `<div class="artist-page-header">`;
+    h += `<img class="artist-page-logo" src="${logo}" onerror="this.onerror=null;this.src='${tracks[0]?getThumbnailFallback(tracks[0].id):''}';this.style.display='none';this.parentElement.querySelector('.artist-fallback').style.display='flex';">`;
+    h += `<div class="artist-fallback" style="display:none;width:80px;height:80px;border-radius:50%;background:var(--bg-elevated);align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:var(--text-base);flex-shrink:0;border:2px solid var(--glass-border-strong);">${artistName[0].toUpperCase()}</div>`;
+    h += `<div class="artist-page-info">`;
+    h += `<div class="artist-page-name">${escapeHtml(artistName)}</div>`;
+    if (subs) h += `<div class="artist-page-subs">${subs}</div>`;
+    h += `</div>`;
+    h += `<button class="artist-page-shuffle ${isShuffleOn?'active':''}" id="artistShuffleBtn" onclick="toggleArtistShuffle()" title="Shuffle Play">`;
+    h += `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5z"/></svg>`;
+    h += `</button>`;
+    h += `</div>`;
+    h += `<div style="margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">`;
+    h += `<button class="btn-primary" onclick="toggleSaveArtist('${artistName.replace(/'/g,"\'")}','${authorId}')" id="saveArtistBtn" style="width:auto;padding:10px 20px;font-size:0.85rem;display:flex;align-items:center;gap:8px;">`;
+    h += isSaved ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Saved to Library` : `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg> Add to Library`;
+    h += `</button></div>`;
+    h += `<div class="track-grid">${tracks.map((t,i)=>`<div class="track-card" onclick="playTrack(${i})" style="--stagger:${(i*0.05).toFixed(2)}s"><div class="track-card-img-wrap"><img class="track-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'"><div class="play-overlay"><div class="play-overlay-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><h4>${escapeHtml(t.title)}</h4><p>${escapeHtml(t.artist)}</p></div>`).join('')}</div>`;
+    $('contentArea').innerHTML = h;
 }
 
-function toggleSaveArtist(artistName) {
+function toggleArtistShuffle() {
+    isShuffleOn = !isShuffleOn;
+    const btn = $('artistShuffleBtn');
+    if (btn) btn.classList.toggle('active', isShuffleOn);
+    $('shuffleBtn').classList.toggle('active', isShuffleOn);
+    showToast(isShuffleOn ? 'Shuffle Enabled' : 'Shuffle Disabled');
+    if (isShuffleOn && tracks.length > 0) {
+        currentTrackIndex = 0;
+        playTrack(0);
+    }
+}
+
+function toggleSaveArtist(artistName, authorId) {
     let savedArtists = Storage.get('swar_saved_artists') || [];
     const existingIndex = savedArtists.findIndex(a => a.name === artistName);
 
@@ -2701,9 +3016,19 @@ function toggleSaveArtist(artistName) {
         Storage.set('swar_saved_artists', savedArtists);
         showToast(`${artistName} removed from Library`);
     } else {
-        const t = tracks[currentTrackIndex];
-        const thumb = t ? getThumbnail(t.id) : '';
-        savedArtists.push({ name: artistName, pic: thumb, addedAt: Date.now() });
+        // Get channel logo from cache or fetch
+        let channelCache = Storage.get('swar_channel_cache') || {};
+        let pic = '';
+
+        if (channelCache[artistName]?.logo) {
+            pic = channelCache[artistName].logo;
+        } else if (authorId) {
+            // Try to get from current tracks
+            const t = tracks.find(tr => tr.artist === artistName);
+            if (t) pic = getThumbnail(t.id);
+        }
+
+        savedArtists.push({ name: artistName, pic: pic, authorId: authorId || '', addedAt: Date.now() });
         Storage.set('swar_saved_artists', savedArtists);
         showToast(`${artistName} added to Library`);
     }
@@ -2733,7 +3058,7 @@ async function openMixPlaylist(name) {
     for (const r of results) {
         if (r.status === 'fulfilled' && r.value?.items) {
             all.push(...r.value.items.filter(it => it.type === 'video').slice(0, 10).map(it => {
-                return { id: it.videoId || '', title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.author || 'Unknown Artist', duration: it.lengthSeconds || 0 };
+                return { id: it.videoId || '', title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.author || 'Unknown Artist', duration: it.lengthSeconds || 0, authorId: it.authorId || '' };
             }));
         }
     }
@@ -2856,6 +3181,14 @@ function setupEventListeners() {
     searchInput.addEventListener('keypress', e => {
         if (e.key === 'Enter') { clearTimeout(searchDebounceTimer); const q = searchInput.value.trim(); if (q) searchMusic(q); }
     });
+    // Prevent search view from closing when playing tracks
+    document.addEventListener('click', e => {
+        const trackCard = e.target.closest('.track-card');
+        if (trackCard && currentView === 'search') {
+            // Don't let the click propagate to close search
+            e.stopPropagation();
+        }
+    }, true);
 
     $('picUpload').addEventListener('change', e => {
         const file = e.target.files[0]; if (!file) return;
