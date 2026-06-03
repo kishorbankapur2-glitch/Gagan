@@ -2120,7 +2120,7 @@ async function buildForYouFeed() {
         
         await Promise.allSettled(picked.map(async (q) => {
             try {
-                const res = await searchAcrossInstances(q);
+                const res = await searchWithFallback(q);
                 if (res?.items) {
                     const parsed = res.items
                         .filter(it => it.type === 'video')
@@ -2566,15 +2566,35 @@ async function searchMusic(query) {
     if (searchAbortController) searchAbortController.abort();
     searchAbortController = new AbortController();
     try {
-        const res = await searchAcrossInstances(query, searchAbortController.signal);
-        if (!res?.items?.length) throw new Error();
-        tracks = res.items.filter(it => it.type === 'video').map(it => {
-            return { id: it.videoId || '', title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.author || 'Unknown Artist', duration: it.lengthSeconds || 0, authorId: it.authorId || '' };
-        });
-        renderTrackGrid(); saveSearchQuery(query);
+        const items = await searchWithFallback(query, searchAbortController.signal);
+        if (!items.length) throw new Error('No results');
+
+        tracks = items.filter(it => !it.type || it.type === 'video').map(it => {
+            return { 
+                id: it.videoId || '', 
+                title: (it.title || 'Unknown').replace(/&quot;/g, '"'), 
+                artist: it.author || 'Unknown Artist', 
+                duration: it.lengthSeconds || 0, 
+                authorId: it.authorId || '' 
+            };
+        }).filter(t => t.id);
+
+        if (!tracks.length) throw new Error('No valid tracks');
+        renderTrackGrid(); 
+        saveSearchQuery(query);
+        showToast(`${tracks.length} results found`);
     } catch(err) {
         if (err.name !== 'AbortError') {
-            $('contentArea').innerHTML = '<div style="text-align:center;padding:60px 20px"><h3 style="margin-bottom:8px">Search Instance Idle</h3><p style="color:var(--text-subdued);font-size:0.85rem">Try again shortly or paste direct YouTube Stream link.</p></div>';
+            console.error('Search error:', err);
+            $('contentArea').innerHTML = `<div style="text-align:center;padding:60px 20px">
+                <h3 style="margin-bottom:8px;color:#fff">Search Currently Unavailable</h3>
+                <p style="color:var(--text-subdued);font-size:0.85rem;margin-bottom:16px">YouTube search API is temporarily blocked. Try these alternatives:</p>
+                <div style="display:flex;flex-direction:column;gap:8px;max-width:300px;margin:0 auto">
+                    <button class="btn-primary" onclick="window.open('https://youtube.com/results?search_query=${encodeURIComponent(query)}','_blank')" style="width:auto;padding:10px 16px;font-size:0.8rem">🔍 Search on YouTube</button>
+                    <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px">Or paste a direct YouTube link in the search box above</p>
+                </div>
+            </div>`;
+            showToast('Search API blocked - use YouTube link');
         }
     }
 }
@@ -2585,16 +2605,48 @@ async function searchAcrossInstances(query, signal) {
         try {
             const res = await fetch(`${ins}/api/v1/search?q=${encodeURIComponent(query)}&type=video`, { signal: signal || controller.signal });
             clearTimeout(timeout);
-            if (!res.ok) throw new Error();
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const d = await res.json();
-            if (!Array.isArray(d) || d.length === 0) throw new Error();
-            return { items: d };
+            // Some instances return array directly, some return {items: [...]}
+            const items = Array.isArray(d) ? d : (d?.items || []);
+            if (!items.length) throw new Error('Empty results');
+            return items; // return array directly
         } catch(e) { clearTimeout(timeout); throw e; }
     });
     return await Promise.any(promises);
 }
 
 // ─── Layout Grid Renderers ───
+async function searchWithFallback(query, signal) {
+    // Try Invidious first
+    try {
+        const result = await searchAcrossInstances(query, signal);
+        const items = Array.isArray(result) ? result : (result?.items || []);
+        if (items.length > 0) return items;
+    } catch(e) { console.log('Invidious search failed, trying fallback...'); }
+
+    // Fallback: try each instance individually with longer timeout
+    for (const instance of INVIDIOUS_INSTANCES) {
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
+            const res = await fetch(`${instance}/api/v1/search?q=${encodeURIComponent(query)}`, { 
+                signal: signal || controller.signal 
+            });
+            clearTimeout(timeout);
+            if (!res.ok) continue;
+            const data = await res.json();
+            const items = Array.isArray(data) ? data : (data?.items || []);
+            if (items.length > 0) {
+                console.log(`Fallback search succeeded with ${instance}`);
+                return items;
+            }
+        } catch(e) { continue; }
+    }
+
+    throw new Error('All search methods failed');
+}
+
 function renderTrackGrid() {
     $('contentArea').innerHTML = `<div class="track-grid">${tracks.map((t, i) => `
         <div class="track-card" onclick="playTrack(${i})" style="--stagger:${(i * 0.05).toFixed(2)}s">
@@ -3053,13 +3105,14 @@ async function openMixPlaylist(name) {
     const queries = defs[name];
     if (!queries) return;
     showToast(`Loading ${name} Mix...`);
-    const results = await Promise.allSettled(queries.map(q => searchAcrossInstances(q)));
+    const results = await Promise.allSettled(queries.map(q => searchWithFallback(q)));
     const all = [];
     for (const r of results) {
-        if (r.status === 'fulfilled' && r.value?.items) {
-            all.push(...r.value.items.filter(it => it.type === 'video').slice(0, 10).map(it => {
+        if (r.status === 'fulfilled') {
+            const items = Array.isArray(r.value) ? r.value : (r.value?.items || []);
+            all.push(...items.filter(it => !it.type || it.type === 'video').slice(0, 10).map(it => {
                 return { id: it.videoId || '', title: (it.title || 'Unknown').replace(/&quot;/g, '"'), artist: it.author || 'Unknown Artist', duration: it.lengthSeconds || 0, authorId: it.authorId || '' };
-            }));
+            }).filter(t => t.id));
         }
     }
     const seen = new Set();
