@@ -844,9 +844,11 @@
 <script>
 'use strict';
 
-// ─── Splash Wave ───
-(function(){const wave=$i('splashWave');const N=60;for(let i=0;i<N;i++){const bar=document.createElement('div');bar.className='splash-bar';const h=Math.round(8+Math.random()*60);const dur=(0.6+Math.random()*0.8).toFixed(2)+'s';const delay=(Math.random()*0.5).toFixed(2)+'s';bar.style.cssText=`--h:${h}px;--dur:${dur};--delay:${delay};height:${Math.round(h*0.3)}px`;wave.appendChild(bar);}})();
+// ─── Core Helper ───
 function $i(id){return document.getElementById(id);}
+
+// ─── Splash Wave ───
+(function(){const wave=$i('splashWave');if(!wave)return;const N=60;for(let i=0;i<N;i++){const bar=document.createElement('div');bar.className='splash-bar';const h=Math.round(8+Math.random()*60);const dur=(0.6+Math.random()*0.8).toFixed(2)+'s';const delay=(Math.random()*0.5).toFixed(2)+'s';bar.style.cssText=`--h:${h}px;--dur:${dur};--delay:${delay};height:${Math.round(h*0.3)}px`;wave.appendChild(bar);}})();
 
 // ─── Splash Exit ───
 (function(){const splash=$i('splash');setTimeout(()=>{splash.classList.add('fade-out');splash.addEventListener('animationend',()=>{splash.style.display='none';},{once:true});setTimeout(()=>{splash.style.display='none';},700);},2000);})();
@@ -1029,13 +1031,13 @@ async function showArtistPanel(){
                 const channelId=channelItem.authorId||channelItem.channelId;
                 const subs=channelItem.subCount||channelItem.subscriberCount;
                 const avatar=channelItem.authorThumbnails?.[channelItem.authorThumbnails.length-1]?.url||null;
-                if(avatar){$i('artistPanelLogo').innerHTML=`<img src="${avatar}" onerror="this.parentElement.textContent='${artistName[0].toUpperCase()}'">"`;}
+                if(avatar){$i('artistPanelLogo').innerHTML=`<img src="${avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.textContent='${artistName[0].toUpperCase()}'">`;}
                 $i('artistPanelSubs').textContent=subs?formatSubCount(subs)+' subscribers':'YouTube Artist';
             }else{
-                // fallback — use video thumbnail-based guess
-                const videoItem=searchRes.items.find(i=>i.type==='video'&&i.author===artistName);
+                // fallback — use video author thumbnails
+                const videoItem=searchRes.items.find(i=>i.type==='video');
                 const authorThumb=videoItem?.authorThumbnails?.[videoItem.authorThumbnails.length-1]?.url;
-                if(authorThumb){$i('artistPanelLogo').innerHTML=`<img src="${authorThumb}" onerror="this.parentElement.textContent='${artistName[0].toUpperCase()}'">"`;}
+                if(authorThumb){$i('artistPanelLogo').innerHTML=`<img src="${authorThumb}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.textContent='${artistName[0].toUpperCase()}'">`;}
                 const subs=videoItem?.authorSubscriberCount||videoItem?.subCount;
                 $i('artistPanelSubs').textContent=subs?formatSubCount(subs)+' subscribers':'YouTube Artist';
             }
@@ -1086,6 +1088,7 @@ function artistPanelShuffle(){
 
 function closeArtistPanel(){
     $i('artistPanel').classList.remove('active');
+    $i('artistPanel').style.transform='';
     $i('artistPanelBackdrop').classList.remove('active');
     document.body.style.overflow='';
 }
@@ -1188,16 +1191,16 @@ function renderLibraryView(){
     // ── SAVED ARTISTS ──
     if(savedArtists.length>0){
         html+=`<div class="lib-section-head" style="margin-top:8px;">Saved Artists</div>`;
-        html+=`<div class="track-grid" style="margin-top:12px;">${savedArtists.map((a,i)=>`
-            <div class="track-card" onclick="loadSavedArtist('${a.name.replace(/'/g,"\\'")}'')" style="--stagger:${(i*0.05).toFixed(2)}s">
+        html+=`<div class="track-grid" style="margin-top:12px;">${savedArtists.map((a,i)=>{
+            const safeName=a.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+            return `<div class="track-card" onclick="loadSavedArtist('${safeName}')" style="--stagger:${(i*0.05).toFixed(2)}s">
                 <div class="track-card-img-wrap" style="border-radius:50%;overflow:hidden;">
-                    ${a.channelLogo?`<img class="track-card-img" src="${a.channelLogo}" loading="lazy" style="border-radius:50%;" onerror="this.onerror=null;this.parentElement.style.background='var(--bg-card-hover)';this.style.display='none'">`:
-                    `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;font-weight:800;color:var(--text-base);">${a.name[0].toUpperCase()}</div>`}
+                    ${a.channelLogo?`<img class="track-card-img" src="${a.channelLogo}" loading="lazy" style="border-radius:50%;width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;font-weight:800;\\'>${a.name[0].toUpperCase()}</div>'">`:`<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;font-weight:800;color:var(--text-base);">${a.name[0].toUpperCase()}</div>`}
                 </div>
                 <h4>${escapeHtml(a.name)}</h4>
                 <p>${a.subs||'Artist'}</p>
-            </div>
-        `).join('')}</div>`;
+            </div>`;
+        }).join('')}</div>`;
     }
 
     $i('contentArea').innerHTML=html;
@@ -1311,21 +1314,38 @@ async function searchMusicByArtist(artistName){
 }
 
 function renderArtistPageView(artistName){
-    const savedArtists=Storage.get('swar_saved_artists')||[];const isSaved=savedArtists.some(a=>a.name===artistName);
+    const savedArtists=Storage.get('swar_saved_artists')||[];
+    const isSaved=savedArtists.some(a=>a.name===artistName);
+    const safeName=artistName.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     let html=`<div style="margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">`;
-    html+=`<button class="btn-primary" onclick="toggleSaveArtist('${artistName.replace(/'/g,"\\'")}'')" id="saveArtistBtn" style="width:auto;padding:10px 20px;font-size:0.85rem;display:flex;align-items:center;gap:8px;">${isSaved?'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Saved':'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg> Add to Library'}</button></div>`;
+    html+=`<button class="btn-primary" onclick="toggleSaveArtist('${safeName}')" id="saveArtistBtn" style="width:auto;padding:10px 20px;font-size:0.85rem;display:flex;align-items:center;gap:8px;">${isSaved?'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Saved':'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg> Add to Library'}</button></div>`;
     html+=`<div class="track-grid">${tracks.map((t,i)=>`<div class="track-card" onclick="playTrack(${i})" style="--stagger:${(i*0.05).toFixed(2)}s"><div class="track-card-img-wrap"><img class="track-card-img" src="${getThumbnail(t.id)}" loading="lazy" onerror="this.onerror=null;this.src='${getThumbnailFallback(t.id)}'"><div class="play-overlay"><div class="play-overlay-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><h4>${escapeHtml(t.title)}</h4><p>${escapeHtml(t.artist)}</p></div>`).join('')}</div>`;
     $i('contentArea').innerHTML=html;
 }
 
 function toggleSaveArtist(artistName){
-    let savedArtists=Storage.get('swar_saved_artists')||[];const idx=savedArtists.findIndex(a=>a.name===artistName);
-    // Get channel logo from artist panel if available
-    const logoEl=$i('artistPanelLogo');const logoImg=logoEl?.querySelector('img')?.src||null;
+    let savedArtists=Storage.get('swar_saved_artists')||[];
+    const idx=savedArtists.findIndex(a=>a.name===artistName);
+    // Get channel logo properly from artist panel
+    const logoEl=$i('artistPanelLogo');
+    const logoImg=logoEl?.querySelector('img')?.src||null;
     const subsText=$i('artistPanelSubs')?.textContent||'Artist';
-    if(idx>=0){savedArtists.splice(idx,1);Storage.set('swar_saved_artists',savedArtists);showToast(`${artistName} removed from Library`);}
-    else{savedArtists.push({name:artistName,channelLogo:logoImg,subs:subsText,addedAt:Date.now()});Storage.set('swar_saved_artists',savedArtists);showToast(`${artistName} added to Library`);}
-    const btn=$i('saveArtistBtn');if(btn){const isSaved=idx<0;btn.innerHTML=isSaved?'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Saved':'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg> Add to Library';}
+    if(idx>=0){
+        savedArtists.splice(idx,1);
+        Storage.set('swar_saved_artists',savedArtists);
+        showToast(`${artistName} removed from Library`);
+    }else{
+        savedArtists.push({name:artistName,channelLogo:logoImg,subs:subsText,addedAt:Date.now()});
+        Storage.set('swar_saved_artists',savedArtists);
+        showToast(`${artistName} added to Library`);
+    }
+    const btn=$i('saveArtistBtn');
+    if(btn){
+        const nowSaved=idx<0;
+        btn.innerHTML=nowSaved
+            ?'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Saved'
+            :'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg> Add to Library';
+    }
 }
 
 async function openMixPlaylist(name){
@@ -1381,7 +1401,16 @@ function setupEventListeners(){
     $i('picUpload').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{$i('picUploader').innerHTML=`<img src="${ev.target.result}">`;$i('picUploader').dataset.img=ev.target.result;};reader.readAsDataURL(file);});
     document.addEventListener('click',()=>{closeUserMenu();closeSleepDropdown();});
     document.addEventListener('keydown',e=>{const tag=document.activeElement?.tagName;if(tag==='INPUT'||tag==='TEXTAREA')return;if(e.key==='Backspace'){if($i('artistPanel').classList.contains('active')){e.preventDefault();closeArtistPanel();}else if($i('appearancePanel').classList.contains('active')){e.preventDefault();_doCloseAppearancePanel();}else if($i('inappWebview').classList.contains('active')){e.preventDefault();closeInAppWebview();}else if($i('profileModal').classList.contains('active')){e.preventDefault();closeProfileModal();}else if(isFullscreenOpen){e.preventDefault();closeFullscreen();}}});
-    window.addEventListener('popstate',e=>{if($i('artistPanel').classList.contains('active')){closeArtistPanel();return;}if($i('appearancePanel').classList.contains('active')){_doCloseAppearancePanel();return;}if($i('inappWebview').classList.contains('active')){closeInAppWebview();return;}if($i('profileModal').classList.contains('active')){closeProfileModal();return;}if(isFullscreenOpen){closeFullscreen();return;}});
+    window.addEventListener('popstate',e=>{
+        // Intercept all — never let browser navigate away
+        if($i('artistPanel').classList.contains('active')){closeArtistPanel();history.pushState(null,'');return;}
+        if($i('appearancePanel').classList.contains('active')){_doCloseAppearancePanel();history.pushState(null,'');return;}
+        if($i('inappWebview').classList.contains('active')){closeInAppWebview();history.pushState(null,'');return;}
+        if($i('profileModal').classList.contains('active')){closeProfileModal();history.pushState(null,'');return;}
+        if(isFullscreenOpen){closeFullscreen();history.pushState(null,'');return;}
+        // Nothing open — push state back so app never unloads
+        history.pushState(null,'');
+    });
     window.addEventListener('resize',updateNavIndicatorSlab);
 }
 
@@ -1451,6 +1480,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     setGreeting();SwarMaterial.init();setupEventListeners();setupSwipeGesture();setupScrubbing();setupAlbumGestures();Marquee.init();
     loadAndRenderHome().then(()=>{tracks=[...PREMIUM_CARDS_TRACKS];});
     initYouTubePlayer();setTimeout(updateNavIndicatorSlab,300);
+    // Prevent back button from leaving app
+    history.pushState(null,'');
 });
 </script>
 </body>
