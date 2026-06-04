@@ -564,6 +564,43 @@
         .marquee:not(.is-animating) .marquee__gap,.marquee:not(.is-animating) .marquee__clone{display:none;}
         @supports(-webkit-mask-image:linear-gradient(#000,#000)) or (mask-image:linear-gradient(#000,#000)){.marquee{-webkit-mask-image:linear-gradient(to right,transparent,#000 var(--marquee-fade),#000 calc(100% - var(--marquee-fade)),transparent);mask-image:linear-gradient(to right,transparent,#000 var(--marquee-fade),#000 calc(100% - var(--marquee-fade)),transparent);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}}
         .mini-player-title,.mini-player-artist,.fs-title,.fs-artist{overflow:visible !important;text-overflow:clip !important;white-space:nowrap !important;}
+
+        /* ── ARTIST OVERLAY ── */
+        .artist-overlay{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--glass-bg-strong);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-top:1px solid var(--glass-border-strong);border-radius:28px 28px 0 0;padding:0 0 calc(env(safe-area-inset-bottom));transform:translateY(100%);transition:transform 0.5s var(--ease-spring);box-shadow:0 -20px 60px rgba(0,0,0,0.85);max-height:82vh;overflow-y:auto;}
+        .artist-overlay.show{transform:translateY(0);}
+        .artist-overlay-backdrop{position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.65);opacity:0;pointer-events:none;transition:opacity 0.4s var(--ease);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+        .artist-overlay-backdrop.show{opacity:1;pointer-events:all;}
+        .ao-handle{width:36px;height:4px;border-radius:2px;background:var(--glass-border-strong);margin:10px auto 0;}
+        .ao-header{display:flex;align-items:center;gap:14px;padding:14px 20px 12px;border-bottom:1px solid var(--glass-border);}
+        .ao-logo{width:54px;height:54px;border-radius:50%;overflow:hidden;background:var(--bg-card);border:1.5px solid var(--glass-border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:var(--text-base);}
+        .ao-logo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+        .ao-info{flex:1;min-width:0;}
+        .ao-name{font-size:1.05rem;font-weight:800;letter-spacing:-0.02em;color:var(--text-base);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .ao-subs{font-size:0.72rem;color:var(--text-subdued);font-weight:500;}
+        .ao-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+        .ao-shuffle-btn{width:38px;height:38px;border-radius:11px;background:var(--text-base);color:var(--bg-base);display:flex;align-items:center;justify-content:center;transition:all 0.2s var(--ease-spring);border:none;cursor:pointer;}
+        .ao-shuffle-btn:hover{transform:scale(1.1);}
+        .ao-shuffle-btn.on{background:rgba(255,255,255,0.15);color:var(--text-base);}
+        .ao-shuffle-btn svg{width:17px;height:17px;fill:currentColor;}
+        .ao-close-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;transition:all 0.2s var(--ease-spring);cursor:pointer;}
+        .ao-close-btn:hover{background:rgba(255,255,255,0.2);transform:scale(1.1) rotate(90deg);}
+        .ao-close-btn svg{width:14px;height:14px;fill:var(--text-base);}
+        .ao-add-lib{margin:10px 20px 4px;padding:12px 18px;border-radius:14px;background:var(--bg-card);border:1px solid var(--glass-border);display:flex;align-items:center;gap:10px;font-size:0.85rem;font-weight:700;color:var(--text-base);cursor:pointer;transition:all 0.2s var(--ease-spring);width:calc(100% - 40px);}
+        .ao-add-lib:hover{background:var(--bg-card-hover);transform:translateY(-1px);}
+        .ao-add-lib.saved{color:var(--text-subdued);}
+        .ao-add-lib svg{width:18px;height:18px;fill:currentColor;flex-shrink:0;}
+        .ao-tracks{padding:8px 20px 12px;}
+        .ao-track-row{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px;cursor:pointer;transition:all 0.18s var(--ease);}
+        .ao-track-row:hover{background:var(--bg-card-hover);}
+        .ao-track-row:active{transform:scale(0.98);}
+        .ao-track-num{font-size:0.72rem;color:var(--text-muted);font-weight:600;width:18px;text-align:center;flex-shrink:0;}
+        .ao-track-img{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--bg-card);}
+        .ao-track-info{flex:1;min-width:0;}
+        .ao-track-title{font-size:0.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-base);}
+        .ao-track-dur{font-size:0.7rem;color:var(--text-subdued);margin-top:1px;}
+        .ao-track-row.ao-playing .ao-track-title{color:var(--text-base);font-weight:800;}
+        .ao-track-row.ao-playing .ao-track-num::before{content:'▶';font-size:0.6rem;}
+        .ao-track-row.ao-playing .ao-track-num{color:var(--text-base);}
         @media(prefers-reduced-motion:reduce){.marquee__track{transform:none !important;}*{animation-duration:0.001ms !important;transition-duration:0.001ms !important;}}
 
         /* Library liked songs section */
@@ -694,7 +731,7 @@
 </div>
 
 <!-- ARTIST PANEL (NEW) -->
-<div class="artist-panel-backdrop" id="artistPanelBackdrop" onclick="closeArtistPanel()"></div>
+<div class="artist-panel-backdrop" id="artistPanelBackdrop" onclick="closeArtistOverlay()"></div>
 <div class="artist-panel" id="artistPanel">
     <div class="artist-panel-handle"></div>
     <div class="artist-panel-header">
@@ -753,12 +790,38 @@
     </section>
 </div>
 
+<!-- ARTIST OVERLAY -->
+<div class="artist-overlay-backdrop" id="artistOverlayBackdrop" onclick="closeArtistOverlay()"></div>
+<div class="artist-overlay" id="artistOverlay">
+    <div class="ao-handle"></div>
+    <div class="ao-header">
+        <div class="ao-logo" id="aoLogo"></div>
+        <div class="ao-info">
+            <div class="ao-name" id="aoName">Artist</div>
+            <div class="ao-subs" id="aoSubs">YouTube Artist</div>
+        </div>
+        <div class="ao-actions">
+            <button class="ao-shuffle-btn" id="aoShuffleBtn" onclick="aoShuffle()" title="Shuffle artist">
+                <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.02 9.83l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.44-3.44-1.41 1.42 3.44 3.44-1.83 1.83z"/></svg>
+            </button>
+            <button class="ao-close-btn" onclick="closeArtistOverlay()" title="Close">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+    </div>
+    <button class="ao-add-lib" id="aoAddLibBtn" onclick="aoToggleLibrary()">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        <span id="aoAddLibText">Add to Library</span>
+    </button>
+    <div class="ao-tracks" id="aoTracksList"></div>
+</div>
+
 <!-- MINI PLAYER -->
 <div class="mini-player" id="miniPlayer" onclick="openFullscreen()">
     <img class="mini-player-img sway-active" id="miniPlayerImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="artwork">
     <div class="mini-player-info">
         <div class="marquee" id="miniTitleMarquee" data-limit="15" data-speed="22" data-pause="1000"><div class="marquee__track"><span class="mini-player-title marquee__text" id="miniPlayerTitle">Not Playing</span><span class="marquee__gap" aria-hidden="true"></span><span class="mini-player-title marquee__text marquee__clone" aria-hidden="true"></span></div></div>
-        <div class="marquee" id="miniArtistMarquee" data-limit="10" data-speed="30" data-pause="800"><div class="marquee__track"><span class="mini-player-artist marquee__text" id="miniPlayerArtist" onclick="event.stopPropagation();showArtistPanel()" style="cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">—</span><span class="marquee__gap" aria-hidden="true"></span><span class="mini-player-artist marquee__text marquee__clone" aria-hidden="true"></span></div></div>
+        <div class="marquee" id="miniArtistMarquee" data-limit="10" data-speed="30" data-pause="800"><div class="marquee__track"><span class="mini-player-artist marquee__text" id="miniPlayerArtist" onclick="event.stopPropagation();openArtistOverlay()" style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px;transition:opacity 0.2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">—</span><span class="marquee__gap" aria-hidden="true"></span><span class="mini-player-artist marquee__text marquee__clone" aria-hidden="true"></span></div></div>
     </div>
     <div class="mini-player-controls" onclick="event.stopPropagation()">
         <button class="mini-btn" onclick="prevTrack()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
@@ -795,7 +858,7 @@
                 <div class="fs-title-row">
                     <div style="flex:1;min-width:0">
                         <div class="marquee" id="fsTitleMarquee" data-limit="15" data-speed="20" data-pause="1100"><div class="marquee__track"><h1 class="fs-title marquee__text" id="fsTitle">Not Playing</h1><span class="marquee__gap" aria-hidden="true"></span><span class="fs-title marquee__text marquee__clone" aria-hidden="true"></span></div></div>
-                        <div class="marquee" id="fsArtistMarquee" data-limit="10" data-speed="28" data-pause="900"><div class="marquee__track"><p class="fs-artist marquee__text" id="fsArtist" onclick="showArtistPanel()" style="cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">—</p><span class="marquee__gap" aria-hidden="true"></span><span class="fs-artist marquee__text marquee__clone" aria-hidden="true"></span></div></div>
+                        <div class="marquee" id="fsArtistMarquee" data-limit="10" data-speed="28" data-pause="900"><div class="marquee__track"><p class="fs-artist marquee__text" id="fsArtist" onclick="openArtistOverlay()" style="cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">—</p><span class="marquee__gap" aria-hidden="true"></span><span class="fs-artist marquee__text marquee__clone" aria-hidden="true"></span></div></div>
                         <div class="fs-meta-utilities"><span class="ap-audio-badge" id="fsBitrateBadge">320kbps High Fidelity</span><div class="fs-vu-widget" id="fsLiveVuContainer"><div class="fs-vu-bar" style="height:60%"></div><div class="fs-vu-bar" style="height:90%"></div><div class="fs-vu-bar" style="height:30%"></div><div class="fs-vu-bar" style="height:70%"></div></div></div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px">
@@ -1004,6 +1067,195 @@ function setupAlbumGestures(){
 }
 function showHeartPop(){const wrap=$i('fsAlbumWrap');const heart=document.createElement('div');heart.textContent='❤️';heart.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;z-index:999;pointer-events:none;animation:heartPop 0.75s ease forwards;filter:drop-shadow(0 0 20px rgba(255,100,100,0.6))';wrap.appendChild(heart);setTimeout(()=>heart.remove(),800);}
 
+// ─── ARTIST OVERLAY ─────────────────────────────────────────────
+let _aoArtistName = '';
+let _aoTracks = [];
+let _aoShuffleOn = false;
+
+function formatSubCount(n) {
+    if (!n || n === 0) return 'YouTube Artist';
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M subscribers';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K subscribers';
+    return n + ' subscribers';
+}
+
+async function openArtistOverlay() {
+    const t = tracks[currentTrackIndex];
+    if (!t) return;
+    _aoArtistName = t.artist;
+    _aoTracks = [];
+    _aoShuffleOn = false;
+
+    // Reset UI immediately
+    $i('aoName').textContent = _aoArtistName;
+    $i('aoSubs').textContent = 'Loading...';
+    $i('aoLogo').innerHTML = '<span style="font-size:1.4rem;font-weight:800">' + _aoArtistName[0].toUpperCase() + '</span>';
+    $i('aoTracksList').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-subdued);font-size:0.85rem">Loading songs...</div>';
+    $i('aoShuffleBtn').classList.remove('on');
+    _updateAoLibBtn();
+
+    // Show overlay
+    $i('artistOverlay').classList.add('show');
+    $i('artistOverlayBackdrop').classList.add('show');
+
+    // Fetch channel + tracks
+    try {
+        const res = await searchAcrossInstances(_aoArtistName + ' songs');
+        if (!res || !res.items) throw new Error('no results');
+
+        // Try to find channel item first
+        const ch = res.items.find(i => i.type === 'channel');
+        if (ch) {
+            const subs = ch.subCount || ch.subscriberCount || 0;
+            const thumbs = ch.authorThumbnails || [];
+            const logo = thumbs.length ? thumbs[thumbs.length - 1].url : null;
+            if (logo) {
+                const safeInit = _aoArtistName[0].toUpperCase();
+                $i('aoLogo').innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='<span style=&quot;font-size:1.4rem;font-weight:800&quot;>' + safeInit + '</span>'">';
+            }
+            $i('aoSubs').textContent = formatSubCount(subs);
+        } else {
+            // Fallback: use authorThumbnails from first video
+            const vi = res.items.find(i => i.type === 'video' && i.authorThumbnails && i.authorThumbnails.length > 0);
+            if (vi) {
+                const thumbs = vi.authorThumbnails;
+                const logo = thumbs[thumbs.length - 1].url;
+                const safeInit = _aoArtistName[0].toUpperCase();
+                $i('aoLogo').innerHTML = '<img src="' + logo + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='<span style=&quot;font-size:1.4rem;font-weight:800&quot;>' + safeInit + '</span>'">';
+                const subs = vi.authorSubscriberCount || vi.subCount || 0;
+                $i('aoSubs').textContent = formatSubCount(subs);
+            } else {
+                $i('aoSubs').textContent = 'YouTube Artist';
+            }
+        }
+
+        // Load video tracks
+        _aoTracks = res.items
+            .filter(i => i.type === 'video')
+            .map(i => ({
+                id: i.videoId || '',
+                title: (i.title || 'Unknown').replace(/&quot;/g, '"'),
+                artist: i.author || _aoArtistName,
+                duration: i.lengthSeconds || 0
+            }))
+            .filter(t => t.id);
+
+        _renderAoTracks();
+    } catch (e) {
+        $i('aoSubs').textContent = 'YouTube Artist';
+        $i('aoTracksList').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-subdued);font-size:0.85rem">Could not load. Check connection.</div>';
+    }
+}
+
+function closeArtistOverlay() {
+    const overlay = $i('artistOverlay');
+    overlay.classList.remove('show');
+    overlay.style.transform = '';
+    $i('artistOverlayBackdrop').classList.remove('show');
+}
+
+function _renderAoTracks() {
+    if (!_aoTracks.length) {
+        $i('aoTracksList').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-subdued);font-size:0.85rem">No tracks found.</div>';
+        return;
+    }
+    const currentId = tracks[currentTrackIndex] ? tracks[currentTrackIndex].id : '';
+    $i('aoTracksList').innerHTML = _aoTracks.map((t, i) => {
+        const playing = t.id === currentId ? ' ao-playing' : '';
+        const thumb = getThumbnail(t.id);
+        const fallback = getThumbnailFallback(t.id);
+        return '<div class="ao-track-row' + playing + '" onclick="_aoPlayTrack(' + i + ')">' +
+            '<span class="ao-track-num">' + (i + 1) + '</span>' +
+            '<img class="ao-track-img" src="' + thumb + '" loading="lazy" onerror="this.onerror=null;this.src='' + fallback + ''">' +
+            '<div class="ao-track-info">' +
+            '<div class="ao-track-title">' + escapeHtml(t.title) + '</div>' +
+            '<div class="ao-track-dur">' + formatDuration(t.duration) + '</div>' +
+            '</div></div>';
+    }).join('');
+}
+
+function _aoPlayTrack(i) {
+    tracks = [..._aoTracks];
+    currentTrackIndex = i;
+    playTrack(i);
+    $i('fsPlayingContext').textContent = _aoArtistName + ' — SWAR';
+}
+
+function aoShuffle() {
+    _aoShuffleOn = !_aoShuffleOn;
+    $i('aoShuffleBtn').classList.toggle('on', _aoShuffleOn);
+    if (_aoShuffleOn && _aoTracks.length) {
+        tracks = [..._aoTracks];
+        isShuffleOn = true;
+        $i('shuffleBtn').classList.add('active');
+        const r = Math.floor(Math.random() * tracks.length);
+        currentTrackIndex = r;
+        playTrack(r);
+        $i('fsPlayingContext').textContent = _aoArtistName + ' Shuffle — SWAR';
+        showToast('Artist Shuffle ON');
+    } else {
+        isShuffleOn = false;
+        $i('shuffleBtn').classList.remove('active');
+        showToast('Shuffle OFF');
+    }
+}
+
+function _updateAoLibBtn() {
+    const saved = Storage.get('swar_saved_artists') || [];
+    const isSaved = saved.some(a => a.name === _aoArtistName);
+    const btn = $i('aoAddLibBtn');
+    const txt = $i('aoAddLibText');
+    if (isSaved) {
+        btn.classList.add('saved');
+        btn.querySelector('svg').innerHTML = '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>';
+        txt.textContent = 'Saved to Library';
+    } else {
+        btn.classList.remove('saved');
+        btn.querySelector('svg').innerHTML = '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>';
+        txt.textContent = 'Add to Library';
+    }
+}
+
+function aoToggleLibrary() {
+    let saved = Storage.get('swar_saved_artists') || [];
+    const idx = saved.findIndex(a => a.name === _aoArtistName);
+    const logoImg = ($i('aoLogo').querySelector('img') || {}).src || null;
+    const subs = $i('aoSubs').textContent || 'Artist';
+    if (idx >= 0) {
+        saved.splice(idx, 1);
+        Storage.set('swar_saved_artists', saved);
+        showToast(_aoArtistName + ' removed from Library');
+    } else {
+        saved.push({ name: _aoArtistName, channelLogo: logoImg, subs: subs, addedAt: Date.now() });
+        Storage.set('swar_saved_artists', saved);
+        showToast(_aoArtistName + ' added to Library');
+    }
+    _updateAoLibBtn();
+}
+
+// Swipe-down to close artist overlay
+(function() {
+    const panel = $i('artistOverlay');
+    let startY = 0, drag = false;
+    panel.addEventListener('touchstart', e => {
+        startY = e.touches[0].clientY; drag = true; panel.style.transition = 'none';
+    }, { passive: true });
+    panel.addEventListener('touchmove', e => {
+        if (!drag) return;
+        const dy = e.touches[0].clientY - startY;
+        if (dy > 0) panel.style.transform = 'translateY(' + dy + 'px)';
+    }, { passive: true });
+    panel.addEventListener('touchend', e => {
+        if (!drag) return; drag = false;
+        const dy = e.changedTouches[0].clientY - startY;
+        panel.style.transition = 'transform 0.45s var(--ease-spring)';
+        if (dy > 80) { closeArtistOverlay(); }
+        else { panel.style.transform = ''; }
+    });
+})();
+// ─── END ARTIST OVERLAY ──────────────────────────────────────────
+
+
 // ─── Artist Panel (NEW) ───
 async function showArtistPanel(){
     const t=tracks[currentTrackIndex];if(!t)return;
@@ -1016,7 +1268,7 @@ async function showArtistPanel(){
     $i('artistPanelShuffleBtn').classList.remove('active');
     $i('artistPanelShuffleBtn').style.background='var(--text-base)';
     $i('artistPanelShuffleBtn').style.color='var(--bg-base)';
-    $i('artistPanel').classList.add('active');
+    $i('artistOverlay').classList.add('active');
     $i('artistPanelBackdrop').classList.add('active');
     document.body.style.overflow='hidden';
     history.pushState({swarArtistPanel:true},'');
@@ -1086,19 +1338,19 @@ function artistPanelShuffle(){
     }
 }
 
-function closeArtistPanel(){
-    $i('artistPanel').classList.remove('active');
-    $i('artistPanel').style.transform='';
+function closeArtistOverlay(){
+    $i('artistOverlay').classList.remove('active');
+    $i('artistOverlay').style.transform='';
     $i('artistPanelBackdrop').classList.remove('active');
     document.body.style.overflow='';
 }
 
 // Artist panel swipe to close
 (function(){
-    const panel=$i('artistPanel');let startY=0,dragging=false;
+    const panel=$i('artistOverlay');let startY=0,dragging=false;
     panel.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;dragging=true;panel.style.transition='none';},{passive:true});
     panel.addEventListener('touchmove',e=>{if(!dragging)return;const dy=e.touches[0].clientY-startY;if(dy>0)panel.style.transform=`translateY(${dy}px)`;},{passive:true});
-    panel.addEventListener('touchend',e=>{if(!dragging)return;dragging=false;const dy=e.changedTouches[0].clientY-startY;panel.style.transition='transform 0.45s var(--ease-spring)';if(dy>80)closeArtistPanel();else panel.style.transform='';});
+    panel.addEventListener('touchend',e=>{if(!dragging)return;dragging=false;const dy=e.changedTouches[0].clientY-startY;panel.style.transition='transform 0.45s var(--ease-spring)';if(dy>80)closeArtistOverlay();else panel.style.transform='';});
 })();
 
 // ─── Media Session ───
@@ -1400,16 +1652,14 @@ function setupEventListeners(){
     searchInput.addEventListener('keypress',e=>{if(e.key==='Enter'){clearTimeout(searchDebounceTimer);const q=searchInput.value.trim();if(q)searchMusic(q);}});
     $i('picUpload').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{$i('picUploader').innerHTML=`<img src="${ev.target.result}">`;$i('picUploader').dataset.img=ev.target.result;};reader.readAsDataURL(file);});
     document.addEventListener('click',()=>{closeUserMenu();closeSleepDropdown();});
-    document.addEventListener('keydown',e=>{const tag=document.activeElement?.tagName;if(tag==='INPUT'||tag==='TEXTAREA')return;if(e.key==='Backspace'){if($i('artistPanel').classList.contains('active')){e.preventDefault();closeArtistPanel();}else if($i('appearancePanel').classList.contains('active')){e.preventDefault();_doCloseAppearancePanel();}else if($i('inappWebview').classList.contains('active')){e.preventDefault();closeInAppWebview();}else if($i('profileModal').classList.contains('active')){e.preventDefault();closeProfileModal();}else if(isFullscreenOpen){e.preventDefault();closeFullscreen();}}});
-    window.addEventListener('popstate',e=>{
-        // Intercept all — never let browser navigate away
-        if($i('artistPanel').classList.contains('active')){closeArtistPanel();history.pushState(null,'');return;}
-        if($i('appearancePanel').classList.contains('active')){_doCloseAppearancePanel();history.pushState(null,'');return;}
-        if($i('inappWebview').classList.contains('active')){closeInAppWebview();history.pushState(null,'');return;}
-        if($i('profileModal').classList.contains('active')){closeProfileModal();history.pushState(null,'');return;}
-        if(isFullscreenOpen){closeFullscreen();history.pushState(null,'');return;}
-        // Nothing open — push state back so app never unloads
-        history.pushState(null,'');
+    document.addEventListener('keydown',e=>{const tag=document.activeElement?.tagName;if(tag==='INPUT'||tag==='TEXTAREA')return;if(e.key==='Backspace'){if($i('artistOverlay')&&$i('artistOverlay').classList.contains('show')){e.preventDefault();closeArtistOverlay();}else if($i('appearancePanel').classList.contains('active')){e.preventDefault();_doCloseAppearancePanel();}else if($i('inappWebview').classList.contains('active')){e.preventDefault();closeInAppWebview();}else if($i('profileModal').classList.contains('active')){e.preventDefault();closeProfileModal();}else if(isFullscreenOpen){e.preventDefault();closeFullscreen();}}});
+    window.addEventListener('popstate', () => {
+        history.pushState(null, '');
+        if ($i('artistOverlay') && $i('artistOverlay').classList.contains('show')) { closeArtistOverlay(); return; }
+        if ($i('appearancePanel').classList.contains('active')) { _doCloseAppearancePanel(); return; }
+        if ($i('inappWebview').classList.contains('active')) { closeInAppWebview(); return; }
+        if ($i('profileModal').classList.contains('active')) { closeProfileModal(); return; }
+        if (isFullscreenOpen) { closeFullscreen(); return; }
     });
     window.addEventListener('resize',updateNavIndicatorSlab);
 }
