@@ -4058,5 +4058,912 @@ if (typeof document !== 'undefined') {
 }
 })();
 </script>
+<style id="swar-playlists-css">
+/* ═══════════ Swar Playlist System — Create / Import / Local Folder ═══════════ */
+.pl-plus-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border-strong);
+    display: none; align-items: center; justify-content: center;
+    cursor: pointer; float: right; margin-top: -4px;
+    transition: all 0.25s var(--ease-spring);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.pl-plus-btn:hover { transform: scale(1.12) rotate(90deg); border-color: var(--text-base); box-shadow: 0 6px 22px rgba(0,0,0,0.5); }
+.pl-plus-btn:active { transform: scale(0.92); }
+.pl-plus-btn svg { width: 18px; height: 18px; fill: var(--text-base); }
+.pl-backdrop {
+    position: fixed; inset: 0; z-index: 2700;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease);
+}
+.pl-backdrop.active { opacity: 1; pointer-events: all; }
+.pl-card {
+    width: 100%; max-width: 400px;
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--glass-border-strong); border-radius: 24px; padding: 24px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06);
+    transform: translateY(24px) scale(0.96);
+    transition: transform 0.4s var(--ease-spring);
+    max-height: 85vh; overflow-y: auto; scrollbar-width: none;
+}
+.pl-backdrop.active .pl-card { transform: none; }
+.pl-card::-webkit-scrollbar { display: none; }
+.pl-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+.pl-sub { font-size: 0.76rem; color: var(--text-subdued); margin-bottom: 18px; line-height: 1.45; }
+.pl-input {
+    width: 100%; padding: 13px 16px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+    border-radius: 12px; color: var(--text-base); font-size: 0.9rem;
+    margin-bottom: 12px; transition: border-color 0.2s; outline: none;
+}
+.pl-input:focus { border-color: var(--glass-border-strong); }
+.pl-btn {
+    width: 100%; padding: 13px; border-radius: 12px;
+    background: var(--text-base); color: var(--bg-base);
+    font-weight: 700; font-size: 0.88rem;
+    transition: all 0.2s var(--ease-spring); position: relative; overflow: hidden;
+}
+.pl-btn:hover { transform: translateY(-1px); }
+.pl-btn:active { transform: scale(0.98); }
+.pl-btn:disabled { opacity: 0.45; pointer-events: none; }
+.pl-btn.ghost { background: rgba(255,255,255,0.07); color: var(--text-base); border: 1px solid var(--glass-border); }
+.pl-row {
+    display: flex; align-items: center; gap: 14px; width: 100%;
+    padding: 14px; border-radius: 16px; text-align: left;
+    background: var(--bg-card); border: 1px solid var(--glass-border);
+    cursor: pointer; transition: all 0.25s var(--ease-spring); margin-bottom: 10px;
+}
+.pl-row:hover { background: var(--bg-card-hover); transform: translateY(-2px); border-color: var(--glass-border-strong); }
+.pl-row:active { transform: scale(0.98); }
+.pl-row-icon {
+    width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--glass-border);
+}
+.pl-row-icon svg { width: 20px; height: 20px; fill: var(--text-base); }
+.pl-row-label { font-size: 0.9rem; font-weight: 700; }
+.pl-row-sub { font-size: 0.72rem; color: var(--text-subdued); margin-top: 1px; }
+.pl-status {
+    font-size: 0.75rem; color: var(--text-subdued); min-height: 20px;
+    margin: 2px 0 12px; display: flex; align-items: center; gap: 8px; line-height: 1.4;
+}
+.pl-spinner {
+    width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--glass-border-strong); border-top-color: var(--text-base);
+    animation: lyricsSpin 0.8s linear infinite;
+}
+.pl-note {
+    font-size: 0.68rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5;
+    padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border); word-break: break-all;
+}
+.pl-section-label { font-size: 1rem; font-weight: 800; margin: 4px 0 12px; letter-spacing: -0.01em; }
+.pl-empty-hint {
+    padding: 26px 18px; border-radius: 16px; text-align: center;
+    background: var(--bg-card); border: 1px dashed var(--glass-border-strong);
+    color: var(--text-subdued); font-size: 0.82rem; line-height: 1.5;
+}
+.pl-detail-head {
+    display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+    background: var(--bg-card); border: 1px solid var(--glass-border);
+    padding: 18px; border-radius: 20px; margin-bottom: 18px;
+}
+.pl-detail-cover { width: 84px; height: 84px; border-radius: 16px; object-fit: cover; background: #111; flex-shrink: 0; }
+.pl-detail-info { flex: 1; min-width: 170px; }
+.pl-detail-name { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+.pl-detail-meta { font-size: 0.78rem; color: var(--text-subdued); margin-bottom: 12px; }
+.pl-detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.pl-mini-btn {
+    padding: 9px 15px; border-radius: 100px; font-size: 0.76rem; font-weight: 700;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--glass-border);
+    color: var(--text-base); display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s var(--ease-spring); cursor: pointer;
+}
+.pl-mini-btn:hover { background: rgba(255,255,255,0.14); transform: translateY(-1px); }
+.pl-mini-btn.primary { background: var(--text-base); color: var(--bg-base); border-color: transparent; }
+.pl-mini-btn.danger { color: var(--danger); }
+.pl-mini-btn.danger.confirm { background: var(--danger); color: #fff; border-color: var(--danger); }
+.pl-mini-btn svg { width: 14px; height: 14px; fill: currentColor; }
+.pl-remove {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0.55; transition: all 0.2s var(--ease-spring);
+}
+.pl-remove:hover { opacity: 1; background: var(--danger); border-color: var(--danger); }
+.pl-remove svg { width: 12px; height: 12px; fill: var(--text-base); }
+.pl-suggest-row {
+    display: flex; align-items: center; gap: 12px; padding: 8px 10px;
+    border-radius: 12px; transition: background 0.2s;
+}
+.pl-suggest-row:hover { background: var(--bg-card-hover); }
+.pl-suggest-add {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s var(--ease-spring);
+}
+.pl-suggest-add:hover { background: var(--text-base); border-color: var(--text-base); }
+.pl-suggest-add:hover svg { fill: var(--bg-base); }
+.pl-suggest-add svg { width: 14px; height: 14px; fill: var(--text-base); transition: fill 0.2s; }
+.pl-suggest-img { width: 40px; height: 40px; border-radius: 9px; object-fit: cover; background: #1a1a1a; flex-shrink: 0; }
+.pl-suggest-info { flex: 1; min-width: 0; }
+.pl-suggest-title { font-size: 0.84rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-suggest-artist { font-size: 0.7rem; color: var(--text-subdued); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.surface-chalk .pl-row-icon, body.surface-canvas .pl-row-icon,
+body.surface-chalk .pl-mini-btn, body.surface-canvas .pl-mini-btn,
+body.surface-chalk .pl-suggest-add, body.surface-canvas .pl-suggest-add,
+body.surface-chalk .pl-remove, body.surface-canvas .pl-remove,
+body.surface-chalk .pl-note, body.surface-canvas .pl-note,
+body.surface-chalk .pl-input, body.surface-canvas .pl-input { background: rgba(0,0,0,0.045); }
+</style>
+<script id="swar-playlists-module">
+'use strict';
+/* ═══════════════════════════════════════════════════════════════════════════
+   Swar Playlist System v1.0 — Create / Import (YouTube · Spotify · Local Folder)
+   Non-invasive: wraps renderLibraryView / navigateTo / playTrack by reference.
+   Local audio is stored in IndexedDB and played through a proxy adapter that
+   delegates the existing YT player methods — scrub, sleep timer & volume keep working.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+
+const P = {
+    KEY: 'swar_playlists',
+    MAX_SUGGEST: 12,
+    MAX_LOCAL_FILES: 500,
+    audioExts: ['mp3', 'm4a', 'aac', 'flac', 'ogg', 'oga', 'opus', 'wav', 'webm', 'aiff', 'aif', 'wma', 'amr']
+};
+
+/* ── small utils ── */
+function hashStr(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+function newId() { return 'pl_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
+function esc(s) { try { return escapeHtml(String(s)); } catch { return String(s); } }
+function fmtDur(s) { try { return formatDuration(s); } catch { return '0:00'; } }
+function isAudioFile(name) { const ext = String(name).split('.').pop().toLowerCase(); return P.audioExts.includes(ext); }
+function cleanTrackName(filename) {
+    let n = String(filename).replace(/\.[^.]+$/, '');
+    n = n.replace(/^\d+[\s.\-_]+/, '').replace(/[_]+/g, ' ').replace(/\s+/g, ' ').trim();
+    return n || String(filename);
+}
+function monogramCover(text) {
+    const ch = (String(text).trim()[0] || 'S').toUpperCase();
+    const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='#0d0d0f'/><line x1='50' y1='104' x2='150' y2='104' stroke='#2c2c30' stroke-width='1.5'/><text x='100' y='118' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='76' fill='#f2f2f0'>" + ch + "</text></svg>";
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+function fetchJson(url, timeoutMs) {
+    return new Promise((resolve, reject) => {
+        const ac = new AbortController();
+        const t = setTimeout(() => { ac.abort(); reject(new DOMException('timeout', 'TimeoutError')); }, timeoutMs || 9000);
+        fetch(url, { signal: ac.signal, headers: { 'Accept': 'application/json' } })
+            .then(r => { clearTimeout(t); resolve(r); })
+            .catch(e => { clearTimeout(t); reject(e); });
+    });
+}
+async function invidiousJson(path) {
+    const insts = (typeof INVIDIOUS_INSTANCES !== 'undefined' && INVIDIOUS_INSTANCES.length)
+        ? INVIDIOUS_INSTANCES
+        : ['https://inv.nadeko.net', 'https://invidious.nerdvpn.de', 'https://inv.thepixora.com'];
+    const jobs = insts.map(base => (async () => {
+        const res = await fetchJson(base + path, 9000);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+    })());
+    return await Promise.any(jobs);
+}
+function parseYouTubePlaylist(url) {
+    const m = String(url || '').match(/[?&]list=([\w-]{10,})/);
+    return m ? m[1] : null;
+}
+function parseYouTubeVideo(url) {
+    const m = String(url || '').match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    return m ? m[1] : null;
+}
+function parseSpotifyPlaylist(url) {
+    const s = String(url || '');
+    const m = s.match(/open\.spotify\.com\/playlist\/([\w]+)/) || s.match(/spotify:playlist:([\w]+)/);
+    return m ? m[1] : null;
+}
+
+/* ── Playlist store (localStorage via existing Storage helper) ── */
+const PlaylistStore = {
+    all() { try { return Storage.get(P.KEY) || []; } catch { return []; } },
+    save(list) { try { Storage.set(P.KEY, list); } catch {} },
+    get(id) { return this.all().find(p => p.id === id) || null; },
+    create(data) {
+        const pl = Object.assign({ id: newId(), name: 'Playlist', source: 'manual', cover: null, tracks: [], createdAt: Date.now(), updatedAt: Date.now() }, data);
+        const list = this.all();
+        list.unshift(pl);
+        this.save(list);
+        return pl;
+    },
+    update(id, patch) {
+        const list = this.all();
+        const i = list.findIndex(p => p.id === id);
+        if (i < 0) return null;
+        list[i] = Object.assign({}, list[i], patch, { updatedAt: Date.now() });
+        this.save(list);
+        return list[i];
+    },
+    remove(id) { this.save(this.all().filter(p => p.id !== id)); }
+};
+
+/* ── IndexedDB blob storage for local audio ── */
+const AudioDB = (() => {
+    let dbp = null;
+    function open() {
+        if (dbp) return dbp;
+        dbp = new Promise((res, rej) => {
+            const req = indexedDB.open('swar_audio_db', 1);
+            req.onupgradeneeded = () => { try { req.result.createObjectStore('files'); } catch {} };
+            req.onsuccess = () => res(req.result);
+            req.onerror = () => rej(req.error);
+        });
+        return dbp;
+    }
+    return {
+        available: typeof indexedDB !== 'undefined',
+        async put(id, blob) { const db = await open(); return new Promise((res, rej) => { const tx = db.transaction('files', 'readwrite'); tx.objectStore('files').put(blob, id); tx.oncomplete = () => res(true); tx.onerror = () => rej(tx.error); }); },
+        async get(id) { try { const db = await open(); return await new Promise((res, rej) => { const rq = db.transaction('files').objectStore('files').get(id); rq.onsuccess = () => res(rq.result || null); rq.onerror = () => rej(rq.error); }); } catch { return null; } }
+    };
+})();
+
+/* ── Local playback adapter: plays IndexedDB blobs through a hidden <audio>,
+      and proxies the existing YT player methods so scrub/sleep/volume work ── */
+const LocalPlayback = (() => {
+    let audio = null, objectUrl = null, active = false;
+    const PLAY = '<path d="M8 5v14l11-7z"/>', PAUSE = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    function ensureAudio() {
+        if (audio) return audio;
+        audio = new Audio();
+        audio.preload = 'auto';
+        audio.addEventListener('play', () => { if (!active) return; try { isPlaying = true; } catch {} setIcons(true); });
+        audio.addEventListener('pause', () => { if (!active) return; try { isPlaying = false; } catch {} setIcons(false); });
+        audio.addEventListener('ended', onEnded);
+        audio.addEventListener('timeupdate', onTime);
+        audio.addEventListener('loadedmetadata', () => {
+            if (!active) return;
+            try {
+                const t = tracks[currentTrackIndex];
+                if (t && t._local && isFinite(audio.duration)) t.duration = Math.round(audio.duration);
+                if (isFinite(audio.duration)) document.getElementById('fsDuration').textContent = fmtDur(audio.duration);
+            } catch {}
+        });
+        return audio;
+    }
+    function setIcons(playing) {
+        try {
+            document.getElementById('miniPlayIcon').innerHTML = playing ? PAUSE : PLAY;
+            document.getElementById('fsPlayIcon').innerHTML = playing ? PAUSE : PLAY;
+            document.getElementById('miniPlayer').classList.toggle('playing', playing);
+        } catch {}
+    }
+    function onTime() {
+        if (!active) return;
+        const d = audio.duration || 0, c = audio.currentTime;
+        if (d > 0) {
+            const pct = (c / d) * 100;
+            try {
+                document.getElementById('miniProgress').style.width = pct + '%';
+                document.getElementById('fsProgress').style.width = pct + '%';
+                document.getElementById('fsCurrentTime').textContent = fmtDur(c);
+                document.getElementById('fsDuration').textContent = fmtDur(d);
+            } catch {}
+        }
+    }
+    function onEnded() {
+        if (!active) return;
+        try {
+            if (repeatMode === 2) { audio.currentTime = 0; audio.play(); return; }
+        } catch {}
+        try { nextTrack(); } catch {}
+    }
+    async function play(i) {
+        const t = tracks[i];
+        if (!t || !t._local) return false;
+        const a = ensureAudio();
+        const blob = await AudioDB.get(t._blobId);
+        if (!blob) { try { showToast('Audio file missing — re-import the folder'); } catch {} return false; }
+        if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch {} }
+        objectUrl = URL.createObjectURL(blob);
+        a.src = objectUrl;
+        try { a.volume = Math.max(0, Math.min(100, (Storage.get('swar_vol') ?? 85))) / 100; } catch { a.volume = 0.85; }
+        try { await a.play(); } catch {}
+        active = true;
+        try { isPlaying = true; } catch {}
+        // mirror the UI work playTrack() does, without touching it
+        try {
+            currentTrackIndex = i;
+            const cover = t.cover || monogramCover(t.title);
+            document.getElementById('miniPlayerImg').src = cover;
+            document.getElementById('miniPlayer').classList.add('visible');
+            document.getElementById('miniPlayerTitle').textContent = t.title;
+            document.getElementById('miniPlayerArtist').textContent = t.artist;
+            document.getElementById('fsAlbumArt').src = cover;
+            document.getElementById('fsTitle').textContent = t.title;
+            document.getElementById('fsArtist').textContent = t.artist;
+            document.getElementById('apPreviewTitle').textContent = t.title;
+            document.getElementById('fsPlayingContext').textContent = 'Local Library';
+            recordPlayedTrackInHistory(t);
+            updateLikeButton();
+            renderQueueList();
+            Marquee.refreshAll();
+        } catch {}
+        return true;
+    }
+    function stop() { active = false; if (audio) { try { audio.pause(); } catch {} } }
+    function patchPlayer() {
+        try {
+            if (typeof player === 'undefined' || !player || player.__swarLocalProxy) return;
+            player.__swarLocalProxy = true;
+            const orig = {};
+            ['playVideo', 'pauseVideo', 'seekTo', 'getCurrentTime', 'getDuration', 'getPlayerState', 'setVolume', 'getVolume']
+                .forEach(k => { if (typeof player[k] === 'function') orig[k] = player[k].bind(player); });
+            player.getCurrentTime = () => active ? audio.currentTime : (orig.getCurrentTime ? orig.getCurrentTime() : 0);
+            player.getDuration = () => active ? (audio.duration || 0) : (orig.getDuration ? orig.getDuration() : 0);
+            player.getPlayerState = () => active ? (isPlaying ? 1 : 2) : (orig.getPlayerState ? orig.getPlayerState() : -1);
+            player.seekTo = s => { if (active) { ensureAudio().currentTime = s; } else if (orig.seekTo) orig.seekTo(s); };
+            player.playVideo = () => { if (active) { ensureAudio().play(); } else if (orig.playVideo) orig.playVideo(); };
+            player.pauseVideo = () => { if (active) { ensureAudio().pause(); } else if (orig.pauseVideo) orig.pauseVideo(); };
+            player.setVolume = v => { if (active) { ensureAudio().volume = Math.max(0, Math.min(100, v)) / 100; } else if (orig.setVolume) orig.setVolume(v); };
+            player.getVolume = () => active ? Math.round(ensureAudio().volume * 100) : (orig.getVolume ? orig.getVolume() : 100);
+        } catch {}
+    }
+    return {
+        play, stop, patchPlayer,
+        isLocal(i) { try { return !!(tracks[i] && tracks[i]._local); } catch { return false; } },
+        get active() { return active; }
+    };
+})();
+
+/* ── Modal helpers ── */
+let backdrop = null;
+function ensureBackdrop() {
+    if (backdrop || typeof document === 'undefined') return;
+    backdrop = document.createElement('div');
+    backdrop.className = 'pl-backdrop';
+    backdrop.id = 'plBackdrop';
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) closeCard(); });
+    document.body.appendChild(backdrop);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && backdrop.classList.contains('active')) closeCard(); });
+}
+function openCard(html) {
+    ensureBackdrop();
+    backdrop.innerHTML = '<div class="pl-card" onclick="event.stopPropagation()">' + html + '</div>';
+    requestAnimationFrame(() => backdrop.classList.add('active'));
+}
+function closeCard() { if (backdrop) backdrop.classList.remove('active'); }
+function statusEl(msg, spinning) { return '<div class="pl-status">' + (spinning ? '<div class="pl-spinner"></div>' : '') + '<span>' + msg + '</span></div>'; }
+
+const ICONS = {
+    mic: '<svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>',
+    down: '<svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>',
+    yt: '<svg viewBox="0 0 24 24"><path d="M10 8.5v7l6-3.5-6-3.5zm11-3.5H3c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/></svg>',
+    spotify: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.5 14.1c-.2.32-.62.43-.94.23-2.58-1.58-5.83-1.93-9.66-1.06-.37.08-.74-.14-.82-.51-.08-.37.14-.74.51-.82 4.2-.96 7.84-.55 10.72 1.21.32.2.43.62.19.95zm1.2-2.67c-.25.4-.77.53-1.17.28-2.96-1.82-7.47-2.35-10.97-1.29-.45.14-.93-.12-1.07-.57-.14-.45.12-.93.57-1.07 4.01-1.22 9-.63 12.41 1.47.4.25.53.77.23 1.18zm.1-2.78C15.24 8.31 9.36 8.1 5.94 9.06c-.54.15-1.09-.16-1.25-.7-.15-.54.16-1.09.7-1.25 3.92-1.12 10.44-.87 14.56 1.37.49.26.68.87.42 1.36-.26.48-.87.68-1.37.41z"/></svg>',
+    folder: '<svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>',
+    play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+    plus: '<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>',
+    pencil: '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
+    trash: '<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
+    close: '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>'
+};
+
+/* ── Flow 1: chooser (+ button) ── */
+function openChooser() {
+    openCard(
+        '<div class="pl-title">Add to Library</div>' +
+        '<div class="pl-sub">Create a new playlist or import one from YouTube, Spotify or your device.</div>' +
+        '<button class="pl-row" id="plChooseCreate"><div class="pl-row-icon">' + ICONS.mic + '</div><div><div class="pl-row-label">New Playlist</div><div class="pl-row-sub">Create an empty folder &amp; add suggested songs</div></div></button>' +
+        '<button class="pl-row" id="plChooseImport"><div class="pl-row-icon">' + ICONS.down + '</div><div><div class="pl-row-label">Import Playlist</div><div class="pl-row-sub">YouTube · Spotify · Local storage folder</div></div></button>'
+    );
+    document.getElementById('plChooseCreate').addEventListener('click', openCreate);
+    document.getElementById('plChooseImport').addEventListener('click', openImport);
+}
+
+/* ── Flow 2: new playlist (folder name → suggest songs) ── */
+function openCreate() {
+    openCard(
+        '<div class="pl-title">New Playlist</div>' +
+        '<div class="pl-sub">Give your folder a name — you can add songs right after.</div>' +
+        '<input class="pl-input" id="plNameInput" placeholder="Folder name (e.g. Late Night Drive)" maxlength="40" autocomplete="off">' +
+        '<div id="plCreateStatus"></div>' +
+        '<button class="pl-btn" id="plCreateBtn">Create Playlist</button>'
+    );
+    const input = document.getElementById('plNameInput');
+    input.focus();
+    input.addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('plCreateBtn').click(); });
+    document.getElementById('plCreateBtn').addEventListener('click', () => {
+        const name = input.value.trim();
+        if (!name) { document.getElementById('plCreateStatus').innerHTML = statusEl('Please enter a folder name'); return; }
+        const pl = PlaylistStore.create({ name, source: 'manual' });
+        closeCard();
+        try { showToast('Playlist "' + name + '" created'); } catch {}
+        openDetail(pl.id);
+    });
+}
+
+/* ── Flow 3: import source picker ── */
+function openImport() {
+    openCard(
+        '<div class="pl-title">Import Playlist</div>' +
+        '<div class="pl-sub">Pick a source — everything syncs into a folder in your Library.</div>' +
+        '<button class="pl-row" data-src="youtube"><div class="pl-row-icon">' + ICONS.yt + '</div><div><div class="pl-row-label">YouTube</div><div class="pl-row-sub">Paste a playlist link — all songs sync</div></div></button>' +
+        '<button class="pl-row" data-src="spotify"><div class="pl-row-icon">' + ICONS.spotify + '</div><div><div class="pl-row-label">Spotify</div><div class="pl-row-sub">Paste a playlist link — matched to streams</div></div></button>' +
+        '<button class="pl-row" data-src="local"><div class="pl-row-icon">' + ICONS.folder + '</div><div><div class="pl-row-label">Local Storage</div><div class="pl-row-sub">Import a full folder of audio from this device</div></div></button>'
+    );
+    backdrop.querySelectorAll('[data-src]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const src = btn.getAttribute('data-src');
+            if (src === 'local') pickLocalFolder(); else openImportForm(src);
+        });
+    });
+}
+
+/* ── Flow 4: YouTube / Spotify link form ── */
+function openImportForm(src) {
+    const isYt = src === 'youtube';
+    openCard(
+        '<div class="pl-title">Import from ' + (isYt ? 'YouTube' : 'Spotify') + '</div>' +
+        '<div class="pl-sub">' + (isYt
+            ? 'Paste a YouTube playlist link — every song syncs into your folder.'
+            : 'Paste a Spotify playlist link — we match it to playable streams. No login needed.') + '</div>' +
+        '<input class="pl-input" id="plFolderName" placeholder="Folder name (optional — auto-filled from playlist)" maxlength="40" autocomplete="off">' +
+        '<input class="pl-input" id="plLink" placeholder="' + (isYt
+            ? 'https://youtube.com/playlist?list=…'
+            : 'https://open.spotify.com/playlist/…') + '" autocomplete="off" style="margin-bottom:8px">' +
+        '<div class="pl-note">Example: https://youtube.com/playlist?list=PLezHrBjXaFn16JvfXcCG4qFiZUIiczxWV&amp;si=…</div>' +
+        '<div id="plSyncStatus" style="margin-top:12px;"></div>' +
+        '<button class="pl-btn" id="plSyncBtn" style="margin-top:4px;">Add to Folder</button>'
+    );
+    document.getElementById('plSyncBtn').addEventListener('click', async () => {
+        const name = document.getElementById('plFolderName').value.trim();
+        const link = document.getElementById('plLink').value.trim();
+        const btn = document.getElementById('plSyncBtn');
+        const st = document.getElementById('plSyncStatus');
+        if (!link) { st.innerHTML = statusEl('Please paste a playlist link'); return; }
+        btn.disabled = true;
+        st.innerHTML = statusEl('Connecting…', true);
+        try {
+            const data = isYt ? await syncYouTube(link, name, m => { st.innerHTML = statusEl(m, true); })
+                              : await syncSpotify(link, name, m => { st.innerHTML = statusEl(m, true); });
+            if (!data) { btn.disabled = false; if (!st.textContent.trim()) st.innerHTML = statusEl('Could not sync — check the link and try again'); return; }
+            const pl = PlaylistStore.create(data);
+            closeCard();
+            try { showToast('Synced ' + data.tracks.length + ' songs into "' + data.name + '"'); } catch {}
+            openDetail(pl.id);
+        } catch (e) {
+            btn.disabled = false;
+            st.innerHTML = statusEl('Sync failed — the service may be busy. Try again in a moment.');
+        }
+    });
+}
+
+/* ── Sync engines ── */
+async function syncYouTube(url, folderName, status) {
+    const listId = parseYouTubePlaylist(url);
+    const videoId = listId ? null : parseYouTubeVideo(url);
+    if (!listId && !videoId) { status('That does not look like a YouTube playlist link'); return null; }
+    if (videoId && !listId) {
+        status('Single video link detected — importing as one song');
+        return { name: folderName || 'YouTube Import', source: 'youtube',
+            cover: 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg',
+            tracks: [{ id: videoId, title: 'Imported YouTube Video', artist: 'YouTube', duration: 0 }] };
+    }
+    status('Fetching playlist from YouTube…');
+    const d = await invidiousJson('/api/v1/playlists/' + encodeURIComponent(listId));
+    if (!d || !Array.isArray(d.videos) || !d.videos.length) { status('No videos found in that playlist'); return null; }
+    const tracks = d.videos.filter(v => v.videoId).map(v => ({
+        id: v.videoId,
+        title: (v.title || 'Unknown').replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
+        artist: v.author || 'Unknown Artist',
+        duration: v.lengthSeconds || 0
+    }));
+    if (!tracks.length) { status('No playable songs found'); return null; }
+    status('Synced ' + tracks.length + ' songs');
+    return {
+        name: folderName || d.title || 'YouTube Playlist',
+        source: 'youtube', tracks,
+        cover: 'https://i.ytimg.com/vi/' + tracks[0].id + '/hqdefault.jpg'
+    };
+}
+async function syncSpotify(url, folderName, status) {
+    const sid = parseSpotifyPlaylist(url);
+    if (!sid) { status('That does not look like a Spotify playlist link'); return null; }
+    let spTitle = '', spThumb = '';
+    try {
+        const o = await (await fetchJson('https://open.spotify.com/oembed?url=' + encodeURIComponent('https://open.spotify.com/playlist/' + sid), 7000)).json();
+        spTitle = (o && o.title) || '';
+        spThumb = (o && o.thumbnail_url) || '';
+    } catch {}
+    const q = spTitle || folderName;
+    if (!q) { status('Could not read the playlist — enter a folder name so we can search it'); return null; }
+    status('Searching streams for "' + q + '"…');
+    let tracks = [];
+    try {
+        const res = await invidiousJson('/api/v1/search?q=' + encodeURIComponent(q) + '&type=playlist');
+        const hit = (Array.isArray(res) ? res : []).find(r => r.type === 'playlist' && r.playlistId);
+        if (hit) {
+            status('Syncing matched playlist…');
+            const d = await invidiousJson('/api/v1/playlists/' + encodeURIComponent(hit.playlistId));
+            if (d && Array.isArray(d.videos)) {
+                tracks = d.videos.filter(v => v.videoId).map(v => ({
+                    id: v.videoId, title: (v.title || 'Unknown').replace(/&quot;/g, '"'),
+                    artist: v.author || 'Unknown Artist', duration: v.lengthSeconds || 0
+                }));
+            }
+        }
+    } catch {}
+    if (!tracks.length) {
+        status('No playlist match — syncing top matching songs…');
+        const vids = await invidiousJson('/api/v1/search?q=' + encodeURIComponent(q) + '&type=video');
+        tracks = (Array.isArray(vids) ? vids : []).filter(v => v.type === 'video' && v.videoId).slice(0, 30).map(v => ({
+            id: v.videoId, title: (v.title || 'Unknown').replace(/&quot;/g, '"'),
+            artist: v.author || 'Unknown Artist', duration: v.lengthSeconds || 0
+        }));
+    }
+    if (!tracks.length) { status('Nothing found for this playlist'); return null; }
+    status('Synced ' + tracks.length + ' songs');
+    return { name: folderName || spTitle || 'Spotify Playlist', source: 'spotify', tracks, cover: spThumb || ('https://i.ytimg.com/vi/' + tracks[0].id + '/hqdefault.jpg') };
+}
+
+/* ── Local folder import ── */
+function pickLocalFolder() {
+    if (typeof document === 'undefined') return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    try { input.setAttribute('webkitdirectory', ''); } catch {}
+    input.accept = 'audio/*,' + P.audioExts.map(e => '.' + e).join(',');
+    input.addEventListener('change', () => { importLocalFiles(input.files); });
+    input.click();
+}
+async function importLocalFiles(fileList) {
+    const files = Array.from(fileList || []).filter(f => isAudioFile(f.name)).slice(0, P.MAX_LOCAL_FILES);
+    if (!files.length) { try { showToast('No audio files found in that folder'); } catch {} return; }
+    const folderName = ((files[0].webkitRelativePath || '').split('/')[0]) || cleanTrackName(files[0].name) || 'Local Folder';
+    openCard(
+        '<div class="pl-title">Importing Folder</div>' +
+        '<div class="pl-sub">"' + esc(folderName) + '" — copying audio into Swar for offline playback.</div>' +
+        '<div id="plLocalStatus">' + statusEl('Starting…', true) + '</div>'
+    );
+    const st = document.getElementById('plLocalStatus');
+    const pl = PlaylistStore.create({ name: folderName, source: 'local', cover: null, tracks: [] });
+    let done = 0, stored = 0;
+    for (const f of files) {
+        const rel = f.webkitRelativePath || f.name;
+        const blobId = pl.id + '::' + rel;
+        const title = cleanTrackName(f.name);
+        const track = {
+            id: 'loc_' + hashStr(rel + ':' + f.size), title,
+            artist: folderName, duration: 0,
+            _local: true, _blobId: blobId,
+            cover: monogramCover(title)
+        };
+        if (AudioDB.available) {
+            try { await AudioDB.put(blobId, f); track._stored = true; stored++; } catch { track._stored = false; }
+        }
+        pl.tracks.push(track);
+        done++;
+        if (st) st.innerHTML = statusEl('Importing ' + done + ' / ' + files.length + '…', true);
+    }
+    PlaylistStore.update(pl.id, { tracks: pl.tracks });
+    if (stored > 0) scanDurations(pl.id);
+    closeCard();
+    try { showToast('Imported ' + done + ' songs from "' + folderName + '"'); } catch {}
+    openDetail(pl.id);
+}
+function probeDuration(blob) {
+    return new Promise(res => {
+        let settled = false;
+        const finish = v => { if (!settled) { settled = true; try { URL.revokeObjectURL(u); } catch {} res(v); } };
+        const u = URL.createObjectURL(blob);
+        const a = new Audio();
+        const to = setTimeout(() => finish(0), 8000);
+        a.preload = 'metadata';
+        a.onloadedmetadata = () => { clearTimeout(to); finish(isFinite(a.duration) ? Math.round(a.duration) : 0); };
+        a.onerror = () => { clearTimeout(to); finish(0); };
+        a.src = u;
+    });
+}
+async function scanDurations(plId) {
+    const pl = PlaylistStore.get(plId);
+    if (!pl) return;
+    let idx = 0, changed = false;
+    async function worker() {
+        while (idx < pl.tracks.length) {
+            const t = pl.tracks[idx++];
+            if (t._local && !t.duration) {
+                try {
+                    const b = await AudioDB.get(t._blobId);
+                    if (b) { const d = await probeDuration(b); if (d) { t.duration = d; changed = true; } }
+                } catch {}
+            }
+        }
+    }
+    await Promise.all(Array.from({ length: 6 }, worker));
+    if (changed) PlaylistStore.update(plId, { tracks: pl.tracks });
+}
+
+/* ── Suggestions (based on the playlist's own listing vibe) ── */
+function suggestionsFor(pl) {
+    try {
+        const pool = [];
+        try { pool.push(...PREMIUM_CARDS_TRACKS); } catch {}
+        try { Object.values(MOOD_TRACKS_DICTIONARY).forEach(a => pool.push(...a)); } catch {}
+        try { pool.push(...(Storage.get('swar_played_history_list') || [])); } catch {}
+        try { if (window.homeFeaturedTracks && window.homeFeaturedTracks.length) pool.push(...window.homeFeaturedTracks); } catch {}
+        const inPl = new Set(pl.tracks.map(t => t.id));
+        const seen = new Set();
+        const uniq = [];
+        for (const t of pool) {
+            if (!t || !t.id || inPl.has(t.id) || seen.has(t.id)) continue;
+            seen.add(t.id);
+            uniq.push(t);
+        }
+        let topVibe = null;
+        if (pl.tracks.length) {
+            const c = {};
+            pl.tracks.forEach(t => { try { const v = inferVibeFromTrack(t); c[v] = (c[v] || 0) + 1; } catch {} });
+            const top = Object.entries(c).sort((a, b) => b[1] - a[1])[0];
+            topVibe = top ? top[0] : null;
+        }
+        let match = [], rest = [];
+        for (const t of uniq) {
+            let v = null;
+            try { v = inferVibeFromTrack(t); } catch {}
+            (topVibe && v === topVibe ? match : rest).push(t);
+        }
+        const shuf = a => a.sort(() => Math.random() - 0.5);
+        return shuf(match).concat(shuf(rest)).slice(0, P.MAX_SUGGEST);
+    } catch { return []; }
+}
+
+/* ── Playlist detail view ── */
+function openDetail(id) {
+    const pl = PlaylistStore.get(id);
+    if (!pl || typeof document === 'undefined') return;
+    try { currentView = 'library'; } catch {}
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('otherView').style.display = 'block';
+    document.getElementById('sectionTitle').textContent = 'Saved Vault';
+    renderDetail(pl);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function renderDetail(pl, opts) {
+    opts = opts || {};
+    const totalDur = pl.tracks.reduce((s, t) => s + (t.duration || 0), 0);
+    const srcLabel = { manual: 'Created by you', youtube: 'YouTube import', spotify: 'Spotify import', local: 'Local folder' }[pl.source] || 'Playlist';
+    const cover = pl.cover || (pl.tracks[0] && pl.tracks[0].cover) || (pl.tracks[0] ? 'https://i.ytimg.com/vi/' + pl.tracks[0].id + '/hqdefault.jpg' : null) || monogramCover(pl.name);
+    let html = '';
+    html += '<div class="pl-detail-head">' +
+        '<img class="pl-detail-cover" src="' + cover + '" onerror="this.onerror=null;this.src=\'' + monogramCover(pl.name) + '\'">' +
+        '<div class="pl-detail-info">' +
+            (opts.editing
+                ? '<input class="pl-input" id="plRenameInput" value="' + esc(pl.name) + '" maxlength="40" style="margin-bottom:8px">' +
+                  '<div class="pl-detail-actions"><button class="pl-mini-btn primary" id="plRenameSave">Save</button><button class="pl-mini-btn" id="plRenameCancel">Cancel</button></div>'
+                : '<div class="pl-detail-name">' + esc(pl.name) + '</div>') +
+            (!opts.editing ? '<div class="pl-detail-meta">' + pl.tracks.length + ' songs · ' + fmtDur(totalDur) + ' · ' + srcLabel + '</div>' : '') +
+            (!opts.editing ? '<div class="pl-detail-actions">' +
+                '<button class="pl-mini-btn primary" id="plPlayAll">' + ICONS.play + ' Play All</button>' +
+                '<button class="pl-mini-btn" id="plRename">' + ICONS.pencil + ' Rename</button>' +
+                '<button class="pl-mini-btn danger" id="plDelete">' + ICONS.trash + ' <span id="plDeleteLabel">Delete</span></button>' +
+            '</div>' : '') +
+        '</div></div>';
+
+    html += '<div class="pl-section-label">Songs</div>';
+    if (!pl.tracks.length) {
+        html += '<div class="pl-empty-hint">No songs yet — add some suggestions below.</div>';
+    } else {
+        html += '<div class="search-list" style="margin-bottom:8px">';
+        pl.tracks.forEach((t, i) => {
+            const thumb = t._local ? (t.cover || monogramCover(t.title)) : ('https://i.ytimg.com/vi/' + t.id + '/hqdefault.jpg');
+            html += '<div class="search-row" onclick="SwarPlaylists.playFrom(&quot;' + pl.id + '&quot;,' + i + ')">' +
+                '<img class="search-row-img" src="' + thumb + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + monogramCover(t.title) + '\'">' +
+                '<div class="search-row-info">' +
+                    '<div class="search-row-title">' + esc(t.title) + '</div>' +
+                    '<div class="search-row-artist">' + esc(t.artist) + (t.duration ? ' · ' + fmtDur(t.duration) : '') + '</div>' +
+                '</div>' +
+                '<button class="pl-remove" onclick="event.stopPropagation();SwarPlaylists.removeTrack(&quot;' + pl.id + '&quot;,' + i + ')" aria-label="Remove song">' + ICONS.close + '</button>' +
+            '</div>';
+        });
+        html += '</div>';
+    }
+
+    const sugg = suggestionsFor(pl);
+    if (sugg.length) {
+        html += '<div class="pl-section-label" style="margin-top:22px">Suggested for this playlist</div>';
+        html += '<div style="margin-bottom:10px"><button class="pl-mini-btn" id="plAddAllSugg">' + ICONS.plus + ' Add all</button></div>';
+        html += '<div class="search-list" style="max-width:560px">';
+        sugg.forEach((t, i) => {
+            const thumb = t._local ? (t.cover || monogramCover(t.title)) : ('https://i.ytimg.com/vi/' + t.id + '/hqdefault.jpg');
+            html += '<div class="pl-suggest-row">' +
+                '<img class="pl-suggest-img" src="' + thumb + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + monogramCover(t.title) + '\'">' +
+                '<div class="pl-suggest-info">' +
+                    '<div class="pl-suggest-title">' + esc(t.title) + '</div>' +
+                    '<div class="pl-suggest-artist">' + esc(t.artist) + '</div>' +
+                '</div>' +
+                '<button class="pl-suggest-add" data-si="' + i + '" aria-label="Add song">' + ICONS.plus + '</button>' +
+            '</div>';
+        });
+        html += '</div>';
+    }
+
+    const area = document.getElementById('contentArea');
+    area.innerHTML = html;
+
+    const rebind = () => {
+        const p = PlaylistStore.get(pl.id);
+        if (!p) return;
+        const playAll = document.getElementById('plPlayAll');
+        if (playAll) playAll.addEventListener('click', () => playFrom(p.id, 0));
+        const ren = document.getElementById('plRename');
+        if (ren) ren.addEventListener('click', () => renderDetail(p, { editing: true }));
+        const renSave = document.getElementById('plRenameSave');
+        if (renSave) renSave.addEventListener('click', () => {
+            const v = document.getElementById('plRenameInput').value.trim();
+            if (!v) return;
+            const upd = PlaylistStore.update(p.id, { name: v });
+            if (upd) { try { showToast('Renamed to "' + v + '"'); } catch {} renderDetail(upd); }
+        });
+        const renCancel = document.getElementById('plRenameCancel');
+        if (renCancel) renCancel.addEventListener('click', () => renderDetail(p));
+        const del = document.getElementById('plDelete');
+        if (del) del.addEventListener('click', () => {
+            if (del.dataset.armed) {
+                PlaylistStore.remove(p.id);
+                try { showToast('Playlist deleted'); } catch {}
+                try { renderLibraryView(); } catch {}
+            } else {
+                del.dataset.armed = '1';
+                del.classList.add('confirm');
+                document.getElementById('plDeleteLabel').textContent = 'Sure?';
+                setTimeout(() => { try { delete del.dataset.armed; del.classList.remove('confirm'); document.getElementById('plDeleteLabel').textContent = 'Delete'; } catch {} }, 2600);
+            }
+        });
+        const addAll = document.getElementById('plAddAllSugg');
+        if (addAll) addAll.addEventListener('click', () => {
+            const cur = PlaylistStore.get(p.id);
+            const sg = suggestionsFor(cur);
+            const merged = cur.tracks.concat(sg.map(t => ({ id: t.id, title: t.title, artist: t.artist, duration: t.duration || 0 })));
+            const upd = PlaylistStore.update(p.id, { tracks: merged });
+            if (upd) { try { showToast('Added ' + sg.length + ' songs'); } catch {} renderDetail(upd); }
+        });
+        area.querySelectorAll('[data-si]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cur = PlaylistStore.get(p.id);
+                const sg = suggestionsFor(cur);
+                const t = sg[parseInt(btn.getAttribute('data-si'), 10)];
+                if (!t) return;
+                const merged = cur.tracks.concat([{ id: t.id, title: t.title, artist: t.artist, duration: t.duration || 0 }]);
+                const upd = PlaylistStore.update(p.id, { tracks: merged });
+                if (upd) { try { showToast('Added "' + t.title + '"'); } catch {} renderDetail(upd); }
+            });
+        });
+    };
+    rebind();
+}
+
+/* ── Playback entry ── */
+function playFrom(id, i) {
+    const pl = PlaylistStore.get(id);
+    if (!pl || !pl.tracks[i]) return;
+    try { tracks = pl.tracks; } catch {}
+    try { document.getElementById('fsPlayingContext').textContent = pl.name; } catch {}
+    try { playTrack(i); } catch {}
+}
+function removeTrack(id, i) {
+    const pl = PlaylistStore.get(id);
+    if (!pl) return;
+    const tracksArr = pl.tracks.slice();
+    tracksArr.splice(i, 1);
+    const upd = PlaylistStore.update(id, { tracks: tracksArr });
+    if (upd) renderDetail(upd);
+}
+
+/* ── Library enhancement (playlists section + glass + button) ── */
+function ensurePlusButton() {
+    if (typeof document === 'undefined') return;
+    let btn = document.getElementById('plPlusBtn');
+    if (btn) return;
+    const header = document.querySelector('.section-header');
+    if (!header) return;
+    btn = document.createElement('button');
+    btn.className = 'pl-plus-btn';
+    btn.id = 'plPlusBtn';
+    btn.title = 'New playlist or import';
+    btn.setAttribute('aria-label', 'Create or import playlist');
+    btn.innerHTML = ICONS.plus;
+    btn.addEventListener('click', openChooser);
+    header.appendChild(btn);
+}
+function syncPlusVisibility(view) {
+    const btn = document.getElementById('plPlusBtn');
+    if (!btn) return;
+    let v = view;
+    if (v === undefined) { try { v = currentView; } catch { v = 'home'; } }
+    btn.style.display = (v === 'library') ? 'flex' : 'none';
+}
+function sourceLabel(s) {
+    return { manual: 'Manual', youtube: 'YouTube', spotify: 'Spotify', local: 'Local' }[s] || 'Playlist';
+}
+function playlistsSectionHtml() {
+    const list = PlaylistStore.all();
+    let html = '<div class="pl-section"><div class="pl-section-label">My Playlists</div>';
+    if (!list.length) {
+        html += '<div class="pl-empty-hint">No playlists yet.<br>Tap the <b>+</b> button above to create one or import from YouTube, Spotify &amp; your device.</div>';
+    } else {
+        html += '<div class="track-grid">';
+        list.forEach((pl, i) => {
+            const cover = pl.cover || (pl.tracks[0] && pl.tracks[0].cover) || (pl.tracks[0] ? 'https://i.ytimg.com/vi/' + pl.tracks[0].id + '/hqdefault.jpg' : null) || monogramCover(pl.name);
+            html += '<div class="track-card" onclick="SwarPlaylists.openDetail(&quot;' + pl.id + '&quot;)" style="--stagger:' + (i * 0.04).toFixed(2) + 's">' +
+                '<div class="track-card-img-wrap">' +
+                    '<img class="track-card-img" src="' + cover + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + monogramCover(pl.name) + '\'">' +
+                    '<div class="play-overlay" onclick="event.stopPropagation();SwarPlaylists.playFrom(&quot;' + pl.id + '&quot;,0)"><div class="play-overlay-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>' +
+                '</div>' +
+                '<h4>' + esc(pl.name) + '</h4>' +
+                '<p>' + pl.tracks.length + ' songs · ' + sourceLabel(pl.source) + '</p>' +
+            '</div>';
+        });
+        html += '</div>';
+    }
+    html += '</div>';
+    return html;
+}
+function enhanceLibrary() {
+    try {
+        if (currentView !== 'library') return;
+    } catch { return; }
+    const area = document.getElementById('contentArea');
+    if (!area) return;
+    if (!area.querySelector('.pl-section')) {
+        area.insertAdjacentHTML('afterbegin', playlistsSectionHtml());
+    }
+    syncPlusVisibility('library');
+}
+
+/* ── Install: wrap existing functions by reference (no source changes) ── */
+let installed = false;
+function install() {
+    if (installed || typeof document === 'undefined') return;
+    installed = true;
+    ensurePlusButton();
+    try {
+        const origRenderLibrary = renderLibraryView;
+        renderLibraryView = function () { const r = origRenderLibrary.apply(this, arguments); try { enhanceLibrary(); } catch {} return r; };
+    } catch {}
+    try {
+        const origNav = navigateTo;
+        navigateTo = function (v) { const r = origNav.apply(this, arguments); try { syncPlusVisibility(v); } catch {} return r; };
+    } catch {}
+    try {
+        const origPlayTrack = playTrack;
+        playTrack = function (i) {
+            try {
+                if (LocalPlayback.isLocal(i)) return LocalPlayback.play(i);
+                LocalPlayback.stop();
+            } catch {}
+            return origPlayTrack.apply(this, arguments);
+        };
+    } catch {}
+    LocalPlayback.patchPlayer();
+    setInterval(() => LocalPlayback.patchPlayer(), 800);
+}
+
+const api = {
+    install, openChooser, openDetail, playFrom, removeTrack,
+    version: '1.0.0',
+    _test: { parseYouTubePlaylist, parseYouTubeVideo, parseSpotifyPlaylist, isAudioFile, cleanTrackName, monogramCover, PlaylistStore, suggestionsFor, syncYouTube, syncSpotify, AudioDB }
+};
+if (typeof window !== 'undefined') window.SwarPlaylists = api;
+else globalThis.SwarPlaylists = api;
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
+    else install();
+}
+})();
+</script>
 </body>
 </html>
