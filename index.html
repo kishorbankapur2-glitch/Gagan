@@ -3832,7 +3832,7 @@ function buildOverlay() {
     overlay.addEventListener('touchmove', e => e.stopPropagation(), { passive: true });
     overlay.addEventListener('touchend', e => {
         e.stopPropagation();
-        if (swipeArmed && (e.changedTouches[0].clientY - swipeY) > 90) close();
+        if (swipeArmed && (e.changedTouches[0].clientY - swipeY) > 170) close();
     }, { passive: true });
     scrollEl.addEventListener('scroll', () => {
         if (programmatic) return;
@@ -4901,7 +4901,7 @@ function playlistsSectionHtml() {
             html += '<div class="track-card" onclick="SwarPlaylists.openDetail(&quot;' + pl.id + '&quot;)" style="--stagger:' + (i * 0.04).toFixed(2) + 's">' +
                 '<div class="track-card-img-wrap">' +
                     '<img class="track-card-img" src="' + cover + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + monogramCover(pl.name) + '\'">' +
-                    '<div class="play-overlay" onclick="event.stopPropagation();SwarPlaylists.playFrom(&quot;' + pl.id + '&quot;,0)"><div class="play-overlay-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>' +
+                    '<div class="play-overlay" onclick="SwarPlaylists.openDetail(&quot;' + pl.id + '&quot;)"><div class="play-overlay-btn" onclick="event.stopPropagation();SwarPlaylists.playFrom(&quot;' + pl.id + '&quot;,0)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>' +
                 '</div>' +
                 '<h4>' + esc(pl.name) + '</h4>' +
                 '<p>' + pl.tracks.length + ' songs · ' + sourceLabel(pl.source) + '</p>' +
@@ -4963,6 +4963,107 @@ if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
     else install();
 }
+})();
+</script>
+<script id="swar-bugfix-module">
+'use strict';
+/* ═══════════════════════════════════════════════════════════════════════════
+   Swar Bugfix Module v1.0
+   1) Pause fix: the hidden YouTube stream kept playing when a local (imported
+      folder) song started — pausing then only stopped one layer. We now pause
+      the YT player before starting local audio.
+   2) Direct lyrics: a mic button on the mini player jumps straight into lyrics;
+      a sticky flag remembers lyrics were open, so track changes / reopening the
+      player land directly in lyrics instead of the player screen.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+    let installed = false;
+    function install() {
+        if (installed || typeof document === 'undefined') return;
+        installed = true;
+
+        /* ── Bug 1: stop the YouTube layer before any local song starts ── */
+        try {
+            const _origPlayTrack = playTrack;
+            playTrack = function (i) {
+                try {
+                    const t = tracks[i];
+                    if (t && t._local) {
+                        try {
+                            if (typeof player !== 'undefined' && player && player.getPlayerState && player.getPlayerState() === 1) player.pauseVideo();
+                        } catch {}
+                    }
+                } catch {}
+                const r = _origPlayTrack.apply(this, arguments);
+                try { keepLyricsContext(); } catch {}
+                return r;
+            };
+        } catch {}
+
+        /* ── Bug 3a: reopening the fullscreen player returns directly to lyrics ── */
+        try {
+            const _origOpenFS = openFullscreen;
+            openFullscreen = function () {
+                const r = _origOpenFS.apply(this, arguments);
+                try {
+                    if (localStorage.getItem('swar_lyrics_sticky') === '1') {
+                        setTimeout(() => { try { SwarLyrics.open(); } catch {} }, 90);
+                    }
+                } catch {}
+                return r;
+            };
+        } catch {}
+
+        installMiniLyricsBtn();
+        watchLyricsSticky();
+    }
+
+    /* If lyrics were the active view, stay in them across song changes */
+    function keepLyricsContext() {
+        if (localStorage.getItem('swar_lyrics_sticky') !== '1') return;
+        const fs = document.getElementById('fullscreenPlayer');
+        const ov = document.getElementById('swarLyricsOverlay');
+        if (fs && fs.classList.contains('active') && ov && !ov.classList.contains('active')) {
+            setTimeout(() => { try { SwarLyrics.open(); } catch {} }, 90);
+        }
+    }
+
+    /* ── Bug 3b: mini player mic button → fullscreen + lyrics directly ── */
+    function installMiniLyricsBtn() {
+        const controls = document.querySelector('.mini-player-controls');
+        if (!controls || document.getElementById('miniLyricsBtn')) return;
+        const btn = document.createElement('button');
+        btn.className = 'mini-btn';
+        btn.id = 'miniLyricsBtn';
+        btn.title = 'Open lyrics';
+        btn.setAttribute('aria-label', 'Open lyrics directly');
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+        btn.addEventListener('click', e => {
+            e.stopPropagation();
+            try { openFullscreen(); } catch {}
+            setTimeout(() => { try { SwarLyrics.open(); } catch {} }, 70);
+        });
+        controls.insertBefore(btn, controls.firstChild);
+    }
+
+    /* Remember whether lyrics are the active view (catches every open/close path) */
+    function watchLyricsSticky() {
+        const ov = document.getElementById('swarLyricsOverlay');
+        if (!ov) { setTimeout(watchLyricsSticky, 1000); return; }
+        try {
+            new MutationObserver(() => {
+                try {
+                    if (ov.classList.contains('active')) localStorage.setItem('swar_lyrics_sticky', '1');
+                    else localStorage.removeItem('swar_lyrics_sticky');
+                } catch {}
+            }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+        } catch {}
+    }
+
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
+        else install();
+    }
 })();
 </script>
 </body>
